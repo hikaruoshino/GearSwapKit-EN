@@ -168,6 +168,7 @@ RECEIVED = [
     ("IncreasedPhalanx", "被ファランクス (受けるファランクスの強化)", [106, 107], []),
     ("IncreasedProtect", "被プロテス (受けるプロテスの強化)", [43, 44, 45, 46, 47], [125, 126, 127, 128, 129]),
     ("IncreasedShell", "被シェル (受けるシェルの強化)", [48, 49, 50, 51, 52], [130, 131, 132, 133, 134]),
+    ("IncreasedCursna", "被カーズナ (受けるカーズナ・死の宣告)", [20], []),
 ]
 RECEIVED_HELP = ("ほかの人 (や自分) から受ける魔法を強くする装備です。自分に向けて唱え始められたら着て、魔法が届いたら (または 8 秒で) "
                  "元の装備に戻します。範囲の魔法 (プロテア・シェルラ・学者の女神降臨の章のあとのファランクス) は、"
@@ -271,6 +272,20 @@ SPELL_FAMILY_ENTRIES = {
                                help="ドレイン・アスピルを唱えている間の装備。ドレイン・アスピル吸収量アップ・暗黒魔法スキル・魔命などを入れます。"),
     "sets.midcast.Helix": dict(title="計略 (門の計)", verified=False,
                                help="火門の計などの計略を唱えている間の装備。魔法攻撃力・魔法ダメージなどを入れます (計略は精霊魔法と違う装備が合うことがあります)。"),
+    "sets.midcast.Cursna": dict(title="カーズナ", verified=False,
+                                help="カーズナを唱えている間の装備。カーズナ効果アップ (成功率) ・回復魔法スキルなどを入れます。"),
+    "sets.midcast.Curaga": dict(title="ケアルガ", verified=False,
+                                help="ケアルガを唱えている間の装備。作らなければ「ケアル」の装備を使います。"),
+    "sets.midcast.Protect": dict(title="プロテス (唱える側)", verified=False,
+                                 help="プロテスを唱えている間の装備 (効果時間アップなど)。受ける側の装備は「被プロテス」です。"),
+    "sets.midcast.Shell": dict(title="シェル (唱える側)", verified=False,
+                               help="シェルを唱えている間の装備 (効果時間アップなど)。受ける側の装備は「被シェル」です。"),
+    "sets.midcast.BarStatus": dict(title="バ状態異常の魔法", verified=False,
+                                   help="バスリプル・バポイズンなど、状態異常のバ系の魔法を唱えている間の装備。強化魔法スキル・効果時間などを入れます。"),
+    "sets.midcast.Storm": dict(title="陣の魔法 (詠唱中)", verified=False,
+                               help="熱波の陣などの陣を唱えている間の装備 (効果時間アップなど)。陣頭指揮の足は、この上から履きます。"),
+    "sets.midcast.Absorb": dict(title="アブゾ系", verified=False,
+                                help="アブゾースト・アブゾタック・アブゾアキュルなどを唱えている間の装備。アブゾ効果時間アップ・魔法命中・暗黒魔法スキルなどを入れます。"),
     "sets.midcast.ElementalEnfeeble": dict(title="属性の弱体 (バーン・ショックなど)", verified=False,
                                            help="バーン・フロスト・チョーク・ラスプ・ショック・ドラウンを唱えている間の装備。魔法命中・INT などを入れます。"),
 }
@@ -282,6 +297,13 @@ SPELL_FAMILY_JOBS = {
     "sets.midcast.Drain": ("BLM", "SCH", "DRK", "GEO"),
     "sets.midcast.Helix": ("SCH",),
     "sets.midcast.ElementalEnfeeble": ("BLM",),
+    "sets.midcast.Cursna": ("WHM", "SCH"),
+    "sets.midcast.Curaga": ("WHM",),
+    "sets.midcast.Protect": ("PLD", "RUN", "WAR", "BLU"),
+    "sets.midcast.Shell": ("PLD", "RUN", "WAR", "BLU"),
+    "sets.midcast.BarStatus": ("WHM",),
+    "sets.midcast.Storm": ("SCH",),
+    "sets.midcast.Absorb": ("DRK",),
 }
 for _path, _e in SPELL_FAMILY_ENTRIES.items():
     _e["path"] = _path
@@ -353,6 +375,50 @@ SONG_FAMILIES = [
 EXTRA_ENTRIES += [(("BRD",), dict(path="sets.midcast.%s" % fam, title="歌 (%s)" % ja, verified=False,
                                   help="%sを歌っている間の装備。%s" % (ja, why)))
                   for fam, ja, why in SONG_FAMILIES]
+# 睡眠から起きるスリップの装備 (FF11 用語辞典 18733「スリップ」・38554「プライムウェポン」の第一段階)
+SLIP_ITEMS = ["フレンジーサリット", "サクリフィストルク", "バーサーカートルク", "ヴィムトルク", "ヴィムトルク+1",
+              "プライムフィスト", "プライムダガー", "プライムソード", "プライムブレード", "プライムピック", "プライムアクス",
+              "プライムランス", "プライムサイズ", "原始短刀", "原始刀", "プライムモール", "プライムスタッフ", "プライムボウ",
+              "プライムガン", "プライムホルン", "プライムシールド",
+              # 第二段階 (同じ名前の第三段階以降には、スリップは付かない)
+              "ヴァルガプルニカワ", "ンプガンドリング", "カリブルヌス", "ヘルヘイム", "スパリリソス", "ラフリア", "ゲイブィード",
+              "フォエナリア", "慟哭", "草薙剣", "ローグモル", "オパショーロ", "ピナカ", "アープ", "ラックナシェード", "ドゥバン"]
+EXTRA_ENTRIES += [
+    (ALL, dict(path="sets.Sleep", title="睡眠から起きる装備 (スリップ)", verified=False,
+               help="睡眠になったら自動で着て、HP が減る効果 (スリップ) で目を覚ます装備です。睡眠が解けたら、元の武器と装備に戻します。"
+                    "使える装備: フレンジーサリット (頭・抜刀時)・バーサーカートルク・ヴィムトルク (+1) (首・抜刀時)・"
+                    "サクリフィストルク (首・召喚獣がいるとき)・プライムウェポンの第一段階 (プライムソードなど)・"
+                    "第二段階 (カリブルヌスなど。同じ名前でも第三段階以降は効きません)。"
+                    "武器 (プライムウェポン) も、このセットのものに持ち替えます。")),
+    (ALL, dict(path="sets.midcast.IncreasedCursna", title="被カーズナ・死の宣告 (聖水)", verified=False,
+               help="カーズナ・聖水の効果を上げる装備 (カーズナ被成功率アップ・聖水の効果アップ)。"
+                    "ほかの人が自分にカーズナを唱え始めたら着るほか、死の宣告にかかっている間は、待機・戦闘中の装備に重ねます "
+                    "(聖水を使う・カーズナを受けるときに着ているように)。聖水は自分で使ってください。")),
+    (("SCH", "RDM", "WHM"), dict(path="sets.midcast['強化魔法'].Other", title="詠唱中 (強化魔法・ほかの人へ)", verified=False,
+                                 help="ほかの人に強化魔法をかけるときの装備 (効果時間アップなど)。自分にかけるときは「詠唱中 (強化魔法)」の装備です。"
+                                      "リフレシュ・リジェネなど、魔法ごとの装備があれば、その上から着ます。")),
+    (("RDM", "WHM"), dict(path="sets.midcast.EnfeeblingEffectInt", title="弱体魔法 (INT 系)", verified=False,
+                          help="スリプル・ブレイク・バインド・ブライン・グラビデ・ポイズン・ディスペルなど、INT が効く弱体魔法の装備。")),
+    (("RDM", "WHM"), dict(path="sets.midcast.EnfeeblingEffectMnd", title="弱体魔法 (MND 系)", verified=False,
+                          help="サイレス・パライズ・スロウ・アドル・ディストラ・フラズルなど、MND が効く弱体魔法の装備。")),
+    (("BLU",), dict(path="sets.midcast.BlueMagicAcc", title="青魔法 (魔命: 弱体)", verified=False,
+                    help="弱体の青魔法 (シープソング・ドリームフラワー・ジェタチュラ・コールドウェーブなど) を唱えている間の装備。魔法命中・青魔法スキルを入れます。")),
+    (("SMN",), dict(path="sets.idle.Avatar.Favor", title="待機 (神獣の加護中)", verified=False,
+                    help="神獣の加護を使っている間の待機の装備 (召喚魔法スキル・加護の効果アップなど)。加護が切れたら、ふだんの待機に戻ります。")),
+    (("PLD", "RUN"), dict(path="sets.LowHp", title="HP が少ないとき", verified=False,
+                          help="HP が 30% 以下のときに、待機・戦闘中の装備に重ねる装備 (被ダメージ軽減・HP 回復など)。"
+                               "行動のあとなど、装備を着替え直すときに判定します。")),
+    (("PLD", "RUN"), dict(path="sets.KnockBack", title="ノックバック防止 (手動で切り替え)", verified=False,
+                          help="ノックバックを防ぐ装備 (リパルスマントなど)。ゲームで「//gs c toggle KnockBack」を押すと、戦闘中の装備に重ねます。")),
+    (("COR", "RNG"), dict(path="sets.midcast.RA.Critical", title="遠隔攻撃 (クリティカル)", verified=False,
+                          help="クリティカルを重視する遠隔攻撃の装備。ゲームで「//gs c cycle RangedMode」で Critical にしたときに着ます。")),
+    (("BLM", "RDM", "SCH", "GEO"), dict(path="sets.midcast['精霊魔法'].Acc", title="詠唱中 (精霊魔法・魔命重視)", verified=False,
+                                        help="魔法命中を重視する精霊魔法の装備。「詠唱中 (精霊魔法)」に重ねて作ります。ゲームで「//gs c cycle CastingMode」で Acc にしたときに着ます。")),
+    (("DNC",), dict(path="sets.engaged.Parry", title="戦闘中 (受け流し)", verified=False,
+                    help="受け流し・被ダメージ軽減を重視する戦闘中の装備 (盾役のとき)。//gs c cycle OffenseMode で Parry にしたときに着ます。")),
+    (("RDM",), dict(path="sets.engaged.Enn", title="戦闘中 (エンスペル)", verified=False,
+                    help="エンスペルの追加ダメージを重視する戦闘中の装備。//gs c cycle OffenseMode で Enn にしたときに着ます。")),
+]
 EXTRA_ENTRIES += [
     (("BLU",), dict(path="sets.midcast.BluePhysical", title="青魔法 (物理)", verified=False,
                     help="物理の青魔法 (シンカードリルなど) を唱えている間の装備。STR・DEX・命中・攻撃などを入れます。どの魔法が物理かは、キットが知っています。")),
@@ -545,6 +611,27 @@ _EN = {
     "sets.midcast.Threnody": ("Song (Threnody)", "Gear worn while singing Threnodies: Magic Accuracy, Threnody effect +."),
     "sets.midcast.Elegy": ("Song (Elegy)", "Gear worn while singing Elegies: Magic Accuracy, Singing skill."),
     "sets.midcast.Requiem": ("Song (Requiem)", "Gear worn while singing Requiems: Magic Accuracy, Singing skill."),
+    # 1.2.0 additions
+    "sets.midcast.Cursna": ("Cursna", "Gear worn while casting Cursna: Cursna +, Healing Magic skill."),
+    "sets.midcast.Curaga": ("Curaga", "Gear worn while casting Curaga. If left empty, the Cure set is used."),
+    "sets.midcast.Protect": ("Protect (casting)", "Gear worn while casting Protect (duration + and the like). Gear for receiving it is \"Protect received\"."),
+    "sets.midcast.Shell": ("Shell (casting)", "Gear worn while casting Shell (duration + and the like). Gear for receiving it is \"Shell received\"."),
+    "sets.midcast.BarStatus": ("Bar-status spells", "Gear worn while casting bar-status spells such as Barsleep and Barpoison: Enhancing Magic skill, duration."),
+    "sets.midcast.Storm": ("Storm spells (midcast)", "Gear worn while casting storms (duration + and the like). The Stormsurge feet still go on over it."),
+    "sets.midcast.Absorb": ("Absorb spells", "Gear worn while casting Absorb-STR, Absorb-TP, Absorb-ACC and the rest: Absorb duration +, Magic Accuracy, Dark Magic skill."),
+    "sets.Sleep": ("Wake from sleep (slip gear)", "Put on automatically when you're slept, so the HP drain (slip) wakes you up. When the sleep wears off, your weapons and gear go back. Gear that works: Frenzy Sallet (head, weapon drawn), Berserker's Torque and Vim Torque (+1) (neck, weapon drawn), Sacrifice Torque (neck, avatar out), stage-one prime weapons (Prime Sword and the rest), and stage-two prime weapons (Caliburnus and the rest; the same weapon at stage three or higher doesn't have the drain). Weapons in this set are swapped in too."),
+    "sets.midcast.IncreasedCursna": ("Cursna received / Doom (Holy Water)", "Gear that boosts Cursna and Holy Water on you (Cursna received +, Holy Water +). It goes on when someone starts casting Cursna on you, and while you're Doomed it's layered over your idle and engaged gear, so it's on when you use Holy Water or get Cursna'd. Use the Holy Water yourself."),
+    "sets.midcast['強化魔法'].Other": ("Midcast (Enhancing on others)", "Gear for enhancing spells you cast on someone else (duration + and the like). Spells on yourself use \"Midcast (Enhancing Magic)\". Spell-specific sets such as Refresh or Regen still go on over it."),
+    "sets.midcast.EnfeeblingEffectInt": ("Enfeebling (INT-based)", "Gear for enfeebles that key off INT: Sleep, Break, Bind, Blind, Gravity, Poison, Dispel."),
+    "sets.midcast.EnfeeblingEffectMnd": ("Enfeebling (MND-based)", "Gear for enfeebles that key off MND: Silence, Paralyze, Slow, Addle, Distract, Frazzle."),
+    "sets.midcast.BlueMagicAcc": ("Blue Magic (M.Acc: debuffs)", "Gear worn while casting debuffing blue spells (Sheep Song, Dream Flower, Jettatura, Cold Wave, etc.): Magic Accuracy, Blue Magic skill."),
+    "sets.idle.Avatar.Favor": ("Idle (Avatar's Favor)", "Idle gear while Avatar's Favor is up (Summoning Magic skill, Favor potency). Back to your normal idle when it wears off."),
+    "sets.LowHp": ("Low HP", "Layered over idle and engaged gear when your HP is 30% or less (damage taken -, HP recovery). Checked whenever your gear is re-equipped, such as after an action."),
+    "sets.KnockBack": ("Knockback guard (manual toggle)", "Gear that stops knockback (Repulse Mantle, etc.). Use //gs c toggle KnockBack in game to layer it over your engaged gear."),
+    "sets.midcast.RA.Critical": ("Ranged attack (critical)", "Ranged attack gear that goes for critical hits. Worn when //gs c cycle RangedMode is set to Critical."),
+    "sets.midcast['精霊魔法'].Acc": ("Midcast (Elemental: accuracy)", "Elemental nuke gear that favors Magic Accuracy. Built on top of \"Midcast (Elemental Magic)\". Worn when //gs c cycle CastingMode is set to Acc."),
+    "sets.engaged.Parry": ("Engaged (parry)", "Engaged gear that favors parrying and damage taken - (for tanking). Worn when //gs c cycle OffenseMode is set to Parry."),
+    "sets.engaged.Enn": ("Engaged (enspell)", "Engaged gear that favors enspell damage. Worn when //gs c cycle OffenseMode is set to Enn."),
     "sets.midcast.BarElement": ("Midcast (Bar-element spells)", "Gear worn while casting elemental bar spells (Barfire, Barfira, etc.): bar-spell effect + (e.g. Shedir Seraweels). Built on top of \"Midcast (Enhancing Magic)\", so you only need the slots you want to change."),
 }
 
@@ -595,6 +682,7 @@ def kind_help(i):
 
 
 RECEIVED_EN = {
+    "IncreasedCursna": "Cursna received (Cursna / Doom)",
     "IncreasedPhalanx": "Phalanx received + (boosts Phalanx cast on you)",
     "IncreasedProtect": "Protect received + (boosts Protect cast on you)",
     "IncreasedShell": "Shell received + (boosts Shell cast on you)",

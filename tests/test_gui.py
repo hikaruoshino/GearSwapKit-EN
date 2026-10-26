@@ -87,8 +87,8 @@ gui.job_var.set("RNG")
 gui.on_job()
 check(any("Jishnu" in v for v in gui.name_cb.cget("values")), "RNG に変えると、弓術の WS が出る")
 gui.kind_var.set("被強化の装備")
-check(len(gui.name_cb.cget("values")) == 3 and any("被ファランクス" in v for v in gui.name_cb.cget("values")),
-      "被強化の装備のドロップダウンに、被ファランクス・被プロテス・被シェルが出る")
+check(len(gui.name_cb.cget("values")) == 4 and any("被ファランクス" in v for v in gui.name_cb.cget("values")),
+      "被強化の装備のドロップダウンに、被ファランクス・被プロテス・被シェル・被カーズナが出る")
 root.update()
 gui.name_var.set([v for v in gui.name_cb.cget("values") if "被プロテス" in v][0])
 root.update()

@@ -33,7 +33,7 @@ if os.path.isfile(os.path.join(RES, "spells.lua")):
     with open(os.path.join(RES, "spells.lua"), "rb") as f:
         txt = f.read().decode("utf-8", errors="replace")
     names = {int(m[0]): m[1] for m in re.findall(r'\bid=(\d+),en="([^"]*)"', txt)}
-    expect = {"IncreasedPhalanx": "Phalanx", "IncreasedProtect": "Protect", "IncreasedShell": "Shell"}
+    expect = {"IncreasedPhalanx": "Phalanx", "IncreasedProtect": "Protect", "IncreasedShell": "Shell", "IncreasedCursna": "Cursna"}
     for name, _ja, ids, aoe in C.RECEIVED:
         for i in ids:
             check(names.get(i, "").startswith(expect[name]) and "ra" not in names.get(i, ""), "%s の番号 %d は %s 系 (実際 %s)" % (name, i, expect[name], names.get(i)))
@@ -42,9 +42,9 @@ if os.path.isfile(os.path.join(RES, "spells.lua")):
 
 # --- 選択式: 最初から左の一覧には出さない・技ごとの追加の「被強化の装備」で選ぶ ---
 for job in C.ALL_JOBS:
-    check(not any(e["path"].startswith("sets.midcast.Increased") for e in C.sets_for_job(job)), "%s: 最初から左の一覧には出さない" % job)
+    check(not any(e["path"].startswith("sets.midcast.Increased") and e["path"] != "sets.midcast.IncreasedCursna" for e in C.sets_for_job(job)), "%s: 最初から左の一覧には出さない (被カーズナ・死の宣告だけは出す)" % job)
 items = CH.choices(None, "received", "SAM")
-check([i["en"] for i in items] == ["IncreasedPhalanx", "IncreasedProtect", "IncreasedShell"], "ドロップダウンに 3 つ出る (res が無くても)")
+check([i["en"] for i in items] == ["IncreasedPhalanx", "IncreasedProtect", "IncreasedShell", "IncreasedCursna"], "ドロップダウンに 4 つ出る (res が無くても)")
 check(C.CUSTOM_KINDS[RECEIVED_KIND][1] == "被強化の装備", "技ごとの追加の種類に「被強化の装備」がある")
 
 pr = Project("SAM")

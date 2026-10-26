@@ -29,7 +29,7 @@ from i18n import L
 from project import Project, RECEIVED_KIND
 
 APP_NAME = "GearSwapKit"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")

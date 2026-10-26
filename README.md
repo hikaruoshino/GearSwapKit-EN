@@ -43,9 +43,12 @@ For gear searches (job ability gear, weapon cycles, ammo), also run `//gs export
 
 - **Pick sets from a list**: idle, engaged, precast (Fast Cast), weapon skills, midcast by magic skill and spell family (Cure, Regen, Refresh, Drain, Helix...), each with a short explanation.
 - **Weapon skills sorted for you**: magical, critical-hit (Evisceration, Vorpal Blade, Blade: Jin...), and ranged weapon skills each go to their own set, and per-WS sets are built on top of the right one.
-- **Modes**: make the set and the mode shows up. `IdleMode` (DT, Refresh), `OffenseMode` (Acc, SubtleBlow), `HybridMode` (DT), `CastingMode` (MB on BLM/RDM/SCH/GEO), `RangedMode` (Acc).
+- **Modes**: make the set and the mode shows up. `IdleMode` (DT, Refresh), `OffenseMode` (Acc, SubtleBlow, plus Parry on DNC and Enn on RDM), `HybridMode` (DT), `CastingMode` (MB and Acc on BLM/RDM/SCH/GEO), `RangedMode` (Acc, plus Critical on RNG/COR).
 - **Treasure Hunter**: `//gs c toggle TreasureHunter` layers your TH gear over engaged gear until you turn it off.
 - **Dual wield by subjob**: `sets.engaged.dual11` goes on automatically when you're /NIN, `dual21` when you're /DNC.
+- **Waking up from sleep**: put slip gear in `sets.Sleep` and it goes on the moment you're slept; the HP drain wakes you, and your weapons and gear come back afterward. Gear that works: Frenzy Sallet, Berserker's Torque, Vim Torque (+1), Sacrifice Torque, and stage-one and stage-two prime weapons (the same weapon at stage three or higher doesn't have the drain).
+- **Doom**: `sets.midcast.IncreasedCursna` goes on when someone casts Cursna on you, when you use Holy Water, and stays layered over idle and engaged gear while you're Doomed. You still use the Holy Water yourself.
+- **More spell families**: Curaga, Cursna, Protect, Shell, bar-status spells, Absorb, Storms; enhancing spells on others (SCH/RDM/WHM); enfeebles split into INT-based and MND-based (RDM/WHM).
 - **Add per skill**: give a specific weapon skill, job ability, spell or pet move its own gear by picking it from a dropdown. No typos, no silent failures. Weapon skills are filtered by what your job can use, including mythic and ergon WS.
 - **Job ability gear, found for you**: the kit knows every relic and empyrean piece that enhances a job ability, across all 22 jobs and every upgrade stage, and finds the ones you own. It also knows *when* each piece needs to be on: just when you use the ability, the whole time the buff is up, or while you cast under it.
 - **Weapon cycle**: `//gs c cycle MainWeapons` (and `SubWeapons` / `RangeWeapons`) swaps through weapons in the order you picked them.
@@ -100,7 +103,13 @@ All of these are opt-in (a checkbox or a mode), so they stay out of your way if 
 - Song precast, plus a set for each song family: March, Minuet, Madrigal, Ballad, Minne, Paeon, Etude, Carol, Prelude, Mambo, Lullaby, Threnody, Elegy, Requiem.
 
 **Blue Mage**
-- Blue magic split into physical, magical, buff and healing sets. The kit ships with the spell list (`blu_spells.json`), so it works on the English client too.
+- Blue magic split into physical, magical, buff, healing and debuff (magic accuracy) sets. The kit ships with the spell list (`blu_spells.json`), so it works on the English client too.
+
+**Summoner**
+- Idle gear while Avatar's Favor is up (`sets.idle.Avatar.Favor`).
+
+**Paladin / Rune Fencer**
+- Low-HP gear layered on at 30% HP or less (`sets.LowHp`), and a knockback guard toggled with `//gs c toggle KnockBack`.
 
 **Geomancer**
 - Idle with a luopan out (`sets.idle.Luopan`), and Indi gear for when you cast on someone else under Entrust.

@@ -17,7 +17,7 @@ local env = {
     set_combine = function(a, b) local r = {} for k, v in pairs(a or {}) do r[k] = v end for k, v in pairs(b or {}) do r[k] = v end return r end,
     player = {equipment = {}, sub_job = sub, main_job = job, status = "Engaged"},
     get_midcast_set = function() return {} end, midaction = function() return false end,
-    windower = {ffxi = {get_player = function() return {} end}},
+    windower = {ffxi = {get_player = function() return {} end}, register_event = function() end},
     pairs = pairs, ipairs = ipairs, string = string, table = table, tostring = tostring, type = type, tonumber = tonumber, math = math,
 }
 setmetatable(env, {__index = _G})
@@ -80,5 +80,63 @@ end
 if S.midcast["Elemental Magic"] and S.midcast["Elemental Magic"].MB then
     check(has(env.state.CastingMode.list, "MB"), "CastingMode に MB (英語)")
 end
+
+-- 1.2.0: 睡眠 (スリップの装備に替えて、起きたら武器を戻す)
+
+if S.Sleep then
+    env.player.equipment = {main = "元の剣", sub = "元の盾", range = "empty"}
+    env.handle_equipping_gear = function() end
+    worn = {}
+    env.job_buff_change("Sleep", true, {})
+    check(worn.main == "プライムソード" and worn.head == "フレンジーサリット", "睡眠でスリップの装備 (武器も)")
+    worn = {}
+    env.job_buff_change("Sleep", false, {})
+    check(worn.main == "元の剣" and worn.sub == "元の盾", "起きたら元の武器に戻す")
+    env.buffactive["Sleep"] = true
+    check(env.customize_idle_set({}).head == "フレンジーサリット", "睡眠中は待機にもスリップの装備を重ねる")
+    env.buffactive["Sleep"] = nil
+end
+-- 死の宣告 (被カーズナの装備を重ねる)・聖水
+if S.midcast.IncreasedCursna then
+    env.buffactive["Doom"] = true
+    check(env.customize_idle_set({}).neck == "カーズナ首" and env.customize_melee_set({}).neck == "カーズナ首", "死の宣告中は被カーズナを重ねる")
+    env.buffactive["Doom"] = nil
+    check(env.customize_idle_set({}).neck == nil, "死の宣告でなければ重ねない")
+    worn = {}
+    env.job_post_precast({action_type = "Item", english = "Holy Water", name = "聖水", type = "Item"}, {}, nil, {})
+    check(worn.neck == "カーズナ首", "聖水を使うとき被カーズナを着る")
+end
+-- 神獣の加護 (待機だけ)
+if S.idle.Avatar and S.idle.Avatar.Favor then
+    env.buffactive["Avatar's Favor"] = true
+    check(env.customize_idle_set({}).head == "加護帽", "神獣の加護中の待機")
+    check(env.customize_melee_set({}).head == nil, "加護は戦闘中には重ねない")
+    env.buffactive["Avatar's Favor"] = nil
+end
+-- HP が少ないとき・ノックバック
+if S.LowHp then
+    env.player.hpp = 20
+    check(env.customize_idle_set({}).body == "LowHp胴", "HP 30% 以下で LowHp")
+    env.player.hpp = 80
+    check(env.customize_idle_set({}).body == nil, "HP が多ければ重ねない")
+end
+if S.KnockBack then
+    env.state.KnockBack.value = true
+    check(env.customize_melee_set({}).back == "リパルスマント", "KnockBack をオンで戦闘中に重ねる")
+    env.state.KnockBack.value = false
+end
+-- 弱体の INT / MND
+if S.midcast.EnfeeblingEffectInt then
+    check(env.job_get_spell_map({english = "Sleep II", type = "WhiteMagic"}, nil) == "EnfeeblingEffectInt", "スリプルIIは INT 系")
+    check(env.job_get_spell_map({english = "Silence", type = "WhiteMagic"}, nil) == "EnfeeblingEffectMnd", "サイレスは MND 系")
+end
+-- 青魔法の魔命
+if S.midcast.BlueMagicAcc then
+    check(env.job_get_spell_map({english = "Sheep Song", type = "BlueMagic"}, nil) == "BlueMagicAcc", "シープソングは魔命")
+end
+-- モードの選択肢
+if S.midcast.RA and S.midcast.RA.Critical then check(has(env.state.RangedMode.list, "Critical"), "RangedMode に Critical") end
+if S.engaged.Parry then check(has(env.state.OffenseMode.list, "Parry"), "OffenseMode に Parry") end
+if S.engaged.Enn then check(has(env.state.OffenseMode.list, "Enn"), "OffenseMode に Enn") end
 
 if fails == 0 then io.write("OK " .. job .. "\n") else io.write("FAILED " .. fails .. "\n"); os.exit(1) end

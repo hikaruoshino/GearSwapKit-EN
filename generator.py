@@ -175,7 +175,7 @@ MERIT_NEEDS_PET = ("PUP", "DRG")
 DUAL_SETS = [("sets.engaged.dual11", "NIN", "忍"), ("sets.engaged.dual21", "DNC", "踊")]
 
 
-def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=()):
+def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=(), status=(), low_hp=False, sleep=False, weapon_cycle=False):
     """待機・戦闘中の装備に重ねる仕組みの Lua。
     - 効果中ずっと着る装備 (sets.buff): buffs = [(セットのパス, バフ番号, 英語名, 日本語名)]。その強化が付いている間だけ重ねる。
     - メリットポイントで覚える特性の装備 (sets.merit.*): //gs c cycle MeritGear を On にしたときだけ、ペットがいる間に重ねる
@@ -195,7 +195,8 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=()):
     toggles = list(toggles or [])
     # toggles の 1 行: (state の名前, 説明, セットのパス[, "melee" = 戦闘中だけ重ねる])
     dual = [d for d in DUAL_SETS if d[0] in emitted] if dual else []
-    if not active and not merits and not any(casts.values()) and not toggles and not dual:
+    status = list(status or [])
+    if not active and not merits and not any(casts.values()) and not toggles and not dual and not status and not low_hp and not sleep:
         return [], [], []
     top = [L("-- 待機と戦闘中の装備に、条件つきで重ねる装備", "-- Conditional gear layered over the idle / engaged sets")]
     if active:
@@ -221,8 +222,14 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=()):
                 "    end",
                 "end",
                 ""]
-    if not active and not merits and not toggles and not dual:
+    if not active and not merits and not toggles and not dual and not status and not low_hp and not sleep:
         return top, [], _cast_reg(casts)
+    if low_hp:
+        top += [L("local LOW_HP = 30   -- HP がこの % 以下なら sets.LowHp を重ねる", "local LOW_HP = 30   -- layer sets.LowHp at or below this HP %")]
+    if sleep:
+        top += [L("-- 睡眠: スリップの装備 (sets.Sleep) で起きる。寝る前の武器を覚えておき、起きたら戻す",
+                  "-- Sleep: wake up with slip gear (sets.Sleep). Remember the weapons and put them back on waking"),
+                "local slept_weapons = nil"]
     if merits:
         needs_pet = job in MERIT_NEEDS_PET
         top += [L("-- メリットポイントで覚える特性の装備 (sets.merit): //gs c cycle MeritGear で On にしたときだけ、%s重ねます。"
@@ -246,6 +253,14 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=()):
             top += ["    base = set_combine(base, %s)" % path + ("" if is_en() else "   -- %s" % desc)]
         else:
             top += ["    if state.%s and state.%s.value%s then base = set_combine(base, %s) end" % (field, field, cond, path)]
+    for en, ja, path, where in status:
+        cond = "buffactive[%s]" % _lua_str(en) + ("" if is_en() else " or buffactive[%s]" % _lua_str(ja))
+        only = " and not melee" if where == "idle" else ""
+        top += ["    if (%s)%s then base = set_combine(base, %s) end" % (cond, only, path)]
+    if low_hp:
+        top += ["    if player and player.hpp and player.hpp <= LOW_HP then base = set_combine(base, sets.LowHp) end"]
+    if sleep:
+        top += ["    if (buffactive['Sleep']%s) then base = set_combine(base, sets.Sleep) end" % ("" if is_en() else " or buffactive['睡眠']")]
     if dual:
         top += [L("    -- 二刀流: サポジョブに合わせて、戦闘中の装備に重ねる (サポ忍 = sets.engaged.dual11・サポ踊 = sets.engaged.dual21)",
                   "    -- Dual wield: layered over engaged gear by subjob (/NIN = sets.engaged.dual11, /DNC = sets.engaged.dual21)")]
@@ -263,18 +278,36 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=()):
             "    return apply_overlay(meleeSet, true)",
             "end",
             ""]
-    if active:
-        top += [L("-- 強化が付いたとき・切れたときに、装備を着替え直します", "-- Re-equip when a buff is gained or lost"),
+    watch = [(en, ja) for en, ja, _p, _w in status]
+    if active or watch or sleep:
+        top += [L("-- 強化・状態が付いたとき・切れたときに、装備を着替え直します", "-- Re-equip when a buff or status is gained or lost"),
                 "function job_buff_change(buff, gain, eventArgs)",
-                "    local name = tostring(buff):lower()",
-                "    for _, b in ipairs(buff_gear) do",
-                "        if name == b[2]:lower() or name == b[3]:lower() then",
-                "            handle_equipping_gear(player.status)",
-                "            return",
-                "        end",
-                "    end",
-                "end",
-                ""]
+                "    local name = tostring(buff):lower()"]
+        if sleep:
+            top += ["    if name == 'sleep'%s then" % ("" if is_en() else " or name == '睡眠'"),
+                    "        if gain then",
+                    "            slept_weapons = {main = player.equipment.main, sub = player.equipment.sub, range = player.equipment.range}",
+                    "            equip(sets.Sleep)",
+                    "        else",
+                    "            if slept_weapons then equip(slept_weapons) end",
+                    "            slept_weapons = nil",
+                    "            handle_equipping_gear(player.status)"]
+            if weapon_cycle:
+                top += ["            send_command('wait 0.5; gs c weapons')"]
+            top += ["        end",
+                    "        return",
+                    "    end"]
+        for en, ja in watch:
+            top += ["    if name == %s%s then handle_equipping_gear(player.status) return end"
+                    % (_lua_str(en.lower()), "" if is_en() else " or name == %s" % _lua_str(ja))]
+        if active:
+            top += ["    for _, b in ipairs(buff_gear) do",
+                    "        if name == b[2]:lower() or name == b[3]:lower() then",
+                    "            handle_equipping_gear(player.status)",
+                    "            return",
+                    "        end",
+                    "    end"]
+        top += ["end", ""]
     setup = []
     for tg in toggles:
         field, desc, path = tg[:3]
@@ -288,7 +321,7 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=()):
                     "    -- Use merit trait gear (Optimization, Fine-Tuning, etc.): //gs c cycle MeritGear. Leave Off if you have no merits there"),
                  "    state.MeritGear = M{['description']='MeritGear', 'Off', 'On'}"]
     reg = []
-    if active or merits or toggles or dual:
+    if active or merits or toggles or dual or status or low_hp or sleep:
         # 念のため: Mote-Include は sets.idle / sets.engaged を空で作るが、無いと customize_idle_set などが呼ばれないので、
         # 無ければ空のセットを用意する (標準の Mote-Include では何も変わらない)
         reg.append(L("    -- 待機・戦闘中の装備のセットが無いときのための用意 (普段は何もしません)",
@@ -560,14 +593,39 @@ BLU_SETS = ("BluePhysical", "BlueMagical", "BlueBuff", "BlueHealing")
 def blu_map_rows(job, emitted):
     """青魔法の分類 {英語名: 'BluePhysical' など}。そのセットを出すときだけ (blu_spells.json = 作者の Mote-Mappings.lua の分類)。"""
     if job != "BLU":
-        return {}
+        return enfeeble_map_rows(job, emitted)
     have = {c for c in BLU_SETS if "sets.midcast.%s" % c in emitted}
-    if not have:
+    if not have and "sets.midcast.BlueMagicAcc" not in emitted:
         return {}
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blu_spells.json")
     with open(path, encoding="utf-8") as f:
         data = json.load(f)["spells"]
+    if "sets.midcast.BlueMagicAcc" in emitted:
+        have.add("BlueMagicAcc")
+        data = dict(data, **{n: "BlueMagicAcc" for n in BLU_ACC_SPELLS})
     return {en: c for en, c in data.items() if c in have}
+
+
+# 弱体の青魔法 (魔命が大事なもの)。sets.midcast.BlueMagicAcc があるときだけ、これらをそちらに分ける
+BLU_ACC_SPELLS = ["Sheep Song", "Soporific", "Dream Flower", "Yawn", "Blank Gaze", "Geist Wall", "Sound Blast", "Chaotic Eye",
+                  "Frightful Roar", "Jettatura", "Feather Tickle", "Reaving Wind", "Mortal Ray", "Absolute Terror", "Cruel Joke",
+                  "Infrasonics", "Filamented Hold", "Lowing", "Auroral Drape", "Venom Shell", "Stinking Gas", "Awful Eye",
+                  "Actinic Burst", "Cold Wave", "Light of Penance", "Blistering Roar"]
+# 弱体魔法の INT 系・MND 系 (作者の RDM.lua の分け方を広げたもの)
+ENFEEBLE_INT = ["Sleep", "Sleep II", "Sleepga", "Sleepga II", "Break", "Breakga", "Bind", "Blind", "Blind II",
+                "Gravity", "Gravity II", "Poison", "Poison II", "Poisonga", "Dispel"]
+ENFEEBLE_MND = ["Silence", "Paralyze", "Paralyze II", "Slow", "Slow II", "Addle", "Addle II", "Distract", "Distract II",
+                "Distract III", "Frazzle", "Frazzle II", "Frazzle III"]
+
+
+def enfeeble_map_rows(job, emitted):
+    """弱体魔法の INT 系・MND 系 {英語名: 'EnfeeblingEffectInt' など}。そのセットを出すときだけ。"""
+    out = {}
+    if "sets.midcast.EnfeeblingEffectInt" in emitted:
+        out.update({n: "EnfeeblingEffectInt" for n in ENFEEBLE_INT})
+    if "sets.midcast.EnfeeblingEffectMnd" in emitted:
+        out.update({n: "EnfeeblingEffectMnd" for n in ENFEEBLE_MND})
+    return out
 
 
 def ws_blocks(emitted, job=None):
@@ -662,6 +720,12 @@ PLD_TOGGLES = [("Magical", "対魔法", "sets.idle.Magical"), ("StatusResist", "
 TOGGLE_EN = {"Magical": "magic defense", "StatusResist": "status resistance", "TreasureHunter": "Treasure Hunter"}
 # トレジャーハンター: //gs c toggle TreasureHunter で、戦闘中の装備に重ねる (全ジョブ)
 TH_TOGGLE = ("TreasureHunter", "トレジャーハンター", "sets.TreasureHunter", "melee")
+# ノックバック防止: //gs c toggle KnockBack で、戦闘中の装備に重ねる (ナイト・魔導剣士)
+KB_TOGGLE = ("KnockBack", "ノックバック防止", "sets.KnockBack", "melee")
+TOGGLE_EN["KnockBack"] = "knockback guard"
+# 死の宣告・神獣の加護: (英語名, 日本語名, セット, idle = 待機だけ / both)
+STATUS_OVERLAYS = [("Doom", "死の宣告", "sets.midcast.IncreasedCursna", "both"),
+                   ("Avatar's Favor", "神獣の加護", "sets.idle.Avatar.Favor", "idle")]
 # メインとサブも着替えるセット (対魔法の武器・盾)。オフにしたら、武器の切り替えで選んでいる武器に戻す
 PLD_WEAPON_SETS = ("sets.idle.Magical", "sets.StatusResist")
 PLD_LAND_ADJUST = 0.30     # 着弾の何秒前に着弾の装備へ替えるか (作者の PLD.lua の実測: 0.30 秒で 10/10)
@@ -1100,10 +1164,6 @@ def ranged_links(emitted):
 def cor_blocks(emitted):
     """遠隔攻撃のモードと、コルセアのクイックドローの切り替えの Lua。戻り値: dict(setup, post_precast, init_tail)。"""
     out = dict(setup=[], post_precast=[], init_tail=[])
-    if "sets.RA_ACC" in emitted:
-        out["setup"] += [L("    -- //gs c cycle RangedMode で、遠隔攻撃の装備を切り替えます (Normal = STP / Acc = 飛命)",
-                           "    -- //gs c cycle RangedMode switches ranged attack gear (Normal = Store TP / Acc = accuracy)"),
-                         "    state.RangedMode:options('Normal', 'Acc')"]
     qd = [(p, L(ja, en)) for p, ja, en in COR_QD_SETS if p in emitted]
     if len(qd) == 2:
         names = ", ".join("'%s'" % n for _p, n in qd)
@@ -1198,6 +1258,9 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
         # からくり士のマニューバは、メイン (乾坤圏など、マニューバを強化する武器) も持ち替える
         if job == "PUP" and path == "sets.precast.JA.Maneuver":
             return tuple(keep_slots) + ("main",)
+        # 睡眠から起きる装備は、プライムウェポン (武器) も持ち替える
+        if path == "sets.Sleep":
+            return tuple(keep_slots) + ("main", "sub", "range")
         return keep_slots
     emitted_paths = {p for p in used if set_lines(p, used[p], include_weapons, cycle_slots=cycle_slots, keep_slots=keep_for(p))}
     pld = pld_blocks(emitted_paths, pld_three_stage, pld_fast_cast) if job == "PLD" else pld_blocks(set())
@@ -1221,8 +1284,11 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     storm_lines = ([L("    -- 陣の魔法では、ファストキャストなどの装備の上から、陣頭指揮の足を履く",
                       "    -- Storm spells: wear the Stormsurge feet over fast cast gear"),
                     "    if spellMap == 'Storm' then equip(sets.Stormsurge) end"] if storm else [])
-    toggles = pld["toggles"] + ([TH_TOGGLE] if TH_TOGGLE[2] in emitted_paths else [])
-    buff_top, buff_setup, buff_reg = overlay_blocks(buffs, emitted_paths, job, toggles, dual=True)
+    toggles = pld["toggles"] + [tg for tg in (TH_TOGGLE, KB_TOGGLE) if tg[2] in emitted_paths]
+    status = [s for s in STATUS_OVERLAYS if s[2] in emitted_paths]
+    buff_top, buff_setup, buff_reg = overlay_blocks(buffs, emitted_paths, job, toggles, dual=True, status=status,
+                                                    low_hp="sets.LowHp" in emitted_paths, sleep="sets.Sleep" in emitted_paths,
+                                                    weapon_cycle=bool(weapon_setup))
     if buff_top:
         out.extend(buff_top)
     out.extend(ws_blocks(emitted_paths, job))
@@ -1230,7 +1296,23 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.extend(recv_top)
     has_cast = "local function equip_cast_gear(phase, spell)" in "\n".join(buff_top)
     # クイックドローの装備は、矢弾 (ammo_pre) より先に着る (弾は使い分けの仕組みで替える)
-    post_pre = (["    equip_cast_gear('precast', spell)"] if has_cast else []) + cor["post_precast"] + ammo_pre + man["post_precast"] + storm_lines
+    post_pre = ((["    equip_cast_gear('precast', spell)"] if has_cast else []) + cor["post_precast"] + ammo_pre + man["post_precast"]
+                + storm_lines)
+    holy = ([L("    -- 聖水を使うときは、被カーズナ (聖水の効果アップ) の装備を着る",
+                "    -- Holy Water: wear the Cursna-received gear (Holy Water +)"),
+              "    if spell.action_type == 'Item' and (spell.english == 'Holy Water'%s) then" % ("" if is_en() else " or spell.name == '聖水'"),
+              "        equip(sets.midcast.IncreasedCursna)",
+              "    end"] if "sets.midcast.IncreasedCursna" in emitted_paths else [])
+    other = ([L("    -- ほかの人への強化魔法: ほかの人への装備を着て、魔法ごとの装備 (リフレシュなど) があれば、その上から着る",
+                "    -- Enhancing on others: wear the Other set, with any spell-specific set over it"),
+              "    if spell.skill == '%s' and spell.target and spell.target.type ~= 'SELF' then" % ("Enhancing Magic" if is_en() else "強化魔法"),
+              "        local own = get_midcast_set(spell, spellMap)",
+              "        if own and own ~= sets.midcast['%s'] then" % ("Enhancing Magic" if is_en() else "強化魔法"),
+              "            equip(set_combine(sets.midcast['%s'].Other, own))" % ("Enhancing Magic" if is_en() else "強化魔法"),
+              "        else",
+              "            equip(sets.midcast['%s'].Other)" % ("Enhancing Magic" if is_en() else "強化魔法"),
+              "        end",
+              "    end"] if "sets.midcast['強化魔法'].Other" in emitted_paths else [])
     entrust = ([L("    -- エントラスト中に、ほかの人へインデ魔法をかけるときは、エントラストの装備",
                    "    -- Indi spell on someone else under Entrust: wear the Entrust set"),
                  "    if (buffactive['Entrust']%s) and spell.english:sub(1, 5) == 'Indi-' and spell.target.type ~= 'SELF' then"
@@ -1238,7 +1320,8 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
                  "        equip(sets.midcast.Entrust)",
                  "    end"] if job == "GEO" and "sets.midcast.Entrust" in emitted_paths else [])
     post_mid = ((["    equip_cast_gear('midcast', spell)"] if has_cast else []) + recv_mid + pld["post_midcast"] + storm_lines
-                + waist["post_midcast"] + entrust)
+                + waist["post_midcast"] + entrust + other)
+    post_pre = post_pre + holy
     if post_pre:
         out += ["function job_post_precast(spell, action, spellMap, eventArgs)"] + post_pre + ["end", ""]
     if post_mid:
@@ -1259,10 +1342,12 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.append("function user_setup()")
     # モードの切り替え: セットがあるモードだけを選択肢にする
     for field, base, modes in (("IdleMode", "sets.idle", ("DT", "Refresh", "Tate")),
-                               ("OffenseMode", "sets.engaged", ("Acc", "SubtleBlow", "Tate", "PetSTP")),
+                               ("OffenseMode", "sets.engaged", ("Acc", "SubtleBlow", "Parry", "Enn", "Tate", "PetSTP")),
                                ("HybridMode", "sets.engaged", ("DT",)),
-                               ("CastingMode", "sets.midcast['精霊魔法']", ("MB",))):
-        have = [m for m in modes if "%s.%s" % (base, m) in used]
+                               ("CastingMode", "sets.midcast['精霊魔法']", ("MB", "Acc")),
+                               ("RangedMode", "sets.midcast.RA", ("Acc", "Critical"))):
+        linked = {tg for ts in links.values() for tg in ts}
+        have = [m for m in modes if "%s.%s" % (base, m) in used or "%s.%s" % (base, m) in linked]
         if have:
             opts = ["Normal"] + have
             what = {"IdleMode": ("待機", "idle"), "CastingMode": ("精霊魔法 (MB = マジックバースト)", "elemental nuke (MB = magic burst)")}.get(
@@ -1305,9 +1390,14 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
         # ケアルの詠唱の開始は、ファストキャストに重ねる (ケアル詠唱時間短縮の部位だけ替えればよいように)
         if not base and p == "sets.precast.FC.Cure" and "sets.precast.FC" in emitted:
             base = "sets.precast.FC"
-        # マジックバーストは、精霊魔法の装備に重ねる
-        if not base and p == "sets.midcast['精霊魔法'].MB" and "sets.midcast['精霊魔法']" in emitted:
+        # マジックバースト・魔命重視は、精霊魔法の装備に重ねる。遠隔攻撃 (クリティカル) は遠隔攻撃に重ねる
+        if not base and p in ("sets.midcast['精霊魔法'].MB", "sets.midcast['精霊魔法'].Acc") and "sets.midcast['精霊魔法']" in emitted:
             base = "sets.midcast['精霊魔法']"
+        if not base and p == "sets.midcast.RA.Critical" and "sets.midcast.RA" in emitted:
+            base = "sets.midcast.RA"
+        # ほかの人への強化は、強化魔法の装備に重ねる
+        if not base and p == "sets.midcast['強化魔法'].Other" and "sets.midcast['強化魔法']" in emitted:
+            base = "sets.midcast['強化魔法']"
         if job == "PLD":
             base = base or pld_base(p, emitted)
         # 結ぶ先と同じ名前のセット (アビリティ強化の装備の sets.precast.CorsairRoll など) は、結んだ元に重ねる

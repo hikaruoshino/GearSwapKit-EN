@@ -28,7 +28,12 @@ def check(cond, msg):
 
 H = EP.parse_equipped_set
 GEAR = {"sets.TreasureHunter": 'head="TH帽"', "sets.engaged.dual11": 'waist="dual11腰"',
-        "sets.engaged.dual21": 'waist="dual21腰"', "sets.midcast.Entrust": 'head="エントラスト帽"'}
+        "sets.engaged.dual21": 'waist="dual21腰"', "sets.midcast.Entrust": 'head="エントラスト帽"',
+        "sets.Sleep": 'main="プライムソード", head="フレンジーサリット"', "sets.midcast.IncreasedCursna": 'neck="カーズナ首"',
+        "sets.idle.Avatar.Favor": 'head="加護帽"', "sets.LowHp": 'body="LowHp胴"', "sets.KnockBack": 'back="リパルスマント"',
+        "sets.midcast['強化魔法'].Other": 'body="他人胴"', "sets.midcast.Refresh": 'head="リフレ帽"',
+        "sets.midcast.EnfeeblingEffectInt": 'head="INT帽"', "sets.midcast.EnfeeblingEffectMnd": 'head="MND帽"',
+        "sets.midcast.BlueMagicAcc": 'head="青魔命帽"'}
 
 # 一覧に出るジョブ
 def paths(job):
