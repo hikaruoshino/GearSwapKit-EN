@@ -41,7 +41,11 @@ For gear searches (job ability gear, weapon cycles, ammo), also run `//gs export
 
 ## What it does
 
-- **Pick sets from a list**: idle, engaged, precast (Fast Cast), weapon skills, midcast by magic skill and more, each with a short explanation.
+- **Pick sets from a list**: idle, engaged, precast (Fast Cast), weapon skills, midcast by magic skill and spell family (Cure, Regen, Refresh, Drain, Helix...), each with a short explanation.
+- **Weapon skills sorted for you**: magical, critical-hit (Evisceration, Vorpal Blade, Blade: Jin...), and ranged weapon skills each go to their own set, and per-WS sets are built on top of the right one.
+- **Modes**: make the set and the mode shows up. `IdleMode` (DT, Refresh), `OffenseMode` (Acc, SubtleBlow), `HybridMode` (DT), `CastingMode` (MB on BLM/RDM/SCH/GEO), `RangedMode` (Acc).
+- **Treasure Hunter**: `//gs c toggle TreasureHunter` layers your TH gear over engaged gear until you turn it off.
+- **Dual wield by subjob**: `sets.engaged.dual11` goes on automatically when you're /NIN, `dual21` when you're /DNC.
 - **Add per skill**: give a specific weapon skill, job ability, spell or pet move its own gear by picking it from a dropdown. No typos, no silent failures. Weapon skills are filtered by what your job can use, including mythic and ergon WS.
 - **Job ability gear, found for you**: the kit knows every relic and empyrean piece that enhances a job ability, across all 22 jobs and every upgrade stage, and finds the ones you own. It also knows *when* each piece needs to be on: just when you use the ability, the whole time the buff is up, or while you cast under it.
 - **Weapon cycle**: `//gs c cycle MainWeapons` (and `SubWeapons` / `RangeWeapons`) swaps through weapons in the order you picked them.
@@ -81,9 +85,28 @@ All of these are opt-in (a checkbox or a mode), so they stay out of your way if 
 **Beastmaster**
 - Pet moves split into physical (accuracy, TP bonus) and magical/debuff (magic accuracy).
 
-**Corsair / Ranger**
+**Corsair / Ranger / Samurai**
+- Snapshot (`sets.precast.RA`) and ranged attack sets: Store TP (`sets.RA_STP`) and accuracy (`sets.RA_ACC`, via `RangedMode`). Samurai gets these plus a ranged physical WS set for bows.
+
+**Corsair**
+- Phantom Roll (`sets.CorsairRoll`); per-roll gear is built on top of it.
+- Quick Draw in three flavors: Store TP (`sets.RA_QDSTP`), damage (`sets.RA_QDDPS`), and magic accuracy (`sets.RA_QDACC`). Make the first two and `//gs c cycle QuickDrawMode` switches between them. Light Shot and Dark Shot always use the accuracy set.
+
+**Corsair / Ranger ammo**
 - **Ammo by role**: physical bullets for shooting and physical WS, magic bullets for Leaden Salute and friends, a Quick Draw bullet, and special bullets for chosen WS. Special and Quick Draw bullets are swapped back out afterward so you never shoot them by accident.
 - Separate WS sets for melee, ranged, magical and ranged-magical weapon skills.
+
+**Bard**
+- Song precast, plus a set for each song family: March, Minuet, Madrigal, Ballad, Minne, Paeon, Etude, Carol, Prelude, Mambo, Lullaby, Threnody, Elegy, Requiem.
+
+**Blue Mage**
+- Blue magic split into physical, magical, buff and healing sets. The kit ships with the spell list (`blu_spells.json`), so it works on the English client too.
+
+**Geomancer**
+- Idle with a luopan out (`sets.idle.Luopan`), and Indi gear for when you cast on someone else under Entrust.
+
+**Dancer**
+- Waltz, Samba, Jig, Step and Flourish I sets.
 
 **Scholar**
 - **Hachirin-no-Obi or Orpheus's Sash**, whichever is better for the weather (storms included), day, and distance to the target.

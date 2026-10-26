@@ -44,7 +44,7 @@ local env = {
     include = function() end, set_language = function() end, send_command = function() end,
     equip = function(s) for k, v in pairs(s) do worn[k] = v end end,
     M = function(t, d) if type(t) == 'table' then return {description = t.description, value = t[1], current = t[1]} end return {value = t} end,
-    state = {IdleMode = {options = function() end}, OffenseMode = {options = function() end}, HybridMode = {options = function() end}},
+    state = {IdleMode = {options = function() end}, OffenseMode = {options = function() end}, HybridMode = {options = function() end}, CastingMode = {options = function() end}, RangedMode = {options = function() end}},
     sets = {precast = {JA = {}, WS = {}, FC = {}}, midcast = {Pet = {}}, buff = {}, idle = {}, engaged = {}, defense = {}},
     set_combine = function(a, b) local r = {} for k, v in pairs(a or {}) do r[k] = v end for k, v in pairs(b or {}) do r[k] = v end return r end,
     windower = {register_event = function() end, raw_register_event = function() end, ffxi = {}},

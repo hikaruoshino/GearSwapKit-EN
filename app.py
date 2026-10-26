@@ -29,7 +29,7 @@ from i18n import L
 from project import Project, RECEIVED_KIND
 
 APP_NAME = "GearSwapKit"
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")
@@ -1391,6 +1391,13 @@ class App:
 
 def main():
     root = tk.Tk()
+    # 窓のアイコン (EXE では --include-data-files で同梱した icon.ico を、展開先の __file__ の隣から読む)
+    icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon.ico")
+    if os.path.exists(icon):
+        try:
+            root.iconbitmap(default=icon)  # default= で、あとから開く窓 (言語の選択・一覧など) にも付く
+        except tk.TclError:
+            pass
     settings = load_settings()
     code = settings.get("lang")
     if code not in i18n.LANGS:

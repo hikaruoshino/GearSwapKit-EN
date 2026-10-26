@@ -211,6 +211,11 @@ WS_MAGIC_ENTRY = dict(
          "魔法攻撃力・魔法ダメージ・WSダメージなどを入れます。どの WS が魔法属性かは、キットが知っています。"
          "技ごとに足した魔法属性の WS は、このセットに重ねて (set_combine) 作ります。"
          "狩人・コルセアで「ウェポンスキル (遠隔魔攻)」を作ったときは、遠隔の魔法属性 WS はそちらを使います。")
+WS_CRIT_ENTRY = dict(
+    path="sets.precast.WS.Critical", title="ウェポンスキル (クリティカル)", verified=False,
+    help="クリティカルの出やすさで威力が変わるウェポンスキル (エヴィサレーション・ボーパルブレード・ランページ・迅など) を使う瞬間の装備。"
+         "クリティカルヒット率・クリティカルダメージ・DEX などを入れます。どの WS がクリティカルかは、キットが知っています。"
+         "技ごとに足したクリティカルの WS は、このセットに重ねて作ります。")
 WS_RANGE_MAGIC_ENTRY = dict(
     path="sets.precast.WS.RangeMagic", title="ウェポンスキル (遠隔魔攻)", verified=True,
     help="魔法属性の遠隔ウェポンスキル (レデンサリュート・ワイルドファイア・トゥルーフライトなど) を使う瞬間の装備。"
@@ -220,6 +225,148 @@ WS_RANGE_ENTRY = dict(
     path="sets.precast.WS.Range", title="ウェポンスキル (遠隔・物理)", verified=True,
     help="弓術・射撃の物理ウェポンスキル (ジシュヌの光輝・ラストスタンドなど) を使う瞬間の装備。飛攻・飛命・WSダメージなどを入れます。"
          "レデンサリュートなど魔法属性の遠隔 WS は「ウェポンスキル (魔攻・属性物理)」を使います。")
+
+
+# 遠隔攻撃 (狩人・コルセア)。sets.RA_STP・sets.RA_ACC は、作者の COR_gear.lua と同じ名前 (generator が sets.midcast.RA に結ぶ)
+RANGED_ENTRIES = [
+    dict(path="sets.precast.RA", title="遠隔の構え (スナップショット)", verified=False,
+         help="遠隔攻撃を構える瞬間の装備。スナップショット・ラピッドショットなど、構えを速くする装備を入れます。"),
+    dict(path="sets.RA_STP", title="遠隔攻撃 (STP)", verified=False,
+         help="遠隔攻撃を撃っている間の基本の装備 (sets.midcast.RA)。ストアTP・飛攻・飛命などを入れます。"),
+    dict(path="sets.RA_ACC", title="遠隔攻撃 (飛命)", verified=False,
+         help="飛命を重視するときの遠隔攻撃の装備 (//gs c cycle RangedMode で Acc にしたとき。sets.midcast.RA.Acc)。"),
+]
+
+# コルセアのロールとクイックドロー。名前は作者の COR_gear.lua と同じ
+COR_QD_MODES = [("sets.RA_QDSTP", "ソーティ", "StoreTP"), ("sets.RA_QDDPS", "通常", "Damage")]
+COR_ENTRIES = [
+    dict(path="sets.CorsairRoll", title="ロール (共通)", verified=False,
+         help="ファントムロールを使う瞬間の装備 (sets.precast.CorsairRoll)。ロールの効果範囲・効果時間アップ・再使用短縮などを入れます。"
+              "ロールごとの装備 (ＣＳトリコルヌ+3 でプリッツアロールなど) は、この装備に重ねて作ります。"),
+    dict(path="sets.RA_QDSTP", title="クイックドロー (STP)", verified=False,
+         help="クイックドローを撃つ瞬間の、ストアTP を重視した装備 (ソーティなど)。クイックドロー能力・ストアTP などを入れます。"
+              "「クイックドロー (威力)」も作ると、//gs c cycle QuickDrawMode で切り替えます (ソーティ / 通常)。"),
+    dict(path="sets.RA_QDDPS", title="クイックドロー (威力)", verified=False,
+         help="クイックドローの威力を重視した装備。魔法攻撃力・クイックドロー能力・AGI などを入れます。"
+              "//gs c cycle QuickDrawMode を「通常」にしたときに着ます。"),
+    dict(path="sets.RA_QDACC", title="クイックドロー (魔命: ライト・ダーク)", verified=False,
+         help="ライトショット・ダークショット (弱体を伸ばす・魔命が大事な弾) を撃つ瞬間の装備。魔法命中を重視します。"
+              "この 2 つは、QuickDrawMode にかかわらず、この装備で撃ちます。"),
+]
+JOB["COR"] = COR_ENTRIES
+
+# 魔法の系統のセット (Mote-Include が魔法の系統名 = spellMap で自動で探すもの)。ジョブごとに、使える系統だけ出す
+SPELL_FAMILY_ENTRIES = {
+    "sets.midcast.Cure": dict(title="ケアル", verified=False,
+                              help="ケアル (I〜VI) を唱えている間の装備。ケアル回復量アップ・MND・回復魔法スキルなどを入れます。"
+                                   "作らなければ「詠唱中 (回復魔法)」を使います。"),
+    "sets.precast.FC.Cure": dict(title="詠唱の開始 (ケアル)", verified=False,
+                                 help="ケアルを唱え始めるときの装備。ケアル詠唱時間短縮 (ケアル専用のファストキャスト) を重ねます。"
+                                      "作らなければ「詠唱の開始 (ファストキャスト)」を使います。"),
+    "sets.midcast.Regen": dict(title="リジェネ", verified=False,
+                               help="リジェネ (I〜V) を唱えている間の装備。リジェネ効果アップ・効果時間アップなどを入れます。"),
+    "sets.midcast.Refresh": dict(title="リフレシュ", verified=False,
+                                 help="リフレシュ (I〜III) を唱えている間の装備。リフレシュ効果アップ・効果時間アップなどを入れます。"),
+    "sets.midcast.Drain": dict(title="ドレイン・アスピル", verified=False,
+                               help="ドレイン・アスピルを唱えている間の装備。ドレイン・アスピル吸収量アップ・暗黒魔法スキル・魔命などを入れます。"),
+    "sets.midcast.Helix": dict(title="計略 (門の計)", verified=False,
+                               help="火門の計などの計略を唱えている間の装備。魔法攻撃力・魔法ダメージなどを入れます (計略は精霊魔法と違う装備が合うことがあります)。"),
+    "sets.midcast.ElementalEnfeeble": dict(title="属性の弱体 (バーン・ショックなど)", verified=False,
+                                           help="バーン・フロスト・チョーク・ラスプ・ショック・ドラウンを唱えている間の装備。魔法命中・INT などを入れます。"),
+}
+SPELL_FAMILY_JOBS = {
+    "sets.midcast.Cure": ("WHM", "RDM", "SCH", "BLU", "GEO", "SMN", "RUN"),
+    "sets.precast.FC.Cure": ("WHM", "RDM", "SCH", "BLU", "GEO", "SMN", "RUN", "PLD"),
+    "sets.midcast.Regen": ("WHM", "SCH", "RUN"),
+    "sets.midcast.Refresh": ("RDM", "SCH", "RUN"),
+    "sets.midcast.Drain": ("BLM", "SCH", "DRK", "GEO"),
+    "sets.midcast.Helix": ("SCH",),
+    "sets.midcast.ElementalEnfeeble": ("BLM",),
+}
+for _path, _e in SPELL_FAMILY_ENTRIES.items():
+    _e["path"] = _path
+
+# 神聖魔法・風水魔法 (技能で探すセット。ジョブを絞る)
+JOB_SKILL_EXTRA = {"WHM": ["神聖魔法"], "PLD": ["神聖魔法"], "GEO": ["風水魔法"]}
+SKILL_EXTRA_HELP = {
+    "神聖魔法": "バニシュ・ホーリーなどの神聖魔法を唱えている間の装備。MND・魔法攻撃力・神聖魔法スキルなどを入れます。",
+    "風水魔法": "インデ・ジオ (風水魔法) を唱えている間の装備。風水魔法スキル・羅盤の効果アップなどを入れます。",
+}
+
+# 踊り子 (Mote-Include はアビリティの種類 = spell.type で探す: sets.precast.Waltz など)
+JOB["DNC"] = [
+    dict(path="sets.precast.Waltz", title="ワルツ", verified=False,
+         help="ケアルワルツなどワルツを使う瞬間の装備。ワルツ回復量アップ・CHR・ワルツの再使用短縮などを入れます。"),
+    dict(path="sets.precast.Samba", title="サンバ", verified=False,
+         help="サンバを使う瞬間の装備。サンバの効果時間アップなどを入れます。"),
+    dict(path="sets.precast.Jig", title="ジグ", verified=False,
+         help="ジグ (スペクトラルジグなど) を使う瞬間の装備。ジグの効果時間アップなどを入れます。"),
+    dict(path="sets.precast.Step", title="ステップ", verified=False,
+         help="ステップを使う瞬間の装備。命中 (ステップが外れないように) などを入れます。"),
+    dict(path="sets.precast.Flourish1", title="フラリッシュ (I: バイオレントフラリッシュなど)", verified=False,
+         help="フラリッシュIの技 (アニマススフラリッシュ・バイオレントフラリッシュなど) を使う瞬間の装備。魔法命中・命中などを入れます。"),
+]
+
+
+# --- 1.1.0 で足したセット (作者の *_gear.lua の見直し) ---
+ALL = tuple(ALL_JOBS)
+DUAL_JOBS = ("WAR", "MNK", "RDM", "THF", "DRK", "BST", "BRD", "SAM", "NIN", "DRG", "BLU", "COR", "DNC", "RUN")
+# (ジョブ, 項目)。ジョブは ALL か、略称のタプル
+EXTRA_ENTRIES = [
+    (ALL, dict(path="sets.TreasureHunter", title="トレジャーハンター (手動で切り替え)", verified=False,
+               help="トレジャーハンターの装備。ゲームで「//gs c toggle TreasureHunter」を押すと、戦闘中の装備に重ねます (待機には重ねません)。"
+                    "敵に最初の一撃を入れたら、もう一度押して外してください。")),
+    (DUAL_JOBS, dict(path="sets.engaged.dual11", title="二刀流 (サポ忍)", verified=False,
+                     help="サポ忍のときに、戦闘中の装備に重ねる装備 (二刀流の値を合わせる耳・腰など)。サポジョブを見て、自動で重ねます。")),
+    (DUAL_JOBS, dict(path="sets.engaged.dual21", title="二刀流 (サポ踊)", verified=False,
+                     help="サポ踊のときに、戦闘中の装備に重ねる装備。サポジョブを見て、自動で重ねます。")),
+    (("BLM", "RDM", "SCH", "GEO"),
+     dict(path="sets.midcast['精霊魔法'].MB", title="詠唱中 (精霊魔法・マジックバースト)", verified=False,
+          help="マジックバーストを狙うときの精霊魔法の装備。マジックバーストダメージ・魔法攻撃力などを入れます。"
+               "「詠唱中 (精霊魔法)」に重ねて作ります。ゲームで「//gs c cycle CastingMode」で MB にしたときに着ます。")),
+    (("MNK", "WHM", "BLM", "RDM", "PLD", "BRD", "RNG", "SMN", "BLU", "PUP", "SCH", "GEO", "RUN"),
+     dict(path="sets.idle.Refresh", title="待機 (リフレシュ)", verified=False,
+          help="MP を回復したいときの待機の装備 (リフレシュ)。ゲームで「//gs c cycle IdleMode」で Refresh にしたときに着ます。")),
+    (ALL, dict(path="sets.engaged.Acc", title="戦闘中 (命中重視)", verified=False,
+               help="命中が足りないときの戦闘中の装備。ゲームで「//gs c cycle OffenseMode」で Acc にしたときに着ます。")),
+    (ALL, dict(path="sets.engaged.SubtleBlow", title="戦闘中 (モクシャ)", verified=False,
+               help="敵に TP を与えにくくする装備 (モクシャ)。ゲームで「//gs c cycle OffenseMode」で SubtleBlow にしたときに着ます。")),
+    (("BRD",), dict(path="sets.precast.FC['歌唱']", title="詠唱の開始 (歌)", verified=False,
+                    help="歌を歌い始めるときの装備。歌唱詠唱時間短縮・ファストキャストを入れます。")),
+]
+SONG_FAMILIES = [
+    ("March", "マーチ", "マーチ効果アップ・歌唱スキルなどを入れます。"),
+    ("Minuet", "メヌエット", "メヌエット効果アップなどを入れます。"),
+    ("Madrigal", "マドリガル", "マドリガル効果アップなどを入れます。"),
+    ("Ballad", "バラード", "バラード効果アップなどを入れます。"),
+    ("Minne", "ミンネ", "ミンネ効果アップなどを入れます。"),
+    ("Paeon", "ピーアン", "ピーアン効果アップなどを入れます。"),
+    ("Etude", "エチュード", "エチュード効果アップなどを入れます。"),
+    ("Carol", "カロル", "カロル効果アップなどを入れます。"),
+    ("Prelude", "プレリュード", "プレリュード効果アップなどを入れます。"),
+    ("Mambo", "マンボ", "マンボ効果アップなどを入れます。"),
+    ("Lullaby", "ララバイ", "魔法命中・歌唱スキル・効果時間などを入れます。"),
+    ("Threnody", "スレノディ", "魔法命中・スレノディ効果アップなどを入れます。"),
+    ("Elegy", "エレジー", "魔法命中・歌唱スキルなどを入れます。"),
+    ("Requiem", "レクイエム", "魔法命中・歌唱スキルなどを入れます。"),
+]
+EXTRA_ENTRIES += [(("BRD",), dict(path="sets.midcast.%s" % fam, title="歌 (%s)" % ja, verified=False,
+                                  help="%sを歌っている間の装備。%s" % (ja, why)))
+                  for fam, ja, why in SONG_FAMILIES]
+EXTRA_ENTRIES += [
+    (("BLU",), dict(path="sets.midcast.BluePhysical", title="青魔法 (物理)", verified=False,
+                    help="物理の青魔法 (シンカードリルなど) を唱えている間の装備。STR・DEX・命中・攻撃などを入れます。どの魔法が物理かは、キットが知っています。")),
+    (("BLU",), dict(path="sets.midcast.BlueMagical", title="青魔法 (魔法)", verified=False,
+                    help="魔法の青魔法 (アンビルライトニング・テネブラルクラッシュなど) を唱えている間の装備。魔法攻撃力・INT・魔法命中などを入れます。")),
+    (("BLU",), dict(path="sets.midcast.BlueBuff", title="青魔法 (強化)", verified=False,
+                    help="強化の青魔法 (コクーン・エラチックフラッターなど) を唱えている間の装備。青魔法スキル・効果時間などを入れます。")),
+    (("BLU",), dict(path="sets.midcast.BlueHealing", title="青魔法 (回復)", verified=False,
+                    help="回復の青魔法 (マジックフルーツ・ホワイトウインドなど) を唱えている間の装備。ケアル回復量・MND・VIT などを入れます。")),
+    (("GEO",), dict(path="sets.idle.Luopan", title="待機 (羅盤がいるとき)", verified=False,
+                    help="羅盤を出している間の待機の装備。羅盤の被ダメージ軽減・羅盤のリジェネなどを入れます。羅盤がいないときは、上の「待機」の装備になります。")),
+    (("GEO",), dict(path="sets.midcast.Entrust", title="エントラスト中のインデ", verified=False,
+                    help="エントラストを使ったあと、ほかの人にインデ魔法をかける間の装備。インデの効果時間アップなどを入れます。")),
+]
 
 
 BAR_ELEMENT_ENTRY = dict(
@@ -236,15 +383,22 @@ def sets_for_job(job):
         if e["path"] == "sets.precast.WS":
             # 共通の WS のすぐ後に、魔攻の WS と (遠隔武器が主のジョブだけ) 遠隔の WS
             out.append(WS_MAGIC_ENTRY)
-            if job in WS.RANGED_JOBS:
+            out.append(WS_CRIT_ENTRY)
+            if job in WS.RANGED_SET_JOBS:
                 out.append(WS_RANGE_ENTRY)
+            if job in WS.RANGED_JOBS:
                 out.append(WS_RANGE_MAGIC_ENTRY)
     out += WEAPON_ENTRIES
+    if job in WS.RANGED_SET_JOBS:
+        out += RANGED_ENTRIES
     if job in WS.RANGED_JOBS:
         out += [e for e in AMMO_ENTRIES if job in e.get("jobs", (job,))]
     out += JOB.get(job, [])
+    have = {e["path"] for e in out}
+    out += [e for p, e in SPELL_FAMILY_ENTRIES.items() if job in SPELL_FAMILY_JOBS[p] and p not in have]
+    out += [e for jobs, e in EXTRA_ENTRIES if job in jobs and e["path"] not in have]
     if job in JOBS_WITH_SKILL_SETS:
-        for skill, text in MAGIC_SKILLS:
+        for skill, text in MAGIC_SKILLS + [(s, SKILL_EXTRA_HELP[s]) for s in JOB_SKILL_EXTRA.get(job, [])]:
             path = "sets.midcast['%s']" % skill
             if any(s["path"] == path for s in out):
                 continue
@@ -266,6 +420,8 @@ MAGIC_SKILLS_HELP_EN = {
     "弱体魔法": "Gear worn while casting enfeebles such as Slow and Sleep. Magic Accuracy, Enfeebling Magic skill, etc.",
     "精霊魔法": "Gear worn while casting elemental nukes such as Fire. Magic Attack, Magic Damage and other potency stats.",
     "暗黒魔法": "Gear worn while casting dark spells such as Drain. Dark Magic skill, etc.",
+    "神聖魔法": "Gear worn while casting divine spells such as Banish and Holy. MND, Magic Attack, Divine Magic skill, etc.",
+    "風水魔法": "Gear worn while casting Indi- and Geo- spells. Geomancy skill, luopan potency and the like.",
 }
 
 AMMO_HELP_TAIL_EN = (" Use \"Pick from inventory…\" to choose from your //gs export all list (or equip it, run //gs export, "
@@ -334,15 +490,70 @@ _EN = {
     "ammo:special": ("Ammo (special, per weapon skill)", "Ammo used only for specific weapon skills (e.g. Hauksbok Bullet for Aeolian Edge or Savage Blade). Pick the ammo, then the weapon skills that use it. It's worn only for that weapon skill, then you go back to the physical ammo (so it isn't fired by accident). Choosing other ammo for the same weapon skill replaces it." + AMMO_HELP_TAIL_EN),
     # weapon skill variants
     "sets.precast.WS.Magic": ("Weapon skill (magical / hybrid)", "Gear worn for magical weapon skills (Sanguine Blade, Aeolian Edge, Leaden Salute, etc., hybrid ones included): Magic Attack, Magic Damage, weapon skill damage. The kit already knows which weapon skills are magical. Magical weapon skills you add per skill are built on top of this set (set_combine). On RNG/COR, if you make \"Weapon skill (ranged magical)\", ranged magical weapon skills use that instead."),
+    "sets.precast.WS.Critical": ("Weapon skill (critical)", "Gear worn for weapon skills whose damage rides on critical hits (Evisceration, Vorpal Blade, Rampage, Blade: Jin, etc.): Critical hit rate, Critical hit damage, DEX. The kit already knows which weapon skills are critical ones. Critical weapon skills you add per skill are built on top of this set."),
     "sets.precast.WS.RangeMagic": ("Weapon skill (ranged magical)", "Gear worn for magical ranged weapon skills (Leaden Salute, Wildfire, Trueflight, etc.): Magic Attack, Magic Damage, Ranged Accuracy. If left empty, \"Weapon skill (magical / hybrid)\" is used. Ranged magical weapon skills you add per skill are built on top of this set."),
     "sets.precast.WS.Range": ("Weapon skill (ranged physical)", "Gear worn for physical Archery and Marksmanship weapon skills (Jishnu's Radiance, Last Stand, etc.): Ranged Attack, Ranged Accuracy, weapon skill damage. Magical ranged weapon skills such as Leaden Salute use \"Weapon skill (magical / hybrid)\"."),
+    # ranged (RNG / COR)
+    "sets.precast.RA": ("Ranged precast (Snapshot)", "Gear worn the moment you start a ranged attack: Snapshot, Rapid Shot and anything else that speeds up the draw."),
+    "sets.RA_STP": ("Ranged attack (Store TP)", "Your base gear while a ranged attack is going off (sets.midcast.RA): Store TP, Ranged Attack, Ranged Accuracy."),
+    "sets.RA_ACC": ("Ranged attack (accuracy)", "Ranged attack gear for when you need more Ranged Accuracy (//gs c cycle RangedMode to Acc; sets.midcast.RA.Acc)."),
+    # COR
+    "sets.CorsairRoll": ("Phantom Roll (default)", "Gear worn the moment you use Phantom Roll (sets.precast.CorsairRoll): roll area, roll duration, recast and so on. Per-roll gear (Chasseur's Tricorne +3 for Allies' Roll, etc.) is built on top of this set."),
+    "sets.RA_QDSTP": ("Quick Draw (Store TP)", "Quick Draw gear that favors Store TP (e.g. for Sortie): Quick Draw damage, Store TP. If you also make \"Quick Draw (damage)\", //gs c cycle QuickDrawMode switches between them (StoreTP / Damage)."),
+    "sets.RA_QDDPS": ("Quick Draw (damage)", "Quick Draw gear that goes for damage: Magic Attack, Quick Draw damage, AGI. Worn when QuickDrawMode is set to Damage."),
+    "sets.RA_QDACC": ("Quick Draw (M.Acc: Light / Dark)", "Gear for Light Shot and Dark Shot, where landing the shot matters more than damage: Magic Accuracy. These two always use this set, whatever QuickDrawMode is set to."),
+    # spell families
+    "sets.midcast.Cure": ("Cure", "Gear worn while casting Cure I-VI: Cure potency, MND, Healing Magic skill. If left empty, \"Midcast (Healing Magic)\" is used."),
+    "sets.precast.FC.Cure": ("Precast (Cure)", "Gear worn when you start casting a Cure: Cure spellcasting time - (Cure-only fast cast). If left empty, \"Precast (Fast Cast)\" is used."),
+    "sets.midcast.Regen": ("Regen", "Gear worn while casting Regen I-V: Regen potency and duration."),
+    "sets.midcast.Refresh": ("Refresh", "Gear worn while casting Refresh I-III: Refresh potency and duration."),
+    "sets.midcast.Drain": ("Drain / Aspir", "Gear worn while casting Drain and Aspir: Drain/Aspir potency, Dark Magic skill, Magic Accuracy."),
+    "sets.midcast.Helix": ("Helix", "Gear worn while casting helixes (Pyrohelix, etc.): Magic Attack, Magic Damage. Helixes sometimes want different gear from your nukes."),
+    "sets.midcast.ElementalEnfeeble": ("Elemental debuffs (Burn, Shock...)", "Gear worn while casting Burn, Frost, Choke, Rasp, Shock or Drown: Magic Accuracy, INT."),
+    # DNC
+    "sets.precast.Waltz": ("Waltz", "Gear worn the moment you use a Waltz (Curing Waltz, etc.): Waltz potency, CHR, Waltz recast -."),
+    "sets.precast.Samba": ("Samba", "Gear worn the moment you use a Samba: Samba duration +."),
+    "sets.precast.Jig": ("Jig", "Gear worn the moment you use a Jig (Spectral Jig, etc.): Jig duration +."),
+    "sets.precast.Step": ("Step", "Gear worn the moment you use a Step: Accuracy, so the step lands."),
+    "sets.precast.Flourish1": ("Flourish I (Violent Flourish...)", "Gear worn the moment you use a Flourish I (Animated Flourish, Violent Flourish, etc.): Magic Accuracy, Accuracy."),
+    # 1.1.0 additions
+    "sets.TreasureHunter": ("Treasure Hunter (manual toggle)", "Treasure Hunter gear. Use //gs c toggle TreasureHunter in game to layer it over your engaged gear (not idle). Once the mob is tagged, toggle it off again."),
+    "sets.engaged.dual11": ("Dual wield (/NIN)", "Layered over your engaged gear while you're /NIN: earrings, waist and so on that bring your Dual Wield to where you want it. Applied automatically based on your subjob."),
+    "sets.engaged.dual21": ("Dual wield (/DNC)", "Layered over your engaged gear while you're /DNC. Applied automatically based on your subjob."),
+    "sets.midcast['精霊魔法'].MB": ("Midcast (Elemental: magic burst)", "Elemental nuke gear for magic bursts: Magic Burst damage, Magic Attack. Built on top of \"Midcast (Elemental Magic)\". Worn when //gs c cycle CastingMode is set to MB."),
+    "sets.idle.Refresh": ("Idle (Refresh)", "Idle gear for getting MP back (Refresh). Worn when //gs c cycle IdleMode is set to Refresh."),
+    "sets.engaged.Acc": ("Engaged (accuracy)", "Engaged gear for when you're missing too much. Worn when //gs c cycle OffenseMode is set to Acc."),
+    "sets.engaged.SubtleBlow": ("Engaged (Subtle Blow)", "Gear that gives the mob less TP (Subtle Blow). Worn when //gs c cycle OffenseMode is set to SubtleBlow."),
+    "sets.precast.FC['歌唱']": ("Precast (songs)", "Gear worn when you start singing: song spellcasting time -, Fast Cast."),
+    "sets.midcast.BluePhysical": ("Blue Magic (physical)", "Gear worn while casting physical blue spells (Sinker Drill, etc.): STR, DEX, Accuracy, Attack. The kit already knows which spells are physical."),
+    "sets.midcast.BlueMagical": ("Blue Magic (magical)", "Gear worn while casting magical blue spells (Anvil Lightning, Tenebral Crush, etc.): Magic Attack, INT, Magic Accuracy."),
+    "sets.midcast.BlueBuff": ("Blue Magic (buffs)", "Gear worn while casting buffing blue spells (Cocoon, Erratic Flutter, etc.): Blue Magic skill, duration."),
+    "sets.midcast.BlueHealing": ("Blue Magic (healing)", "Gear worn while casting healing blue spells (Magic Fruit, White Wind, etc.): Cure potency, MND, VIT."),
+    "sets.idle.Luopan": ("Idle (luopan out)", "Idle gear while you have a luopan out: luopan damage taken -, luopan Regen and the like. Without a luopan, the regular Idle set is used."),
+    "sets.midcast.Entrust": ("Indi spell under Entrust", "Gear worn while you cast an Indi spell on someone else after Entrust: Indi duration + and the like."),
+    "sets.midcast.March": ("Song (March)", "Gear worn while singing Marchs: March effect +, Singing skill."),
+    "sets.midcast.Minuet": ("Song (Minuet)", "Gear worn while singing Minuets: Minuet effect +."),
+    "sets.midcast.Madrigal": ("Song (Madrigal)", "Gear worn while singing Madrigals: Madrigal effect +."),
+    "sets.midcast.Ballad": ("Song (Ballad)", "Gear worn while singing Ballads: Ballad effect +."),
+    "sets.midcast.Minne": ("Song (Minne)", "Gear worn while singing Minnes: Minne effect +."),
+    "sets.midcast.Paeon": ("Song (Paeon)", "Gear worn while singing Paeons: Paeon effect +."),
+    "sets.midcast.Etude": ("Song (Etude)", "Gear worn while singing Etudes: Etude effect +."),
+    "sets.midcast.Carol": ("Song (Carol)", "Gear worn while singing Carols: Carol effect +."),
+    "sets.midcast.Prelude": ("Song (Prelude)", "Gear worn while singing Preludes: Prelude effect +."),
+    "sets.midcast.Mambo": ("Song (Mambo)", "Gear worn while singing Mambos: Mambo effect +."),
+    "sets.midcast.Lullaby": ("Song (Lullaby)", "Gear worn while singing Lullabies: Magic Accuracy, Singing skill, duration."),
+    "sets.midcast.Threnody": ("Song (Threnody)", "Gear worn while singing Threnodies: Magic Accuracy, Threnody effect +."),
+    "sets.midcast.Elegy": ("Song (Elegy)", "Gear worn while singing Elegies: Magic Accuracy, Singing skill."),
+    "sets.midcast.Requiem": ("Song (Requiem)", "Gear worn while singing Requiems: Magic Accuracy, Singing skill."),
     "sets.midcast.BarElement": ("Midcast (Bar-element spells)", "Gear worn while casting elemental bar spells (Barfire, Barfira, etc.): bar-spell effect + (e.g. Shedir Seraweels). Built on top of \"Midcast (Enhancing Magic)\", so you only need the slots you want to change."),
 }
 
 
 def _attach_en():
-    groups = [(None, COMMON), (None, WEAPON_ENTRIES), (None, AMMO_ENTRIES),
-              (None, [WS_MAGIC_ENTRY, WS_RANGE_MAGIC_ENTRY, WS_RANGE_ENTRY, BAR_ELEMENT_ENTRY])]
+    groups = [(None, COMMON), (None, WEAPON_ENTRIES), (None, AMMO_ENTRIES), (None, RANGED_ENTRIES),
+              (None, list(SPELL_FAMILY_ENTRIES.values())),
+              (None, [e for _j, e in EXTRA_ENTRIES]),
+              (None, [WS_MAGIC_ENTRY, WS_CRIT_ENTRY, WS_RANGE_MAGIC_ENTRY, WS_RANGE_ENTRY, BAR_ELEMENT_ENTRY])]
     groups += list(JOB.items())
     for job, lst in groups:
         for e in lst:

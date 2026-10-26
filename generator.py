@@ -5,6 +5,7 @@
 他の作者のコードは使わない。装備の中身 (名前・オーグメント) は export の表記をそのまま使う。
 """
 import datetime
+import json
 import os
 
 import export_parser as EP
@@ -170,7 +171,11 @@ MERIT_BASE = "sets.merit"
 MERIT_NEEDS_PET = ("PUP", "DRG")
 
 
-def overlay_blocks(buffs, emitted, job=None, toggles=()):
+# 二刀流のセット: (パス, サポジョブの英語略称, 日本語略称)。作者の user-globals.lua の customize_melee_set と同じ
+DUAL_SETS = [("sets.engaged.dual11", "NIN", "忍"), ("sets.engaged.dual21", "DNC", "踊")]
+
+
+def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=()):
     """待機・戦闘中の装備に重ねる仕組みの Lua。
     - 効果中ずっと着る装備 (sets.buff): buffs = [(セットのパス, バフ番号, 英語名, 日本語名)]。その強化が付いている間だけ重ねる。
     - メリットポイントで覚える特性の装備 (sets.merit.*): //gs c cycle MeritGear を On にしたときだけ、ペットがいる間に重ねる
@@ -188,7 +193,9 @@ def overlay_blocks(buffs, emitted, job=None, toggles=()):
     casts = {ph: [b[:4] + (b[5],) for b in rows if b[4] in (ph, "both")] for ph in ("precast", "midcast")}
     merits = [p for p in sorted(emitted) if p.startswith(MERIT_BASE + ".")]
     toggles = list(toggles or [])
-    if not active and not merits and not any(casts.values()) and not toggles:
+    # toggles の 1 行: (state の名前, 説明, セットのパス[, "melee" = 戦闘中だけ重ねる])
+    dual = [d for d in DUAL_SETS if d[0] in emitted] if dual else []
+    if not active and not merits and not any(casts.values()) and not toggles and not dual:
         return [], [], []
     top = [L("-- 待機と戦闘中の装備に、条件つきで重ねる装備", "-- Conditional gear layered over the idle / engaged sets")]
     if active:
@@ -214,7 +221,7 @@ def overlay_blocks(buffs, emitted, job=None, toggles=()):
                 "    end",
                 "end",
                 ""]
-    if not active and not merits and not toggles:
+    if not active and not merits and not toggles and not dual:
         return top, [], _cast_reg(casts)
     if merits:
         needs_pet = job in MERIT_NEEDS_PET
@@ -223,7 +230,7 @@ def overlay_blocks(buffs, emitted, job=None, toggles=()):
                   "-- Merit trait gear (sets.merit): layered on only when //gs c cycle MeritGear is On%s."
                   % (" and your pet is out" if needs_pet else "")),
                 "local merit_gear = {}"]
-    top += ["local function apply_overlay(base)"]
+    top += ["local function apply_overlay(base, melee)"]
     if active:
         top += ["    for _, b in ipairs(buff_gear) do",
                 "        if buffactive[b[1]] then base = set_combine(base, b[4]) end",
@@ -232,11 +239,19 @@ def overlay_blocks(buffs, emitted, job=None, toggles=()):
         top += ["    if state.MeritGear and state.MeritGear.value == 'On'%s then" % (" and pet and pet.isvalid" if needs_pet else ""),
                 "        for _, s in ipairs(merit_gear) do base = set_combine(base, s) end",
                 "    end"]
-    for field, desc, path in toggles:
+    for tg in toggles:
+        field, desc, path = tg[:3]
+        cond = " and melee" if len(tg) > 3 and tg[3] == "melee" else ""
         if field is None:     # いつも重ねる装備 (学者の陣頭指揮の足など)
             top += ["    base = set_combine(base, %s)" % path + ("" if is_en() else "   -- %s" % desc)]
         else:
-            top += ["    if state.%s and state.%s.value then base = set_combine(base, %s) end" % (field, field, path)]
+            top += ["    if state.%s and state.%s.value%s then base = set_combine(base, %s) end" % (field, field, cond, path)]
+    if dual:
+        top += [L("    -- 二刀流: サポジョブに合わせて、戦闘中の装備に重ねる (サポ忍 = sets.engaged.dual11・サポ踊 = sets.engaged.dual21)",
+                  "    -- Dual wield: layered over engaged gear by subjob (/NIN = sets.engaged.dual11, /DNC = sets.engaged.dual21)")]
+        for path, sub_en, sub_ja in dual:
+            subs = "player.sub_job == '%s'" % sub_en + ("" if is_en() else " or player.sub_job == '%s'" % sub_ja)
+            top += ["    if melee and (%s) then base = set_combine(base, %s) end" % (subs, path)]
     top += ["    return base",
             "end",
             "",
@@ -245,7 +260,7 @@ def overlay_blocks(buffs, emitted, job=None, toggles=()):
             "end",
             "",
             "function customize_melee_set(meleeSet)",
-            "    return apply_overlay(meleeSet)",
+            "    return apply_overlay(meleeSet, true)",
             "end",
             ""]
     if active:
@@ -261,7 +276,8 @@ def overlay_blocks(buffs, emitted, job=None, toggles=()):
                 "end",
                 ""]
     setup = []
-    for field, desc, path in toggles:
+    for tg in toggles:
+        field, desc, path = tg[:3]
         if field is None:
             continue
         setup += [L("    -- %s の装備 (%s) を重ねるか: //gs c toggle %s" % (desc, path, field),
@@ -272,7 +288,7 @@ def overlay_blocks(buffs, emitted, job=None, toggles=()):
                     "    -- Use merit trait gear (Optimization, Fine-Tuning, etc.): //gs c cycle MeritGear. Leave Off if you have no merits there"),
                  "    state.MeritGear = M{['description']='MeritGear', 'Off', 'On'}"]
     reg = []
-    if active or merits or toggles:
+    if active or merits or toggles or dual:
         # 念のため: Mote-Include は sets.idle / sets.engaged を空で作るが、無いと customize_idle_set などが呼ばれないので、
         # 無ければ空のセットを用意する (標準の Mote-Include では何も変わらない)
         reg.append(L("    -- 待機・戦闘中の装備のセットが無いときのための用意 (普段は何もしません)",
@@ -538,16 +554,43 @@ def pet_map_rows(job, emitted):
     return rows
 
 
+BLU_SETS = ("BluePhysical", "BlueMagical", "BlueBuff", "BlueHealing")
+
+
+def blu_map_rows(job, emitted):
+    """青魔法の分類 {英語名: 'BluePhysical' など}。そのセットを出すときだけ (blu_spells.json = 作者の Mote-Mappings.lua の分類)。"""
+    if job != "BLU":
+        return {}
+    have = {c for c in BLU_SETS if "sets.midcast.%s" % c in emitted}
+    if not have:
+        return {}
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blu_spells.json")
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)["spells"]
+    return {en: c for en, c in data.items() if c in have}
+
+
 def ws_blocks(emitted, job=None):
     """WS の分け方 (job_get_spell_map) の Lua。sets.precast.WS.Magic / .Range が出るときだけ。
     標準の Mote-Include は spellMap の名前でもセットを探すので、魔法属性の WS は 'Magic'・遠隔の WS は 'Range' と分ける。"""
     has_magic = "sets.precast.WS.Magic" in emitted
     has_range = "sets.precast.WS.Range" in emitted
     has_rmagic = "sets.precast.WS.RangeMagic" in emitted
+    has_crit = "sets.precast.WS.Critical" in emitted
     pet_rows = pet_map_rows(job, emitted) if job else {}
-    if not (has_magic or has_range or has_rmagic or pet_rows):
+    blu_rows = blu_map_rows(job, emitted)
+    if not (has_magic or has_range or has_rmagic or has_crit or pet_rows or blu_rows):
         return []
     top = []
+    if blu_rows:
+        top += [L("-- 青魔法の分け方: sets.midcast.BluePhysical (物理)・BlueMagical (魔法)・BlueBuff (強化)・BlueHealing (回復)",
+                  "-- Blue magic mapping: sets.midcast.BluePhysical / BlueMagical / BlueBuff / BlueHealing"),
+                L("-- (魔法ごとのセット sets.midcast['魔法の名前'] があれば、そちらが先に使われます)",
+                  "-- (A per-spell set, sets.midcast['Spell Name'], takes priority if you have one)"),
+                "local blu_spell_map = {"]
+        for en in sorted(blu_rows):
+            top.append("    [%s] = '%s'," % (_lua_str(en), blu_rows[en]))
+        top += ["}"]
     if pet_rows:
         names = sorted(set(pet_rows.values()))
         top += [L("-- ペットの技の分け方: %s" % "・".join("sets.midcast.Pet.%s" % n for n in names),
@@ -559,10 +602,13 @@ def ws_blocks(emitted, job=None):
             top.append("    [%s] = '%s'," % (_lua_str(en), pet_rows[en]))
         top += ["}",
                 "local pet_move_types = {%s}" % ", ".join("['%s'] = true" % t for t in PET_TYPES[job])]
-    if not (has_magic or has_range or has_rmagic):
-        top += ["function job_get_spell_map(spell, default_spell_map)",
-                "    if pet_move_types[spell.type] and pet_move_map[spell.english] then return pet_move_map[spell.english] end",
-                "end", ""]
+    if not (has_magic or has_range or has_rmagic or has_crit):
+        top += ["function job_get_spell_map(spell, default_spell_map)"]
+        if pet_rows:
+            top.append("    if pet_move_types[spell.type] and pet_move_map[spell.english] then return pet_move_map[spell.english] end")
+        if blu_rows:
+            top.append("    if blu_spell_map[spell.english] then return blu_spell_map[spell.english] end")
+        top += ["end", ""]
         return top
     top += [L("-- ウェポンスキルの分け方: 魔法属性の WS (属性物理を含む) は sets.precast.WS.Magic、"
               "弓術・射撃の WS は sets.precast.WS.Range を使います",
@@ -570,6 +616,9 @@ def ws_blocks(emitted, job=None):
               "archery / marksmanship WS use sets.precast.WS.Range"),
             L("-- (技ごとのセット sets.precast.WS['技の名前'] があれば、そちらが先に使われます)",
               "-- (A per-WS set, sets.precast.WS['WS Name'], takes priority if you have one)")]
+    if has_crit:
+        top[1:1] = [L("-- クリティカルの WS (エヴィサレーション・ボーパルブレードなど) は sets.precast.WS.Critical を使います",
+                      "-- Critical-hit WS (Evisceration, Vorpal Blade, etc.) use sets.precast.WS.Critical")]
     if has_rmagic:
         top[1:1] = [L("-- 魔法属性の遠隔 WS (レデンサリュートなど) は sets.precast.WS.RangeMagic を使います",
                       "-- Magical ranged WS (Leaden Salute, etc.) use sets.precast.WS.RangeMagic")]
@@ -578,9 +627,16 @@ def ws_blocks(emitted, job=None):
         for i in range(0, len(WS.MAGIC_WS), 4):
             top.append("    " + " ".join("[%s] = true," % _lua_str(n) for n in WS.MAGIC_WS[i:i + 4]))
         top.append("}")
+    if has_crit:
+        top.append("local crit_ws = {")
+        for i in range(0, len(WS.CRIT_WS), 4):
+            top.append("    " + " ".join("[%s] = true," % _lua_str(n) for n in WS.CRIT_WS[i:i + 4]))
+        top.append("}")
     top += ["function job_get_spell_map(spell, default_spell_map)"]
     if pet_rows:
         top.append("    if pet_move_types[spell.type] and pet_move_map[spell.english] then return pet_move_map[spell.english] end")
+    if blu_rows:
+        top.append("    if blu_spell_map[spell.english] then return blu_spell_map[spell.english] end")
     top += ["    if spell.type ~= 'WeaponSkill' then return end"]
     ranged = "(%s)" % _RANGED_SKILL()
     if has_rmagic:
@@ -589,6 +645,8 @@ def ws_blocks(emitted, job=None):
         top.append("    if magic_ws[spell.english] then return 'Magic' end")
     if has_range:
         top.append("    if %s then return 'Range' end" % _RANGED_SKILL())
+    if has_crit:
+        top.append("    if crit_ws[spell.english] then return 'Critical' end")
     top += ["end", ""]
     return top
 
@@ -601,7 +659,9 @@ PLD_ENMITY_SPELLS = ("Flash", "Foil", "Reprisal", "Crusade", "Banish", "Banishga
                      "Jettatura", "Geist Wall", "Sheep Song", "Blank Gaze", "Soporific", "Stinking Gas", "Poisonga")
 # 手動で重ねる装備: (state の名前, 説明, セットのパス)。後ろのものが上に重なる
 PLD_TOGGLES = [("Magical", "対魔法", "sets.idle.Magical"), ("StatusResist", "状態異常耐性", "sets.StatusResist")]
-TOGGLE_EN = {"Magical": "magic defense", "StatusResist": "status resistance"}
+TOGGLE_EN = {"Magical": "magic defense", "StatusResist": "status resistance", "TreasureHunter": "Treasure Hunter"}
+# トレジャーハンター: //gs c toggle TreasureHunter で、戦闘中の装備に重ねる (全ジョブ)
+TH_TOGGLE = ("TreasureHunter", "トレジャーハンター", "sets.TreasureHunter", "melee")
 # メインとサブも着替えるセット (対魔法の武器・盾)。オフにしたら、武器の切り替えで選んでいる武器に戻す
 PLD_WEAPON_SETS = ("sets.idle.Magical", "sets.StatusResist")
 PLD_LAND_ADJUST = 0.30     # 着弾の何秒前に着弾の装備へ替えるか (作者の PLD.lua の実測: 0.30 秒で 10/10)
@@ -1021,6 +1081,59 @@ def waist_blocks(emitted, enabled):
     return out
 
 
+# --- 狩人・コルセアの遠隔攻撃、コルセアのロールとクイックドロー ---
+# 名前は作者の COR_gear.lua と同じ (sets.RA_STP など)。出したら、Mote-Include が探す名前に結ぶ
+COR_QD_SETS = [("sets.RA_QDSTP", "ソーティ", "StoreTP"), ("sets.RA_QDDPS", "通常", "Damage")]
+COR_QD_ACC_SHOTS = [("Light Shot", "ライトショット"), ("Dark Shot", "ダークショット")]
+
+
+def ranged_links(emitted):
+    """{出したセット: [結ぶ先のパス]}。結ぶ先は、出した直後に `先 = セット` の行で作る (ロールごとのセットなどを、その上に重ねるため)。"""
+    links = {"sets.RA_STP": ["sets.midcast.RA"], "sets.RA_ACC": ["sets.midcast.RA.Acc"],
+             "sets.CorsairRoll": ["sets.precast.CorsairRoll"]}
+    qd = [p for p, _ja, _en in COR_QD_SETS if p in emitted]
+    if qd:
+        links[qd[0]] = ["sets.precast.CorsairShot"]      # 既定のクイックドローは STP (無ければ威力)
+    return {k: v for k, v in links.items() if k in emitted}
+
+
+def cor_blocks(emitted):
+    """遠隔攻撃のモードと、コルセアのクイックドローの切り替えの Lua。戻り値: dict(setup, post_precast, init_tail)。"""
+    out = dict(setup=[], post_precast=[], init_tail=[])
+    if "sets.RA_ACC" in emitted:
+        out["setup"] += [L("    -- //gs c cycle RangedMode で、遠隔攻撃の装備を切り替えます (Normal = STP / Acc = 飛命)",
+                           "    -- //gs c cycle RangedMode switches ranged attack gear (Normal = Store TP / Acc = accuracy)"),
+                         "    state.RangedMode:options('Normal', 'Acc')"]
+    qd = [(p, L(ja, en)) for p, ja, en in COR_QD_SETS if p in emitted]
+    if len(qd) == 2:
+        names = ", ".join("'%s'" % n for _p, n in qd)
+        out["setup"] += [L("    -- //gs c cycle QuickDrawMode で、クイックドローの装備を切り替えます (%s)" % names.replace("'", ""),
+                           "    -- //gs c cycle QuickDrawMode switches Quick Draw gear (%s)" % names.replace("'", "")),
+                         "    state.QuickDrawMode = M{['description']='QuickDrawMode', %s}" % names]
+        out["init_tail"] += [L("    -- //gs c cycle QuickDrawMode で切り替えるクイックドローの装備 (job_post_precast で着る)",
+                               "    -- Quick Draw sets for //gs c cycle QuickDrawMode (worn in job_post_precast)"),
+                             "    sets.QuickDraw = {"]
+        out["init_tail"] += ["        ['%s'] = %s," % (n, p) for p, n in qd] + ["    }"]
+        out["post_precast"] = [
+            L("    -- クイックドロー: QuickDrawMode の装備を着る (ライトショット・ダークショットは魔命の装備のまま)",
+              "    -- Quick Draw: wear the QuickDrawMode set (Light Shot / Dark Shot keep their accuracy set)"),
+            "    if spell.type == 'CorsairShot' and spell.english ~= 'Light Shot' and spell.english ~= 'Dark Shot'",
+            "        and sets.QuickDraw and sets.QuickDraw[state.QuickDrawMode.value] then",
+            "        equip(sets.QuickDraw[state.QuickDrawMode.value])",
+            "    end"]
+    if "sets.RA_QDACC" in emitted:
+        out["init_tail"] += [L("    -- ライトショット・ダークショットは、魔命の装備で撃つ",
+                               "    -- Light Shot and Dark Shot use the magic accuracy set"),
+                             "    sets.precast.CorsairShot = sets.precast.CorsairShot or {}"]
+        for en, ja in COR_QD_ACC_SHOTS:
+            out["init_tail"].append("    %s = sets.RA_QDACC" % make_key("sets.precast.CorsairShot", en))
+            if not is_en():     # 日本語名で探す改造版の Mote-Include 用
+                out["init_tail"].append("    %s = sets.RA_QDACC" % make_key("sets.precast.CorsairShot", ja))
+    if out["init_tail"]:
+        out["init_tail"].append("")
+    return out
+
+
 def ws_base(path, emitted):
     """技ごとの WS (sets.precast.WS['英語名']) を重ねる元のセット。魔法属性 → WS.Magic・遠隔 → WS.Range・ほか → WS (共通)。"""
     prefix = "sets.precast.WS['"
@@ -1095,6 +1208,8 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.extend(man["top"])
     waist = waist_blocks(emitted_paths, auto_waist)
     out.extend(waist["top"])
+    cor = cor_blocks(emitted_paths)
+    links = ranged_links(emitted_paths)
     cmds = weapon_cmds + lock_cmds + ammo_cmds + pld["cmds"] + pup["cmds"]
     if cmds:
         out.append("function job_self_command(cmdParams, eventArgs)")
@@ -1106,15 +1221,24 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     storm_lines = ([L("    -- 陣の魔法では、ファストキャストなどの装備の上から、陣頭指揮の足を履く",
                       "    -- Storm spells: wear the Stormsurge feet over fast cast gear"),
                     "    if spellMap == 'Storm' then equip(sets.Stormsurge) end"] if storm else [])
-    buff_top, buff_setup, buff_reg = overlay_blocks(buffs, emitted_paths, job, pld["toggles"])
+    toggles = pld["toggles"] + ([TH_TOGGLE] if TH_TOGGLE[2] in emitted_paths else [])
+    buff_top, buff_setup, buff_reg = overlay_blocks(buffs, emitted_paths, job, toggles, dual=True)
     if buff_top:
         out.extend(buff_top)
     out.extend(ws_blocks(emitted_paths, job))
     recv_top, recv_reg, recv_mid = received_blocks(emitted_paths, received_manual)
     out.extend(recv_top)
     has_cast = "local function equip_cast_gear(phase, spell)" in "\n".join(buff_top)
-    post_pre = (["    equip_cast_gear('precast', spell)"] if has_cast else []) + ammo_pre + man["post_precast"] + storm_lines
-    post_mid = (["    equip_cast_gear('midcast', spell)"] if has_cast else []) + recv_mid + pld["post_midcast"] + storm_lines + waist["post_midcast"]
+    # クイックドローの装備は、矢弾 (ammo_pre) より先に着る (弾は使い分けの仕組みで替える)
+    post_pre = (["    equip_cast_gear('precast', spell)"] if has_cast else []) + cor["post_precast"] + ammo_pre + man["post_precast"] + storm_lines
+    entrust = ([L("    -- エントラスト中に、ほかの人へインデ魔法をかけるときは、エントラストの装備",
+                   "    -- Indi spell on someone else under Entrust: wear the Entrust set"),
+                 "    if (buffactive['Entrust']%s) and spell.english:sub(1, 5) == 'Indi-' and spell.target.type ~= 'SELF' then"
+                 % ("" if is_en() else " or buffactive['エントラスト']"),
+                 "        equip(sets.midcast.Entrust)",
+                 "    end"] if job == "GEO" and "sets.midcast.Entrust" in emitted_paths else [])
+    post_mid = ((["    equip_cast_gear('midcast', spell)"] if has_cast else []) + recv_mid + pld["post_midcast"] + storm_lines
+                + waist["post_midcast"] + entrust)
     if post_pre:
         out += ["function job_post_precast(spell, action, spellMap, eventArgs)"] + post_pre + ["end", ""]
     if post_mid:
@@ -1134,20 +1258,23 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.append("")
     out.append("function user_setup()")
     # モードの切り替え: セットがあるモードだけを選択肢にする
-    for field, base, modes in (("IdleMode", "sets.idle", ("DT", "Tate")), ("OffenseMode", "sets.engaged", ("Tate", "PetSTP")),
-                               ("HybridMode", "sets.engaged", ("DT",))):
+    for field, base, modes in (("IdleMode", "sets.idle", ("DT", "Refresh", "Tate")),
+                               ("OffenseMode", "sets.engaged", ("Acc", "SubtleBlow", "Tate", "PetSTP")),
+                               ("HybridMode", "sets.engaged", ("DT",)),
+                               ("CastingMode", "sets.midcast['精霊魔法']", ("MB",))):
         have = [m for m in modes if "%s.%s" % (base, m) in used]
         if have:
             opts = ["Normal"] + have
-            out.append(L("    -- //gs c cycle %s で、%sの装備を切り替えます (%s)" % (field, "待機" if field == "IdleMode" else "戦闘中",
-                                                                       " / ".join(opts)),
-                         "    -- //gs c cycle %s switches %s gear (%s)" % (field, "idle" if field == "IdleMode" else "engaged",
-                                                                     " / ".join(opts))))
+            what = {"IdleMode": ("待機", "idle"), "CastingMode": ("精霊魔法 (MB = マジックバースト)", "elemental nuke (MB = magic burst)")}.get(
+                field, ("戦闘中", "engaged"))
+            out.append(L("    -- //gs c cycle %s で、%sの装備を切り替えます (%s)" % (field, what[0], " / ".join(opts)),
+                         "    -- //gs c cycle %s switches %s gear (%s)" % (field, what[1], " / ".join(opts))))
             out.append("    state.%s:options(%s)" % (field, ", ".join("'%s'" % o for o in opts)))
     out.extend(weapon_setup)
     out.extend(buff_setup)
     out.extend(lock_setup)
     out.extend(ammo_setup)
+    out.extend(cor["setup"])
     out.extend(pup["setup"])
     out.extend(man["setup"])
     out.append("end")
@@ -1175,11 +1302,25 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
         base = base or ws_base(p, emitted)
         if not base and p == "sets.midcast.BarElement" and "sets.midcast['強化魔法']" in emitted:
             base = "sets.midcast['強化魔法']"
+        # ケアルの詠唱の開始は、ファストキャストに重ねる (ケアル詠唱時間短縮の部位だけ替えればよいように)
+        if not base and p == "sets.precast.FC.Cure" and "sets.precast.FC" in emitted:
+            base = "sets.precast.FC"
+        # マジックバーストは、精霊魔法の装備に重ねる
+        if not base and p == "sets.midcast['精霊魔法'].MB" and "sets.midcast['精霊魔法']" in emitted:
+            base = "sets.midcast['精霊魔法']"
         if job == "PLD":
             base = base or pld_base(p, emitted)
+        # 結ぶ先と同じ名前のセット (アビリティ強化の装備の sets.precast.CorsairRoll など) は、結んだ元に重ねる
+        src = next((s for s, ts in links.items() if p in ts), None)
+        if not base and src in emitted:
+            base = src
         lines = set_lines(p, used[p], include_weapons, base, cycle_slots, keep_for(p))
         if lines:
             emitted.add(p)
+            # Mote-Include が探す名前に結ぶ (sets.midcast.RA = sets.RA_STP など)。ロールごとのセットは、結んだ先に重ねる
+            for target in links.get(p, []):
+                lines = lines[:-1] + ["    %s = %s" % (target, p), ""]
+                emitted.add(target)
         out.extend(lines)
     # 英語クライアント用の出力には、日本語名の別名を出さない
     alias_lines = [] if is_en() else ["    %s = %s" % (a, target) for a, target in (aliases or {}).items() if target in emitted]
@@ -1194,6 +1335,13 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
                  "idle with an avatar out (Mote looks for sets.idle.Pet)")):
             if source in emitted and target not in emitted:
                 alias_lines.append("    %s = %s   -- %s" % (target, source, L(why, why_en)))
+    # 風水士: 羅盤がいるときの待機 (Mote は、ペットがいると sets.idle.Pet を見る)
+    if job == "GEO" and "sets.idle.Luopan" in emitted and "sets.idle.Pet" not in emitted:
+        alias_lines.append("    sets.idle.Pet = sets.idle.Luopan   -- %s" % L("羅盤がいるときの待機", "idle with a luopan out"))
+    # アスピル: 日本語名で探す改造版の Mote はドレインと同じ系統 (Drain)、標準の Mote は Aspir で探す
+    if "sets.midcast.Drain" in emitted and "sets.midcast.Aspir" not in emitted:
+        alias_lines.append("    sets.midcast.Aspir = sets.midcast.Drain   -- %s" % L("アスピルも、ドレインの装備で唱える",
+                                                                                "Aspir uses the Drain gear"))
     if alias_lines:
         out.append(L("    -- 日本語名の別名 (標準の Mote-Include は英語名で、日本語名で探す改造版は日本語名で、セットを探します)",
                      "    -- Fallback sets"))
@@ -1202,6 +1350,7 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.extend(buff_reg)
     out.extend(recv_reg)
     out.extend(pld["init_tail"])
+    out.extend(cor["init_tail"])
     out.append("end")
     out.append("")
     text = "\n".join(out)

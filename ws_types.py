@@ -39,16 +39,28 @@ RANGED_WS = [
     "Trueflight", "Leaden Salute", "Numbing Shot", "Wildfire", "Last Stand", "Terminus",
 ]
 
+# クリティカルの WS (クリティカル率・クリティカルダメージの装備が効くもの)。
+# 出どころ: 作者の user-globals.lua の init_weapon_skill (sets.precast.WS.Critical に分けている WS)
+CRIT_WS = [
+    "Backhand Blow", "Ascetic's Fury", "Stringing Pummel", "Victory Smite", "Evisceration", "Vorpal Blade",
+    "Chant du Cygne", "Power Slash", "Rampage", "Keen Edge", "Raging Rush", "Vorpal Scythe", "Vorpal Thrust",
+    "Skewer", "Drakesbane", "Blade: Rin", "Blade: Jin", "Blade: Hi", "True Strike", "Hexa Strike",
+]
+
 # 遠隔の WS のセット (sets.precast.WS.Range) を出すジョブ (遠隔武器が主のジョブ)
 RANGED_JOBS = ("RNG", "COR")
+# 遠隔の WS・遠隔攻撃のセットを出すジョブ (侍は弓を持てるので、矢弾の使い分けは無しでセットだけ)
+RANGED_SET_JOBS = ("RNG", "COR", "SAM")
 
 
 def kind_of(en_name):
-    """WS の英語名から "RangeMagic" (魔法属性の遠隔) / "Magic" / "Range" / None (ふつうの近接物理)。"""
+    """WS の英語名から "RangeMagic" (魔法属性の遠隔) / "Magic" / "Range" / "Critical" / None (ふつうの近接物理)。"""
     if en_name in MAGIC_WS:
         return "RangeMagic" if en_name in RANGED_WS else "Magic"
     if en_name in RANGED_WS:
         return "Range"
+    if en_name in CRIT_WS:
+        return "Critical"
     return None
 
 

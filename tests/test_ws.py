@@ -35,6 +35,8 @@ if os.path.isfile(os.path.join(RES, "weapon_skills.lua")):
     all_ws = set(re.findall(r'\ben="([^"]*)"', txt))
     for n in WS.MAGIC_WS:
         check(n in all_ws, "魔法属性の WS の名前が res にある: %s" % n)
+    for n in WS.CRIT_WS:
+        check(n in all_ws, "クリティカルの WS の名前が res にある: %s" % n)
     ranged = set()
     for line in txt.splitlines():
         m = re.search(r'\ben="([^"]*)".*\bskill=(\d+)', line)
@@ -64,7 +66,7 @@ check(WS.kind_of("Leaden Salute") == "RangeMagic" and WS.kind_of("Aeolian Edge")
 for job in C.ALL_JOBS:
     paths = [e["path"] for e in C.sets_for_job(job)]
     check("sets.precast.WS.Magic" in paths, "%s に魔攻の WS がある" % job)
-    check(("sets.precast.WS.Range" in paths) == (job in ("RNG", "COR")), "%s の遠隔の WS は、狩人とコルセアだけ" % job)
+    check(("sets.precast.WS.Range" in paths) == (job in ("RNG", "COR", "SAM")), "%s の遠隔の WS は、狩人・コルセア・侍だけ" % job)
     check(("sets.precast.WS.RangeMagic" in paths) == (job in ("RNG", "COR")), "%s の遠隔魔攻の WS は、狩人とコルセアだけ" % job)
     if "sets.precast.WS.Magic" in paths:
         check(paths.index("sets.precast.WS.Magic") == paths.index("sets.precast.WS") + 1, "%s: 魔攻の WS は、共通の WS のすぐ後" % job)
