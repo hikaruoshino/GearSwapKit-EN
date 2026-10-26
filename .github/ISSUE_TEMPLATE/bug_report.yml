@@ -1,0 +1,44 @@
+name: 不具合 / Bug report
+description: 思った通りに動かない・エラーが出た / Something does not work or shows an error
+title: "[不具合 / Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **日本語**: 分かる範囲で構いません。日本語でも英語でも書けます。
+        **English**: Fill in what you can. Japanese or English is fine.
+  - type: textarea
+    id: what
+    attributes:
+      label: 何が起きましたか / What happened
+      description: 期待した動きと、実際の動きを書いてください / What you expected and what actually happened
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現の手順 / Steps to reproduce
+      description: どのコマンドを打ったか、どこで起きたか / Which command you typed, where it happened
+  - type: dropdown
+    id: client
+    attributes:
+      label: FFXI クライアントの言語 / Client language
+      options:
+        - 日本語 / Japanese
+        - English
+        - その他 / Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: アドオンの版 / Addon version
+      description: 例 / e.g. v0.2.0
+  - type: textarea
+    id: log
+    attributes:
+      label: エラーの表示・ログ / Error message or log (optional)
+      description: |
+        Windower の `console.log` の該当行など。キャラクター名が入っていたら消してください。
+        The relevant lines of Windower's `console.log`. Please remove your character name.
+      render: text

@@ -1,0 +1,6076 @@
+{
+ "about": "アビリティを強化する装備の対応表 (レリック装束・エンピリアン装束のうち、アビリティ強化のプロパティを持つ部位)。出どころは FF11用語辞典 (wiki.ffo.jp) の各装束のページ。items は、強化の世代が低い順に並べる。",
+ "retrieved": "2026-10-26",
+ "timing_help": {
+  "use": "そのアビリティを使う瞬間だけ着れば、効果が出る装備 (sets.precast.JA)",
+  "while_active": "強化の効果が続いている間、着たままにする必要がある装備 (sets.buff)",
+  "merit": "メリットポイントで覚える特性の装備。//gs c cycle MeritGear で On にしたときだけ着る (からくり士・竜騎士はペットがいる間) (sets.merit)",
+  "cast": "その強化が効いている間に魔法を唱えるとき、詠唱の開始 (precast) または詠唱中 (midcast) に着る装備 (sets.buff・学者の章など)"
+ },
+ "confidence_help": {
+  "wiki": "FF11用語辞典 (wiki.ffo.jp) の記載で確かめた",
+  "author": "作者がゲーム内で確かめた",
+  "author_gearswap": "作者の GearSwap での使い分けと一致することを確かめた",
+  "greeds": "ぐりーずさんの GearSwap (github.com/ktgreeds/GearSwap) のデータで、precast か sets.buff かを確かめた",
+  "inferred": "効果の書き方から推定した",
+  "low": "確かめられていない (推定)。間違いを見つけたら教えてください"
+ },
+ "jobs": {
+  "SMN": [
+   {
+    "ability_en": "Astral Flow",
+    "ability_ja": "アストラルフロウ",
+    "slot": "head",
+    "timing": "use",
+    "effect": "アストラルフロウ効果アップ (効果時間 +30 秒)",
+    "source": "wiki.ffo.jp/html/3552.html・30922.html",
+    "items": [
+     {
+      "ja": "ＳＭホーン+2",
+      "note": "オーグメント (忘れ去られた願い) をしたものだけ"
+     },
+     {
+      "ja": "グリフホーン"
+     },
+     {
+      "ja": "ＧＬホーン+1"
+     },
+     {
+      "ja": "ＧＬホーン+2"
+     },
+     {
+      "ja": "ＧＬホーン+3"
+     },
+     {
+      "ja": "ＧＬホーン+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Avatar's Favor",
+    "ability_ja": "神獣の加護",
+    "slot": "head",
+    "timing": "while_active",
+    "buff": {
+     "id": 431,
+     "en": "Avatar's Favor",
+     "ja": "神獣の加護"
+    },
+    "effect": "神獣の加護効果アップ (加護のランクの底上げと上限の拡張。ベコナー系は +2〜+5)",
+    "source": "wiki.ffo.jp/html/23302.html・33151.html・18157.html",
+    "items": [
+     {
+      "ja": "ＣＬホーン+1"
+     },
+     {
+      "ja": "ＣＬホーン+2"
+     },
+     {
+      "ja": "ベコナーホーン"
+     },
+     {
+      "ja": "ＢＣホーン+1"
+     },
+     {
+      "ja": "ＢＣホーン+2"
+     },
+     {
+      "ja": "ＢＣホーン+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Mana Cede",
+    "ability_ja": "マナシード",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "マナシード効果アップ (変換で増える TP が増える。ベコナー系は +110〜+140)",
+    "source": "wiki.ffo.jp/html/23302.html・33151.html・22225.html",
+    "items": [
+     {
+      "ja": "ＣＬブレーサー+1"
+     },
+     {
+      "ja": "ＣＬブレーサー+2"
+     },
+     {
+      "ja": "ベコナーブレーサー"
+     },
+     {
+      "ja": "ＢＣブレーサー+1"
+     },
+     {
+      "ja": "ＢＣブレーサー+2"
+     },
+     {
+      "ja": "ＢＣブレーサー+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Elemental Siphon",
+    "ability_ja": "エレメントサイフォン",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "エレメントサイフォン効果アップ (MP 回復量が増える。ベコナー系は +50〜+80)",
+    "source": "wiki.ffo.jp/html/23302.html・33151.html・14780.html",
+    "items": [
+     {
+      "ja": "ＣＬピガッシュ+1"
+     },
+     {
+      "ja": "ＣＬピガッシュ+2"
+     },
+     {
+      "ja": "ベコナーピガッシュ"
+     },
+     {
+      "ja": "ＢＣピガッシュ+1"
+     },
+     {
+      "ja": "ＢＣピガッシュ+2"
+     },
+     {
+      "ja": "ＢＣピガッシュ+3"
+     }
+    ]
+   }
+  ],
+  "BLU": [
+   {
+    "ability_en": "Convergence",
+    "ability_ja": "コンバージェンス",
+    "slot": "head",
+    "timing": "cast",
+    "buff": {
+     "id": 355,
+     "en": "Convergence",
+     "ja": "コンバージェンス"
+    },
+    "effect": "コンバージェンス効果アップ (能力値1につき魔命+2)",
+    "source": "wiki.ffo.jp/html/16057.html・30884.html",
+    "timing_basis": "効果中に唱える青魔法に乗る強化 (ブルーチェーンなどと同じく、着弾時に着る) (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＭＩケフィエ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ルラーザケフィエ"
+     },
+     {
+      "ja": "ＬＬケフィエ+1"
+     },
+     {
+      "ja": "ＬＬケフィエ+2"
+     },
+     {
+      "ja": "ＬＬケフィエ+3"
+     },
+     {
+      "ja": "ＬＬケフィエ+4"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   },
+   {
+    "ability_en": "Azure Lore",
+    "ability_ja": "アジュールロー",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "アジュールロー効果アップ (効果時間+10秒)",
+    "source": "wiki.ffo.jp/html/16057.html・30884.html",
+    "timing_basis": "効果時間の延長であり、使用の瞬間に決まると推定 (ページで直接確認できず) (作者の GearSwap の使い分けと一致)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＭＩバズバンド+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ルラーザバズバンド"
+     },
+     {
+      "ja": "ＬＬバズバンド+1"
+     },
+     {
+      "ja": "ＬＬバズバンド+2"
+     },
+     {
+      "ja": "ＬＬバズバンド+3"
+     },
+     {
+      "ja": "ＬＬバズバンド+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Diffusion",
+    "ability_ja": "ディフュージョン",
+    "slot": "feet",
+    "timing": "cast",
+    "buff": {
+     "id": 356,
+     "en": "Diffusion",
+     "ja": "ディフュージョン"
+    },
+    "effect": "ディフュージョン効果アップ (強化系青魔法の効果時間+5%/能力値1)",
+    "source": "wiki.ffo.jp/html/16057.html・30884.html",
+    "timing_basis": "効果中に唱える強化系青魔法に乗る強化 (着弾時に着る) (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＭＩチャルク+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ルラーザチャルク"
+     },
+     {
+      "ja": "ＬＬチャルク+1"
+     },
+     {
+      "ja": "ＬＬチャルク+2"
+     },
+     {
+      "ja": "ＬＬチャルク+3"
+     },
+     {
+      "ja": "ＬＬチャルク+4"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   },
+   {
+    "ability_en": "Chain Affinity",
+    "ability_ja": "ブルーチェーン",
+    "slot": "head",
+    "timing": "cast",
+    "buff": {
+     "id": 164,
+     "en": "Chain Affinity",
+     "ja": "ブルーチェーン"
+    },
+    "effect": "ブルーチェーン効果アップ (ブルーチェーンの効果を上げる)",
+    "source": "wiki.ffo.jp/html/23303.html・33204.html",
+    "timing_basis": "wiki.ffo.jp/html/33204.html: 魔法着弾時に装備している必要がある (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＭＶカヴク+1"
+     },
+     {
+      "ja": "ＭＶカヴク+2"
+     },
+     {
+      "ja": "ハシシンカヴク"
+     },
+     {
+      "ja": "ＨＳカヴク+1"
+     },
+     {
+      "ja": "ＨＳカヴク+2"
+     },
+     {
+      "ja": "ＨＳカヴク+3"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   },
+   {
+    "ability_en": "Efflux",
+    "ability_ja": "エフラックス",
+    "slot": "legs",
+    "timing": "cast",
+    "buff": {
+     "id": 457,
+     "en": "Efflux",
+     "ja": "エフラックス"
+    },
+    "effect": "エフラックス効果アップ (ハシシン版はエフラックスのTPボーナス+)",
+    "source": "wiki.ffo.jp/html/23303.html・33204.html",
+    "timing_basis": "wiki.ffo.jp/html/33204.html: 魔法着弾時に装備している必要がある (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＭＶタイト+1"
+     },
+     {
+      "ja": "ＭＶタイト+2"
+     },
+     {
+      "ja": "ハシシンタイト"
+     },
+     {
+      "ja": "ＨＳタイト+1"
+     },
+     {
+      "ja": "ＨＳタイト+2"
+     },
+     {
+      "ja": "ＨＳタイト+3"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   },
+   {
+    "ability_en": "Burst Affinity",
+    "ability_ja": "ブルーバースト",
+    "slot": "feet",
+    "timing": "cast",
+    "buff": {
+     "id": 165,
+     "en": "Burst Affinity",
+     "ja": "ブルーバースト"
+    },
+    "effect": "ブルーバースト効果アップ",
+    "source": "wiki.ffo.jp/html/23303.html・33204.html",
+    "timing_basis": "wiki.ffo.jp/html/33204.html: 魔法着弾時に装備している必要がある (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＭＶバシュマク+1"
+     },
+     {
+      "ja": "ＭＶバシュマク+2"
+     },
+     {
+      "ja": "ハシシンバシュマク"
+     },
+     {
+      "ja": "ＨＳバシュマク+1"
+     },
+     {
+      "ja": "ＨＳバシュマク+2"
+     },
+     {
+      "ja": "ＨＳバシュマク+3"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   }
+  ],
+  "PUP": [
+   {
+    "ability_en": "Overdrive",
+    "ability_ja": "オーバードライヴ",
+    "slot": "body",
+    "timing": "use",
+    "effect": "オーバードライヴ効果アップ (効果時間 +20 秒)",
+    "source": "wiki.ffo.jp/html/16110.html・30925.html・26038.html・954.html",
+    "timing_basis": "作者確認 (2026-10-26): レリック (パンタン+2 以降・ピトル) は全部位、使う瞬間に装備していればよい。エンピリアン (チルコ+1 以降・カラゴズ) のタクティクスウィッチも発動時に装備",
+    "timing_confidence": "author",
+    "items": [
+     {
+      "ja": "ＰＮトベ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ピトルトベ"
+     },
+     {
+      "ja": "ＰＩトベ+1"
+     },
+     {
+      "ja": "ＰＩトベ+2"
+     },
+     {
+      "ja": "ＰＩトベ+3"
+     },
+     {
+      "ja": "ＰＩトベ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Ventriloquy",
+    "ability_ja": "腹話術",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "腹話術効果アップ (能力値1につき入れ替えた敵対心の高い方に+5%、低い方に-5%)",
+    "source": "wiki.ffo.jp/html/16110.html・30925.html",
+    "timing_basis": "作者確認 (2026-10-26): レリック (パンタン+2 以降・ピトル) は全部位、使う瞬間に装備していればよい。エンピリアン (チルコ+1 以降・カラゴズ) のタクティクスウィッチも発動時に装備",
+    "timing_confidence": "author",
+    "items": [
+     {
+      "ja": "ＰＮチュリダル+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ピトルチュリダル"
+     },
+     {
+      "ja": "ＰＩチュリダル+1"
+     },
+     {
+      "ja": "ＰＩチュリダル+2"
+     },
+     {
+      "ja": "ＰＩチュリダル+3"
+     },
+     {
+      "ja": "ＰＩチュリダル+4"
+     }
+    ],
+    "requires": "メリットポイント (からくり士のグループ2) で習得が必要"
+   },
+   {
+    "ability_en": "Role Reversal",
+    "ability_ja": "黒衣チェンジ",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "黒衣チェンジ効果アップ (能力値1につき入れ替えた[HP]+50)",
+    "source": "wiki.ffo.jp/html/16110.html・30925.html",
+    "timing_basis": "作者確認 (2026-10-26): レリック (パンタン+2 以降・ピトル) は全部位、使う瞬間に装備していればよい。エンピリアン (チルコ+1 以降・カラゴズ) のタクティクスウィッチも発動時に装備",
+    "timing_confidence": "author",
+    "items": [
+     {
+      "ja": "ＰＮバブーシュ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ピトルバブーシュ"
+     },
+     {
+      "ja": "ＰＩバブーシュ+1"
+     },
+     {
+      "ja": "ＰＩバブーシュ+2"
+     },
+     {
+      "ja": "ＰＩバブーシュ+3"
+     },
+     {
+      "ja": "ＰＩバブーシュ+4"
+     }
+    ],
+    "requires": "メリットポイント (からくり士のグループ2) で習得が必要"
+   },
+   {
+    "ability_en": "Tactical Switch",
+    "ability_ja": "タクティクスウィッチ",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "タクティクスウィッチ効果アップ (使用時に交換される両者のTPに乗算。IL版は 109:+25 / 119:+30 / +2:+35 / +3:+40。NQ版 CC は数値の記載なし)",
+    "source": "wiki.ffo.jp/html/23305.html・33206.html",
+    "timing_basis": "作者確認 (2026-10-26): レリック (パンタン+2 以降・ピトル) は全部位、使う瞬間に装備していればよい。エンピリアン (チルコ+1 以降・カラゴズ) のタクティクスウィッチも発動時に装備",
+    "timing_confidence": "author",
+    "items": [
+     {
+      "ja": "ＣＣスカルペ+1"
+     },
+     {
+      "ja": "ＣＣスカルペ+2"
+     },
+     {
+      "ja": "カラゴズスカルペ"
+     },
+     {
+      "ja": "ＫＧスカルペ+1"
+     },
+     {
+      "ja": "ＫＧスカルペ+2"
+     },
+     {
+      "ja": "ＫＧスカルペ+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Maneuver",
+    "ability_ja": "マニューバ",
+    "slot": "body",
+    "timing": "use",
+    "set_path": "sets.precast.JA.Maneuver",
+    "effect": "オーバーロード確率ダウン (マニューバを使ったときのオーバーロードの確率が下がる)",
+    "source": "wiki.ffo.jp/html/23305.html・33206.html",
+    "timing_basis": "作者確認 (2026-10-26): マニューバを点灯させるときに使う。発動前に装備している必要がある",
+    "timing_confidence": "author",
+    "items": [
+     {
+      "ja": "ＣＣファルセット+1"
+     },
+     {
+      "ja": "ＣＣファルセット+2"
+     },
+     {
+      "ja": "カラゴズファルセト"
+     },
+     {
+      "ja": "ＫＧファルセト+1"
+     },
+     {
+      "ja": "ＫＧファルセト+2"
+     },
+     {
+      "ja": "ＫＧファルセト+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Optimization",
+    "ability_ja": "最適化",
+    "slot": "head",
+    "timing": "merit",
+    "set_path": "sets.merit.Optimization",
+    "effect": "最適化効果アップ",
+    "source": "wiki.ffo.jp/html/16110.html・30925.html",
+    "timing_basis": "作者確認 (2026-10-26): メリットポイントを振らないと使えないので、振っていない人は別の装備で対応している → 専用のセットにして、使う人だけ On にする",
+    "timing_confidence": "author",
+    "requires": "メリットポイント (からくり士のグループ2) で習得が必要。振っていなければ使わない",
+    "items": [
+     {
+      "ja": "ＰＮタージ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ピトルタージ"
+     },
+     {
+      "ja": "ＰＩタージ+1"
+     },
+     {
+      "ja": "ＰＩタージ+2"
+     },
+     {
+      "ja": "ＰＩタージ+3"
+     },
+     {
+      "ja": "ＰＩタージ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Fine-Tuning",
+    "ability_ja": "微調整",
+    "slot": "hands",
+    "timing": "merit",
+    "set_path": "sets.merit.FineTuning",
+    "effect": "微調整効果アップ",
+    "source": "wiki.ffo.jp/html/16110.html・30925.html",
+    "timing_basis": "作者確認 (2026-10-26): メリットポイントを振らないと使えないので、振っていない人は別の装備で対応している → 専用のセットにして、使う人だけ On にする",
+    "timing_confidence": "author",
+    "requires": "メリットポイント (からくり士のグループ2) で習得が必要。振っていなければ使わない",
+    "items": [
+     {
+      "ja": "ＰＮダスタナ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ピトルダスタナ"
+     },
+     {
+      "ja": "ＰＩダスタナ+1"
+     },
+     {
+      "ja": "ＰＩダスタナ+2"
+     },
+     {
+      "ja": "ＰＩダスタナ+3"
+     },
+     {
+      "ja": "ＰＩダスタナ+4"
+     }
+    ]
+   }
+  ],
+  "BST": [
+   {
+    "ability_en": "Reward",
+    "ability_ja": "いたわる",
+    "slot": "body",
+    "timing": "use",
+    "timing_confidence": "author_gearswap",
+    "effect": "いたわる性能アップ2 (NQ・+1) /3 (+2・IL 版)",
+    "source": "wiki.ffo.jp/html/3549.html・30908.html",
+    "timing_basis": "ページに記述なし。使用時に効果が決まるアビリティとして推定 (作者の GearSwap の使い分けと一致)",
+    "items": [
+     {
+      "ja": "モンスタージャック"
+     },
+     {
+      "ja": "ＭＳジャック+1"
+     },
+     {
+      "ja": "ＭＳジャック+2"
+     },
+     {
+      "ja": "アンクサジャック"
+     },
+     {
+      "ja": "ＡＫジャック+1"
+     },
+     {
+      "ja": "ＡＫジャック+2"
+     },
+     {
+      "ja": "ＡＫジャック+3"
+     },
+     {
+      "ja": "ＡＫジャック+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Reward",
+    "ability_ja": "いたわる",
+    "slot": "feet",
+    "timing": "use",
+    "timing_confidence": "author_gearswap",
+    "effect": "いたわる効果アップ2 (NQ・+1) /3 (+2) / いたわる+32〜+41 (IL 版)",
+    "source": "wiki.ffo.jp/html/3549.html・30908.html",
+    "timing_basis": "ページに記述なし。使用時に効果が決まるアビリティとして推定 (作者の GearSwap の使い分けと一致)",
+    "items": [
+     {
+      "ja": "モンスターゲートル"
+     },
+     {
+      "ja": "ＭＳゲートル+1"
+     },
+     {
+      "ja": "ＭＳゲートル+2"
+     },
+     {
+      "ja": "アンクサゲートル"
+     },
+     {
+      "ja": "ＡＫゲートル+1"
+     },
+     {
+      "ja": "ＡＫゲートル+2"
+     },
+     {
+      "ja": "ＡＫゲートル+3"
+     },
+     {
+      "ja": "ＡＫゲートル+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Reward",
+    "ability_ja": "いたわる",
+    "slot": "legs",
+    "timing": "use",
+    "timing_confidence": "author_gearswap",
+    "effect": "いたわる使用時間短縮 (+2) / いたわる使用間隔-15〜-21 (IL 版)。NQ・+1 のトラウザは対象外 (ヒーリングHP+のみ)",
+    "source": "wiki.ffo.jp/html/3549.html・30908.html",
+    "timing_basis": "ページに記述なし。使用時に効果が決まるアビリティとして推定 (作者の GearSwap の使い分けと一致)",
+    "items": [
+     {
+      "ja": "ＭＳトラウザ+2"
+     },
+     {
+      "ja": "アンクサトラウザ"
+     },
+     {
+      "ja": "ＡＫトラウザ+1"
+     },
+     {
+      "ja": "ＡＫトラウザ+2"
+     },
+     {
+      "ja": "ＡＫトラウザ+3"
+     },
+     {
+      "ja": "ＡＫトラウザ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Call Beast",
+    "ability_ja": "よびだす",
+    "slot": "hands",
+    "timing": "use",
+    "timing_confidence": "author_gearswap",
+    "effect": "よびだす性能アップ (NQ〜+2) / よびだす+2 (IL 版)",
+    "source": "wiki.ffo.jp/html/3549.html・30908.html",
+    "timing_basis": "ページに記述なし。使用時に効果が決まるアビリティとして推定 (作者の GearSwap の使い分けと一致)",
+    "items": [
+     {
+      "ja": "モンスターグローブ"
+     },
+     {
+      "ja": "ＭＳグローブ+1"
+     },
+     {
+      "ja": "ＭＳグローブ+2"
+     },
+     {
+      "ja": "アンクサグローブ"
+     },
+     {
+      "ja": "ＡＫグローブ+1"
+     },
+     {
+      "ja": "ＡＫグローブ+2"
+     },
+     {
+      "ja": "ＡＫグローブ+3"
+     },
+     {
+      "ja": "ＡＫグローブ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Killer Instinct",
+    "ability_ja": "K.インスティンクト",
+    "slot": "head",
+    "timing": "use",
+    "timing_confidence": "author_gearswap",
+    "effect": "キラーインスティンクト効果アップ (+2 は『オーグメントしたものだけ』。IL 版は固有プロパティ欄に記載・オーグメント扱いか未確認)",
+    "source": "wiki.ffo.jp/html/3549.html・30908.html",
+    "timing_basis": "ページに記述なし。使用時に効果が決まるアビリティとして推定 (作者の GearSwap の使い分けと一致)",
+    "items": [
+     {
+      "ja": "ＭＳヘルム+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アンクサヘルム"
+     },
+     {
+      "ja": "ＡＫヘルム+1"
+     },
+     {
+      "ja": "ＡＫヘルム+2"
+     },
+     {
+      "ja": "ＡＫヘルム+3"
+     },
+     {
+      "ja": "ＡＫヘルム+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Feral Howl",
+    "ability_ja": "フェラルハウル",
+    "slot": "body",
+    "timing": "use",
+    "timing_confidence": "low",
+    "effect": "フェラルハウル効果アップ (+2 は『オーグメントしたものだけ』。IL 版はオーグメント扱いか未確認)",
+    "source": "wiki.ffo.jp/html/3549.html・30908.html",
+    "timing_basis": "ページに記述なし。使用時に効果が決まるアビリティとして推定",
+    "items": [
+     {
+      "ja": "ＭＳジャック+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アンクサジャック"
+     },
+     {
+      "ja": "ＡＫジャック+1"
+     },
+     {
+      "ja": "ＡＫジャック+2"
+     },
+     {
+      "ja": "ＡＫジャック+3"
+     },
+     {
+      "ja": "ＡＫジャック+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Familiar",
+    "ability_ja": "使い魔",
+    "slot": "legs",
+    "timing": "use",
+    "timing_confidence": "author_gearswap",
+    "effect": "使い魔効果アップ (+2 は『オーグメントしたものだけ』。IL 版はオーグメント扱いか未確認)",
+    "source": "wiki.ffo.jp/html/3549.html・30908.html",
+    "timing_basis": "ページに記述なし。使用時に効果が決まるアビリティとして推定 (作者の GearSwap の使い分けと一致)",
+    "items": [
+     {
+      "ja": "ＭＳトラウザ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アンクサトラウザ"
+     },
+     {
+      "ja": "ＡＫトラウザ+1"
+     },
+     {
+      "ja": "ＡＫトラウザ+2"
+     },
+     {
+      "ja": "ＡＫトラウザ+3"
+     },
+     {
+      "ja": "ＡＫトラウザ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Sic",
+    "ability_ja": "ほんきだせ",
+    "slot": "hands",
+    "timing": "use",
+    "timing_confidence": "low",
+    "effect": "ほんきだせ・しじをさせろの効果アップ (IL 版は TPボーナス+550〜+700)",
+    "source": "wiki.ffo.jp/html/23297.html・33073.html",
+    "timing_basis": "ページに記述なし。使用時に効果が決まるアビリティとして推定",
+    "items": [
+     {
+      "ja": "ＦＲマノプラス+1"
+     },
+     {
+      "ja": "ＦＲマノプラス+2"
+     },
+     {
+      "ja": "ヌグーミマノプラス"
+     },
+     {
+      "ja": "ＮＫマノプラス+1"
+     },
+     {
+      "ja": "ＮＫマノプラス+2"
+     },
+     {
+      "ja": "ＮＫマノプラス+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Ready",
+    "ability_ja": "しじをさせろ",
+    "slot": "hands",
+    "timing": "use",
+    "timing_confidence": "low",
+    "effect": "ほんきだせ・しじをさせろの効果アップ (IL 版は TPボーナス+550〜+700)",
+    "source": "wiki.ffo.jp/html/23297.html・33073.html",
+    "timing_basis": "ページに記述なし。使用時に効果が決まるアビリティとして推定",
+    "items": [
+     {
+      "ja": "ＦＲマノプラス+1"
+     },
+     {
+      "ja": "ＦＲマノプラス+2"
+     },
+     {
+      "ja": "ヌグーミマノプラス"
+     },
+     {
+      "ja": "ＮＫマノプラス+1"
+     },
+     {
+      "ja": "ＮＫマノプラス+2"
+     },
+     {
+      "ja": "ＮＫマノプラス+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Spur",
+    "ability_ja": "きばれ",
+    "slot": "feet",
+    "timing": "use",
+    "timing_confidence": "low",
+    "effect": "きばれの効果アップ (IL 版は きばれ+12〜+21 でストアTPに加算)",
+    "source": "wiki.ffo.jp/html/23297.html・33073.html",
+    "timing_basis": "きばれは効果時間90秒のペットコマンド。装備の効果が使用時に決まるかは wiki で確認できず推定",
+    "items": [
+     {
+      "ja": "ＦＲオクレア+1"
+     },
+     {
+      "ja": "ＦＲオクレア+2"
+     },
+     {
+      "ja": "ヌグーミオクレア"
+     },
+     {
+      "ja": "ＮＫオクレア+1"
+     },
+     {
+      "ja": "ＮＫオクレア+2"
+     },
+     {
+      "ja": "ＮＫオクレア+3"
+     }
+    ]
+   }
+  ],
+  "NIN": [
+   {
+    "ability_en": "Yonin",
+    "ability_ja": "陽忍",
+    "slot": "head",
+    "timing": "use",
+    "effect": "陽忍効果アップ (オーグメント: 能力値1につき最大HP+10)",
+    "source": "wiki.ffo.jp/html/3553.html・30920.html",
+    "items": [
+     {
+      "ja": "真甲賀半首",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "望月半首"
+     },
+     {
+      "ja": "望月半首改"
+     },
+     {
+      "ja": "真望月半首"
+     },
+     {
+      "ja": "極望月半首"
+     },
+     {
+      "ja": "越望月半首"
+     }
+    ],
+    "timing_basis": "作者の GearSwap (作者の NIN_gear.lua) の使い分けに合わせた: レリック (越望月) は precast.JA、エンピリアン (極服部) の陽忍・陰忍は sets.buff、二重は precast.JA",
+    "timing_confidence": "author_gearswap"
+   },
+   {
+    "ability_en": "Innin",
+    "ability_ja": "陰忍",
+    "slot": "head",
+    "timing": "use",
+    "effect": "陰忍効果アップ (オーグメント: 能力値に応じてWSダメージ)",
+    "source": "wiki.ffo.jp/html/3553.html・30920.html",
+    "items": [
+     {
+      "ja": "真甲賀半首",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "望月半首"
+     },
+     {
+      "ja": "望月半首改"
+     },
+     {
+      "ja": "真望月半首"
+     },
+     {
+      "ja": "極望月半首"
+     },
+     {
+      "ja": "越望月半首"
+     }
+    ],
+    "timing_basis": "作者の GearSwap (作者の NIN_gear.lua) の使い分けに合わせた: レリック (越望月) は precast.JA、エンピリアン (極服部) の陽忍・陰忍は sets.buff、二重は precast.JA",
+    "timing_confidence": "author_gearswap"
+   },
+   {
+    "ability_en": "Sange",
+    "ability_ja": "散華",
+    "slot": "body",
+    "timing": "use",
+    "effect": "散華効果アップ (オーグメント: 能力値に応じて飛攻)",
+    "source": "wiki.ffo.jp/html/3553.html・30920.html",
+    "items": [
+     {
+      "ja": "真甲賀鎖帷子",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "望月鎖帷子"
+     },
+     {
+      "ja": "望月鎖帷子改"
+     },
+     {
+      "ja": "真望月鎖帷子"
+     },
+     {
+      "ja": "極望月鎖帷子"
+     },
+     {
+      "ja": "越望月鎖帷子"
+     }
+    ],
+    "timing_basis": "作者の GearSwap (作者の NIN_gear.lua) の使い分けに合わせた: レリック (越望月) は precast.JA、エンピリアン (極服部) の陽忍・陰忍は sets.buff、二重は precast.JA",
+    "timing_confidence": "author_gearswap"
+   },
+   {
+    "ability_en": "Mijin Gakure",
+    "ability_ja": "微塵がくれ",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "微塵がくれ効果アップ (微塵がくれのダメージ+50%)",
+    "source": "wiki.ffo.jp/html/3553.html・30920.html",
+    "items": [
+     {
+      "ja": "真甲賀袴",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "望月袴"
+     },
+     {
+      "ja": "望月袴改"
+     },
+     {
+      "ja": "真望月袴"
+     },
+     {
+      "ja": "極望月袴"
+     },
+     {
+      "ja": "越望月袴"
+     }
+    ],
+    "timing_basis": "作者の GearSwap (作者の NIN_gear.lua) の使い分けに合わせた: レリック (越望月) は precast.JA、エンピリアン (極服部) の陽忍・陰忍は sets.buff、二重は precast.JA",
+    "timing_confidence": "author_gearswap"
+   },
+   {
+    "ability_en": "Innin",
+    "ability_ja": "陰忍",
+    "slot": "head",
+    "timing": "while_active",
+    "buff": {
+     "id": 421,
+     "en": "Innin",
+     "ja": "陰忍"
+    },
+    "effect": "陰忍効果アップ (陰忍:ダブルアタック+7%〜+13%、世代で増加)",
+    "source": "wiki.ffo.jp/html/21317.html・33129.html",
+    "timing_basis": "作者の GearSwap (作者の NIN_gear.lua) の使い分けに合わせた: レリック (越望月) は precast.JA、エンピリアン (極服部) の陽忍・陰忍は sets.buff、二重は precast.JA",
+    "items": [
+     {
+      "ja": "伊賀頭巾改"
+     },
+     {
+      "ja": "真伊賀頭巾"
+     },
+     {
+      "ja": "服部頭巾"
+     },
+     {
+      "ja": "服部頭巾改"
+     },
+     {
+      "ja": "真服部頭巾"
+     },
+     {
+      "ja": "極服部頭巾"
+     }
+    ],
+    "timing_confidence": "author_gearswap"
+   },
+   {
+    "ability_en": "Yonin",
+    "ability_ja": "陽忍",
+    "slot": "legs",
+    "timing": "while_active",
+    "buff": {
+     "id": 420,
+     "en": "Yonin",
+     "ja": "陽忍"
+    },
+    "effect": "陽忍効果アップ (陽忍:カウンター+12〜+18、世代で増加)",
+    "source": "wiki.ffo.jp/html/21317.html・33129.html",
+    "timing_basis": "作者の GearSwap (作者の NIN_gear.lua) の使い分けに合わせた: レリック (越望月) は precast.JA、エンピリアン (極服部) の陽忍・陰忍は sets.buff、二重は precast.JA",
+    "items": [
+     {
+      "ja": "伊賀袴改"
+     },
+     {
+      "ja": "真伊賀袴"
+     },
+     {
+      "ja": "服部袴"
+     },
+     {
+      "ja": "服部袴改"
+     },
+     {
+      "ja": "真服部袴"
+     },
+     {
+      "ja": "極服部袴"
+     }
+    ],
+    "timing_confidence": "author_gearswap"
+   },
+   {
+    "ability_en": "Futae",
+    "ability_ja": "二重",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "二重効果アップ (二重+22〜+28・遁術ダメージ、世代で増加)",
+    "source": "wiki.ffo.jp/html/21317.html・33129.html",
+    "timing_basis": "作者の GearSwap (作者の NIN_gear.lua) の使い分けに合わせた: レリック (越望月) は precast.JA、エンピリアン (極服部) の陽忍・陰忍は sets.buff、二重は precast.JA",
+    "items": [
+     {
+      "ja": "伊賀手甲改"
+     },
+     {
+      "ja": "真伊賀手甲"
+     },
+     {
+      "ja": "服部手甲"
+     },
+     {
+      "ja": "服部手甲改"
+     },
+     {
+      "ja": "真服部手甲"
+     },
+     {
+      "ja": "極服部手甲"
+     }
+    ],
+    "timing_confidence": "author_gearswap"
+   }
+  ],
+  "WAR": [
+   {
+    "ability_en": "Warcry",
+    "ability_ja": "ウォークライ",
+    "slot": "head",
+    "timing": "use",
+    "effect": "ウォークライ効果アップ",
+    "source": "wiki.ffo.jp/html/3544.html",
+    "timing_basis": "作者の WAR_gear.lua sets.precast.JA['ウォークライ'] に頭 (AG)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ウォリアーマスク"
+     },
+     {
+      "ja": "ＷＲマスク+1"
+     },
+     {
+      "ja": "ＷＲマスク+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Warcry",
+    "ability_ja": "ウォークライ",
+    "slot": "head",
+    "timing": "use",
+    "effect": "ウォークライ効果時間+25〜+30・サベッジリ効果アップ",
+    "source": "wiki.ffo.jp/html/30673.html",
+    "timing_basis": "作者の WAR_gear.lua sets.precast.JA['ウォークライ'] = {head=\"ＡＧマスク+4\"}",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "アゴージマスク"
+     },
+     {
+      "ja": "ＡＧマスク+1"
+     },
+     {
+      "ja": "ＡＧマスク+2"
+     },
+     {
+      "ja": "ＡＧマスク+3"
+     },
+     {
+      "ja": "ＡＧマスク+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Warcry",
+    "ability_ja": "ウォークライ",
+    "slot": "head",
+    "timing": "use",
+    "effect": "サベッジリ (メリット特性: ウォークライを使ったときに効く) サベッジリ効果アップ (ウォークライ使用時)",
+    "source": "wiki.ffo.jp/html/3544.html",
+    "timing_basis": "サベッジリはウォークライの効果を変える特性。作者はウォークライの precast に頭を入れている",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで サベッジリ を習得している必要がある",
+    "items": [
+     {
+      "ja": "ＷＲマスク+2",
+      "note": "オーグメントしたものだけ"
+     }
+    ]
+   },
+   {
+    "ability_en": "Aggressor",
+    "ability_ja": "アグレッサー",
+    "slot": "body",
+    "timing": "use",
+    "effect": "アグレッサー効果アップ",
+    "source": "wiki.ffo.jp/html/3544.html",
+    "timing_basis": "作者の WAR_gear.lua sets.precast.JA['アグレッサー'] に胴 (AG)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ウォリアーロリカ"
+     },
+     {
+      "ja": "ＷＲロリカ+1"
+     },
+     {
+      "ja": "ＷＲロリカ+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Aggressor",
+    "ability_ja": "アグレッサー",
+    "slot": "body",
+    "timing": "use",
+    "effect": "アグレッサー効果時間+15〜+30・アグレシブエイム効果アップ",
+    "source": "wiki.ffo.jp/html/30673.html",
+    "timing_basis": "作者の WAR_gear.lua sets.precast.JA['アグレッサー'] に body=\"ＡＧロリカ+3\"",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "アゴージロリカ"
+     },
+     {
+      "ja": "ＡＧロリカ+1"
+     },
+     {
+      "ja": "ＡＧロリカ+2"
+     },
+     {
+      "ja": "ＡＧロリカ+3"
+     },
+     {
+      "ja": "ＡＧロリカ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Aggressor",
+    "ability_ja": "アグレッサー",
+    "slot": "body",
+    "timing": "use",
+    "effect": "アグレシブエイム (メリット特性: アグレッサーを使ったときに効く) アグレシブエイム効果アップ (アグレッサー使用時)",
+    "source": "wiki.ffo.jp/html/3544.html",
+    "timing_basis": "アグレッサーの効果を変える特性。作者はアグレッサーの precast に胴を入れている",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで アグレシブエイム を習得している必要がある",
+    "items": [
+     {
+      "ja": "ＷＲロリカ+2",
+      "note": "オーグメントしたものだけ"
+     }
+    ]
+   },
+   {
+    "ability_en": "Mighty Strikes",
+    "ability_ja": "マイティストライク",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "マイティストライク効果アップ",
+    "source": "wiki.ffo.jp/html/3544.html・30673.html",
+    "timing_basis": "作者の WAR_gear.lua sets.precast.JA['マイティストライク'] = {hands=\"ＡＧマフラ+4\"}",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＷＲマフラ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アゴージマフラ"
+     },
+     {
+      "ja": "ＡＧマフラ+1"
+     },
+     {
+      "ja": "ＡＧマフラ+2"
+     },
+     {
+      "ja": "ＡＧマフラ+3"
+     },
+     {
+      "ja": "ＡＧマフラ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Defender",
+    "ability_ja": "ディフェンダー",
+    "slot": "hands",
+    "timing": "while_active",
+    "effect": "ディフェンダー効果時間+10〜+15・ディフェンダー：盾発動率+10〜+15",
+    "source": "wiki.ffo.jp/html/30673.html",
+    "timing_basis": "作者の WAR_gear.lua で sets.buff['ディフェンダー'] と sets.precast.JA['ディフェンダー'] の両方に ＡＧマフラ+4 (効果時間は使う瞬間・盾発動率は効果中)",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 57,
+     "en": "Defender",
+     "ja": "ディフェンダー"
+    },
+    "items": [
+     {
+      "ja": "ＡＧマフラ+2"
+     },
+     {
+      "ja": "ＡＧマフラ+3"
+     },
+     {
+      "ja": "ＡＧマフラ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Warrior's Charge",
+    "ability_ja": "ウォリアーチャージ",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "ウォリアーチャージ効果アップ",
+    "source": "wiki.ffo.jp/html/3544.html・30673.html",
+    "timing_basis": "作者の precast.JA['ウォリアーチャージ'] は空。根拠なし / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "ＷＲクウィス+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アゴージクウィス"
+     },
+     {
+      "ja": "ＡＧクウィス+1"
+     },
+     {
+      "ja": "ＡＧクウィス+2"
+     },
+     {
+      "ja": "ＡＧクウィス+3"
+     },
+     {
+      "ja": "ＡＧクウィス+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Berserk",
+    "ability_ja": "バーサク",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "バーサク効果アップ",
+    "source": "wiki.ffo.jp/html/3544.html",
+    "timing_basis": "作者の WAR_gear.lua sets.precast.JA['バーサク'] に足 (AG)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ウォリアーカリガ"
+     },
+     {
+      "ja": "ＷＲカリガ+1"
+     },
+     {
+      "ja": "ＷＲカリガ+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Berserk",
+    "ability_ja": "バーサク",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "バーサク効果時間+15〜+30・トマホーク効果アップ",
+    "source": "wiki.ffo.jp/html/30673.html",
+    "timing_basis": "作者の WAR_gear.lua sets.precast.JA['バーサク'] に feet=\"ＡＧカリガ+3\"",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "アゴージカリガ"
+     },
+     {
+      "ja": "ＡＧカリガ+1"
+     },
+     {
+      "ja": "ＡＧカリガ+2"
+     },
+     {
+      "ja": "ＡＧカリガ+3"
+     },
+     {
+      "ja": "ＡＧカリガ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Tomahawk",
+    "ability_ja": "トマホーク",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "トマホーク効果アップ",
+    "source": "wiki.ffo.jp/html/3544.html・30673.html",
+    "timing_basis": "作者の WAR_gear.lua sets.precast.JA['トマホーク'] に feet=\"ＡＧカリガ+3\"",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "ＷＲカリガ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アゴージカリガ"
+     },
+     {
+      "ja": "ＡＧカリガ+1"
+     },
+     {
+      "ja": "ＡＧカリガ+2"
+     },
+     {
+      "ja": "ＡＧカリガ+3"
+     },
+     {
+      "ja": "ＡＧカリガ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Blood Rage",
+    "ability_ja": "ブラッドレイジ",
+    "slot": "body",
+    "timing": "use",
+    "effect": "ブラッドレイジ効果アップ (IL: 効果時間+32/+34)",
+    "source": "wiki.ffo.jp/html/23289.html・32986.html",
+    "timing_basis": "作者の WAR_gear.lua sets.precast.JA['ブラッドレイジ'] = {body=\"ＢＩロリカ+3\"} (wiki の要約では +2/+3 にブラッドレイジの記載が無かった) / 作者確認 (2026-10-26): ＢＩロリカ+2・+3 も対応",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "ＲＶロリカ+1"
+     },
+     {
+      "ja": "ＲＶロリカ+2"
+     },
+     {
+      "ja": "ボイイロリカ"
+     },
+     {
+      "ja": "ＢＩロリカ+1"
+     },
+     {
+      "ja": "ＢＩロリカ+2"
+     },
+     {
+      "ja": "ＢＩロリカ+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Restraint",
+    "ability_ja": "リストレント",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "リストレント効果アップ (IL: リストレント+100〜+130)",
+    "source": "wiki.ffo.jp/html/23289.html・32986.html",
+    "timing_basis": "作者の precast.JA['リストレント'] は空。根拠なし / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "ＲＶマフラ+1"
+     },
+     {
+      "ja": "ＲＶマフラ+2"
+     },
+     {
+      "ja": "ボイイマフラ"
+     },
+     {
+      "ja": "ＢＩマフラ+1"
+     },
+     {
+      "ja": "ＢＩマフラ+2"
+     },
+     {
+      "ja": "ＢＩマフラ+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Retaliation",
+    "ability_ja": "リタリエーション",
+    "slot": "feet",
+    "timing": "while_active",
+    "effect": "リタリエーション効果アップ (IL: リタリエーション+22〜+31)",
+    "source": "wiki.ffo.jp/html/23289.html・32986.html",
+    "timing_basis": "作者の WAR_gear.lua sets.buff['リタリエーション'] に feet=\"ＢＩカリガ+3\"",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "buff": {
+     "id": 405,
+     "en": "Retaliation",
+     "ja": "リタリエーション"
+    },
+    "items": [
+     {
+      "ja": "ＲＶカリガ+1"
+     },
+     {
+      "ja": "ＲＶカリガ+2"
+     },
+     {
+      "ja": "ボイイカリガ"
+     },
+     {
+      "ja": "ＢＩカリガ+1"
+     },
+     {
+      "ja": "ＢＩカリガ+2"
+     },
+     {
+      "ja": "ＢＩカリガ+3"
+     }
+    ]
+   }
+  ],
+  "MNK": [
+   {
+    "ability_en": "Chi Blast",
+    "ability_ja": "気孔弾",
+    "slot": "head",
+    "timing": "use",
+    "effect": "発剄効果アップ",
+    "source": "wiki.ffo.jp/html/3545.html・30887.html",
+    "timing_basis": "発剄 (Penance・特性) は気孔弾に効く。作者の MNK_gear.lua sets.precast.JA['気孔弾'] = {head=\"ＨＥクラウン+3\"}",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "ＭＬクラウン+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ヘシカスクラウン"
+     },
+     {
+      "ja": "ＨＥクラウン+1"
+     },
+     {
+      "ja": "ＨＥクラウン+2"
+     },
+     {
+      "ja": "ＨＥクラウン+3"
+     },
+     {
+      "ja": "ＨＥクラウン+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Formless Strikes",
+    "ability_ja": "無想無念",
+    "slot": "body",
+    "timing": "use",
+    "effect": "無想無念効果アップ",
+    "source": "wiki.ffo.jp/html/3545.html・30887.html",
+    "timing_basis": "作者の MNK_gear.lua sets.precast.JA['無想無念'] = {body=\"ＨＥシクラス+3\"}",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "ＭＬシクラス+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ヘシカスシクラス"
+     },
+     {
+      "ja": "ＨＥシクラス+1"
+     },
+     {
+      "ja": "ＨＥシクラス+2"
+     },
+     {
+      "ja": "ＨＥシクラス+3"
+     },
+     {
+      "ja": "ＨＥシクラス+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Chakra",
+    "ability_ja": "チャクラ",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "チャクラ効果アップ2〜3",
+    "source": "wiki.ffo.jp/html/3545.html",
+    "timing_basis": "作者の MNK_gear.lua sets.precast.JA['チャクラ'] に手 (HE)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "メレーグローブ"
+     },
+     {
+      "ja": "ＭＬグローブ+1"
+     },
+     {
+      "ja": "ＭＬグローブ+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Chakra",
+    "ability_ja": "チャクラ",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "練気効果アップ (IL 版は wiki の抽出で「チャクラ3+」の記載も)",
+    "source": "wiki.ffo.jp/html/3545.html・30887.html",
+    "timing_basis": "練気 (Invigorate・特性) はチャクラに効く。作者の MNK_gear.lua sets.precast.JA['チャクラ'] = {hands=\"ＨＥグローブ+3\"}",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "ＭＬグローブ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ヘシカスグローブ"
+     },
+     {
+      "ja": "ＨＥグローブ+1"
+     },
+     {
+      "ja": "ＨＥグローブ+2"
+     },
+     {
+      "ja": "ＨＥグローブ+3"
+     },
+     {
+      "ja": "ＨＥグローブ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Hundred Fists",
+    "ability_ja": "百烈拳",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "百烈拳効果アップ",
+    "source": "wiki.ffo.jp/html/3545.html・30887.html",
+    "timing_basis": "作者の MNK_gear.lua sets.precast.JA['百烈拳 '] = {legs=\"ＨＥホーズ+3\"} (キーの末尾に空白があり、ゲーム内で一致しない可能性)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＭＬホーズ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ヘシカスホーズ"
+     },
+     {
+      "ja": "ＨＥホーズ+1"
+     },
+     {
+      "ja": "ＨＥホーズ+2"
+     },
+     {
+      "ja": "ＨＥホーズ+3"
+     },
+     {
+      "ja": "ＨＥホーズ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Counterstance",
+    "ability_ja": "かまえる",
+    "slot": "feet",
+    "timing": "while_active",
+    "effect": "かまえる効果アップ",
+    "source": "wiki.ffo.jp/html/3545.html",
+    "timing_basis": "作者の MNK_gear.lua sets.buff['かまえる'] = {feet=\"ＨＥゲートル+3\"} (同じ足の部位。HE にかまえる効果アップが付くかは IL ページの抽出で未確認) / 作者確認 (2026-10-26): ＨＥゲートル系も対応",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 61,
+     "en": "Counterstance",
+     "ja": "かまえる"
+    },
+    "items": [
+     {
+      "ja": "メレーゲートル"
+     },
+     {
+      "ja": "ＭＬゲートル+1"
+     },
+     {
+      "ja": "ＭＬゲートル+2"
+     },
+     {
+      "ja": "ヘシカスゲートル"
+     },
+     {
+      "ja": "ＨＥゲートル+1"
+     },
+     {
+      "ja": "ＨＥゲートル+2"
+     },
+     {
+      "ja": "ＨＥゲートル+3"
+     },
+     {
+      "ja": "ＨＥゲートル+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Mantra",
+    "ability_ja": "マントラ",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "マントラ効果アップ",
+    "source": "wiki.ffo.jp/html/3545.html・30887.html",
+    "timing_basis": "作者の MNK_gear.lua sets.precast.JA['マントラ'] = {feet=\"ＨＥゲートル+3\"}",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "ＭＬゲートル+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ヘシカスゲートル"
+     },
+     {
+      "ja": "ＨＥゲートル+1"
+     },
+     {
+      "ja": "ＨＥゲートル+2"
+     },
+     {
+      "ja": "ＨＥゲートル+3"
+     },
+     {
+      "ja": "ＨＥゲートル+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Impetus",
+    "ability_ja": "インピタス",
+    "slot": "body",
+    "timing": "while_active",
+    "effect": "インピタス性能アップ",
+    "source": "wiki.ffo.jp/html/23290.html・32987.html",
+    "timing_basis": "作者の MNK_gear.lua sets.buff['インピタス'] = {body=\"ＢＫシクラス+3\"}",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "buff": {
+     "id": 461,
+     "en": "Impetus",
+     "ja": "インピタス"
+    },
+    "items": [
+     {
+      "ja": "ＴＴシクラス+1"
+     },
+     {
+      "ja": "ＴＴシクラス+2"
+     },
+     {
+      "ja": "ビックシクラス"
+     },
+     {
+      "ja": "ＢＫシクラス+1"
+     },
+     {
+      "ja": "ＢＫシクラス+2"
+     },
+     {
+      "ja": "ＢＫシクラス+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Footwork",
+    "ability_ja": "猫足立ち",
+    "slot": "feet",
+    "timing": "while_active",
+    "effect": "猫足立ち効果アップ",
+    "source": "wiki.ffo.jp/html/23290.html・32987.html",
+    "timing_basis": "作者の MNK_gear.lua sets.buff['猫足立ち'] = {feet=\"ＢＫゲートル+2\"}",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "buff": {
+     "id": 406,
+     "en": "Footwork",
+     "ja": "猫足立ち"
+    },
+    "items": [
+     {
+      "ja": "ＴＴゲートル+1"
+     },
+     {
+      "ja": "ＴＴゲートル+2"
+     },
+     {
+      "ja": "ビックゲートル"
+     },
+     {
+      "ja": "ＢＫゲートル+1"
+     },
+     {
+      "ja": "ＢＫゲートル+2"
+     },
+     {
+      "ja": "ＢＫゲートル+3"
+     }
+    ]
+   }
+  ],
+  "WHM": [
+   {
+    "ability_en": "Devotion",
+    "ability_ja": "デヴォーション",
+    "slot": "head",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "デヴォーション効果アップ (能力値1につき回復量増加・消費HPは変わらない)",
+    "source": "wiki.ffo.jp/html/3546.html・30896.html",
+    "timing_basis": "res に効果時間が無い即時のアビリティ (使う瞬間に回復量が決まる)。作者の GearSwap に該当セット無し / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＣＲキャップ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "パエティキャップ"
+     },
+     {
+      "ja": "ＰＩキャップ+1"
+     },
+     {
+      "ja": "ＰＩキャップ+2"
+     },
+     {
+      "ja": "ＰＩキャップ+3"
+     },
+     {
+      "ja": "ＰＩキャップ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Benediction",
+    "ability_ja": "女神の祝福",
+    "slot": "body",
+    "timing": "use",
+    "effect": "女神の祝福効果アップ (使用時の敵対心が大きく減る)",
+    "source": "wiki.ffo.jp/html/3546.html・30896.html",
+    "timing_basis": "作者の WHM_gear.lua に sets.precast.JA['女神の祝福'] がある (中身は空)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＣＲブリオー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "パエティブリオー"
+     },
+     {
+      "ja": "ＰＩブリオー+1"
+     },
+     {
+      "ja": "ＰＩブリオー+2"
+     },
+     {
+      "ja": "ＰＩブリオー+3"
+     },
+     {
+      "ja": "ＰＩブリオー+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Martyr",
+    "ability_ja": "マーター",
+    "slot": "hands",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "マーター効果アップ (能力値1につき回復量増加・消費HPは変わらない)",
+    "source": "wiki.ffo.jp/html/3546.html・30896.html",
+    "timing_basis": "res に効果時間が無い即時のアビリティ。作者の GearSwap に該当セット無し / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＣＲミトン+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "パエティミトン"
+     },
+     {
+      "ja": "ＰＩミトン+1"
+     },
+     {
+      "ja": "ＰＩミトン+2"
+     },
+     {
+      "ja": "ＰＩミトン+3"
+     },
+     {
+      "ja": "ＰＩミトン+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Afflatus Misery",
+    "ability_ja": "ハートオブミゼリ",
+    "slot": "legs",
+    "timing": "cast",
+    "effect": "ソウルオブミゼリ効果アップ (ハートオブミゼリ中のバニシュのダメージが能力値に応じて増える)",
+    "source": "wiki.ffo.jp/html/3546.html・30896.html",
+    "timing_basis": "ミゼリ中のバニシュなどに乗る強化 (魔法の詠唱中に着る) (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 418,
+     "en": "Afflatus Misery",
+     "ja": "ハートオブミゼリ"
+    },
+    "items": [
+     {
+      "ja": "ＣＲパンタロン+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "パエティパンタロン"
+     },
+     {
+      "ja": "ＰＩパンタロン+1"
+     },
+     {
+      "ja": "ＰＩパンタロン+2"
+     },
+     {
+      "ja": "ＰＩパンタロン+3"
+     },
+     {
+      "ja": "ＰＩパンタロン+4"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   },
+   {
+    "ability_en": "Afflatus Solace",
+    "ability_ja": "ハートオブソラス",
+    "slot": "feet",
+    "timing": "cast",
+    "effect": "ソウルオブソラス効果アップ (ハートオブソラス中のホーリーのダメージが能力値に応じて増える)",
+    "source": "wiki.ffo.jp/html/3546.html・30896.html",
+    "timing_basis": "ソラス中のケアル・ホーリーなどに乗る強化 (魔法の詠唱中に着る) (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 417,
+     "en": "Afflatus Solace",
+     "ja": "ハートオブソラス"
+    },
+    "items": [
+     {
+      "ja": "ＣＲダックビル+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "パエティダックビル"
+     },
+     {
+      "ja": "ＰＩダックビル+1"
+     },
+     {
+      "ja": "ＰＩダックビル+2"
+     },
+     {
+      "ja": "ＰＩダックビル+3"
+     },
+     {
+      "ja": "ＰＩダックビル+4"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   },
+   {
+    "ability_en": "Afflatus Solace",
+    "ability_ja": "ハートオブソラス",
+    "slot": "body",
+    "timing": "cast",
+    "effect": "ハートオブソラス効果アップ (EB は ハートオブソラス+12〜+18)",
+    "source": "wiki.ffo.jp/html/23291.html・32988.html",
+    "timing_basis": "ソラス中のケアル・ホーリーなどに乗る強化 (魔法の詠唱中に着る) (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 417,
+     "en": "Afflatus Solace",
+     "ja": "ハートオブソラス"
+    },
+    "items": [
+     {
+      "ja": "ＯＲブリオー+1"
+     },
+     {
+      "ja": "ＯＲブリオー+2"
+     },
+     {
+      "ja": "エーベルブリオー"
+     },
+     {
+      "ja": "ＥＢブリオー+1"
+     },
+     {
+      "ja": "ＥＢブリオー+2"
+     },
+     {
+      "ja": "ＥＢブリオー+3"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   },
+   {
+    "ability_en": "Divine Caress",
+    "ability_ja": "女神の愛撫",
+    "slot": "hands",
+    "timing": "cast",
+    "effect": "女神の愛撫効果アップ (EB は 女神の愛撫+2〜+5)",
+    "source": "wiki.ffo.jp/html/23291.html・32988.html",
+    "timing_basis": "作者の WHM.lua も job_post_midcast で sets.buff['女神の愛撫'] を着る (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 453,
+     "en": "Divine Caress",
+     "ja": "女神の愛撫"
+    },
+    "items": [
+     {
+      "ja": "ＯＲミトン+1"
+     },
+     {
+      "ja": "ＯＲミトン+2"
+     },
+     {
+      "ja": "エーベルミトン"
+     },
+     {
+      "ja": "ＥＢミトン+1"
+     },
+     {
+      "ja": "ＥＢミトン+2"
+     },
+     {
+      "ja": "ＥＢミトン+3"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   }
+  ],
+  "BLM": [
+   {
+    "ability_en": "Manafont",
+    "ability_ja": "魔力の泉",
+    "slot": "body",
+    "timing": "use",
+    "effect": "魔力の泉効果アップ",
+    "source": "wiki.ffo.jp/html/3543.html・30898.html",
+    "timing_basis": "作者の BLM_gear.lua に sets.precast.JA['魔力の泉'] = {body=\"ＡＲコート+3\"}",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＳＲコート+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アークコート"
+     },
+     {
+      "ja": "ＡＲコート+1"
+     },
+     {
+      "ja": "ＡＲコート+2"
+     },
+     {
+      "ja": "ＡＲコート+3"
+     },
+     {
+      "ja": "ＡＲコート+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Mana Wall",
+    "ability_ja": "マナウォール",
+    "slot": "feet",
+    "timing": "while_active",
+    "effect": "マナウォール効果アップ (WC はマナウォールのダメージカット率加算・装備中のみ)",
+    "source": "wiki.ffo.jp/html/23292.html・32989.html",
+    "timing_basis": "作者の BLM_gear.lua の sets.buff['マナウォール'] に feet=\"ＷＣサボ+3\"・BLM.lua が効果中に着る",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 437,
+     "en": "Mana Wall",
+     "ja": "マナウォール"
+    },
+    "items": [
+     {
+      "ja": "ＧＴサボ+1"
+     },
+     {
+      "ja": "ＧＴサボ+2"
+     },
+     {
+      "ja": "ウィッケサボ"
+     },
+     {
+      "ja": "ＷＣサボ+1"
+     },
+     {
+      "ja": "ＷＣサボ+2"
+     },
+     {
+      "ja": "ＷＣサボ+3"
+     }
+    ]
+   }
+  ],
+  "RDM": [
+   {
+    "ability_en": "Chainspell",
+    "ability_ja": "連続魔",
+    "slot": "body",
+    "timing": "use",
+    "effect": "連続魔効果アップ",
+    "source": "wiki.ffo.jp/html/3547.html・30904.html",
+    "timing_basis": "作者の RDM_gear.lua の sets.precast.JA['連続魔'] に ＶＩタバード+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＤＬタバード+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ヴィティタバード"
+     },
+     {
+      "ja": "ＶＩタバード+1"
+     },
+     {
+      "ja": "ＶＩタバード+2"
+     },
+     {
+      "ja": "ＶＩタバード+3"
+     },
+     {
+      "ja": "ＶＩタバード+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Saboteur",
+    "ability_ja": "サボトゥール",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "サボトゥール効果アップ (IL 版はサボトゥール+11〜+14)",
+    "source": "wiki.ffo.jp/html/23293.html・32990.html",
+    "timing_basis": "作者の RDM_gear.lua の sets.precast.JA['サボトゥール'] に ＬＴガントロ+2",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＥＱガントロ+1"
+     },
+     {
+      "ja": "ＥＱガントロ+2"
+     },
+     {
+      "ja": "レサジーガントロ"
+     },
+     {
+      "ja": "ＬＴガントロ+1"
+     },
+     {
+      "ja": "ＬＴガントロ+2"
+     },
+     {
+      "ja": "ＬＴガントロ+3"
+     }
+    ]
+   }
+  ],
+  "THF": [
+   {
+    "ability_en": "Mug",
+    "ability_ja": "かすめとる",
+    "slot": "head",
+    "timing": "use",
+    "effect": "かすめとる効果アップ",
+    "source": "wiki.ffo.jp/html/1712.html",
+    "timing_basis": "作者の GearSwap に頭の指定なし (かすめとるは手 ＰＤアムレット+3)。根拠なし",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "アサシンボンネット"
+     },
+     {
+      "ja": "ＡＳボンネット+1"
+     },
+     {
+      "ja": "ＡＳボンネット+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Mug",
+    "ability_ja": "かすめとる",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "ギルスティール効果アップ",
+    "source": "wiki.ffo.jp/html/1712.html",
+    "timing_basis": "「ギルスティール」をかすめとるのギル奪取と解釈 (要確認)。GearSwap に指定なし",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "アサシンキュロット"
+     },
+     {
+      "ja": "ＡＳキュロット+1"
+     },
+     {
+      "ja": "ＡＳキュロット+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Steal",
+    "ability_ja": "ぬすむ",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "ぬすむ+5",
+    "source": "wiki.ffo.jp/html/1712.html",
+    "timing_basis": "作者の THF_gear.lua の sets.precast.JA['ぬすむ'] に アサシンキュロット",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "アサシンキュロット"
+     },
+     {
+      "ja": "ＡＳキュロット+1"
+     }
+    ]
+   },
+   {
+    "ability_en": "Aura Steal",
+    "ability_ja": "オーラスティール",
+    "slot": "head",
+    "timing": "merit",
+    "set_path": "sets.merit.AuraSteal",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "オーラスティール効果アップ (一度に盗める強化数が2つになることがある・能力値1につき発動率+20%)",
+    "source": "wiki.ffo.jp/html/1712.html・30905.html",
+    "timing_basis": "res の job_traits.lua・merit_points.lua にある特性 (ぬすむ使用時に効く)",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＡＳボンネット+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "プランダボンネット"
+     },
+     {
+      "ja": "ＰＤボンネット+1"
+     },
+     {
+      "ja": "ＰＤボンネット+2"
+     },
+     {
+      "ja": "ＰＤボンネット+3"
+     },
+     {
+      "ja": "ＰＤボンネット+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Ambush",
+    "ability_ja": "アンブッシュ",
+    "slot": "body",
+    "timing": "merit",
+    "set_path": "sets.merit.Ambush",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "アンブッシュ効果アップ (能力値1につき背後からの攻撃時トリプルアタック+1%)",
+    "source": "wiki.ffo.jp/html/1712.html・30905.html",
+    "timing_basis": "res の job_traits.lua・merit_points.lua にある常時効く特性",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＡＳベスト+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "プランダベスト"
+     },
+     {
+      "ja": "ＰＤベスト+1"
+     },
+     {
+      "ja": "ＰＤベスト+2"
+     },
+     {
+      "ja": "ＰＤベスト+3"
+     },
+     {
+      "ja": "ＰＤベスト+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Perfect Dodge",
+    "ability_ja": "絶対回避",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "絶対回避効果アップ (効果時間+10秒)",
+    "source": "wiki.ffo.jp/html/1712.html・30905.html",
+    "timing_basis": "作者の THF_gear.lua の sets.precast.JA['絶対回避'] に ＰＤアムレット+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＡＳアムレット+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "プランダアムレット"
+     },
+     {
+      "ja": "ＰＤアムレット+1"
+     },
+     {
+      "ja": "ＰＤアムレット+2"
+     },
+     {
+      "ja": "ＰＤアムレット+3"
+     },
+     {
+      "ja": "ＰＤアムレット+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Feint",
+    "ability_ja": "フェイント",
+    "slot": "legs",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "フェイント効果アップ (能力値1につき回避-10)",
+    "source": "wiki.ffo.jp/html/1712.html・30905.html",
+    "timing_basis": "作者の THF_gear.lua の sets.precast.JA['フェイント'] に ＰＤキュロット+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＡＳキュロット+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "プランダキュロット"
+     },
+     {
+      "ja": "ＰＤキュロット+1"
+     },
+     {
+      "ja": "ＰＤキュロット+2"
+     },
+     {
+      "ja": "ＰＤキュロット+3"
+     },
+     {
+      "ja": "ＰＤキュロット+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Assassin's Charge",
+    "ability_ja": "アサシンチャージ",
+    "slot": "feet",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "アサシンチャージ効果アップ (能力値1につきクリティカルヒット確率+1%)",
+    "source": "wiki.ffo.jp/html/1712.html・30905.html",
+    "timing_basis": "GearSwap に指定なし。使う瞬間か効果中かの根拠なし",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＡＳプーレーヌ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "プランダプーレーヌ"
+     },
+     {
+      "ja": "ＰＤプーレーヌ+1"
+     },
+     {
+      "ja": "ＰＤプーレーヌ+2"
+     },
+     {
+      "ja": "ＰＤプーレーヌ+3"
+     },
+     {
+      "ja": "ＰＤプーレーヌ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Accomplice",
+    "ability_ja": "アカンプリス",
+    "slot": "head",
+    "timing": "use",
+    "effect": "アカンプリス&コラボレーター効果アップ (IL 版 +12〜+21%)",
+    "source": "wiki.ffo.jp/html/23294.html・32991.html",
+    "timing_basis": "作者の THF_gear.lua の sets.precast.JA['アカンプリス'] に ＳＫボンネット+2",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＲＤボンネット+1"
+     },
+     {
+      "ja": "ＲＤボンネット+2"
+     },
+     {
+      "ja": "スカルカボンネット"
+     },
+     {
+      "ja": "ＳＫボンネット+1"
+     },
+     {
+      "ja": "ＳＫボンネット+2"
+     },
+     {
+      "ja": "ＳＫボンネット+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Collaborator",
+    "ability_ja": "コラボレーター",
+    "slot": "head",
+    "timing": "use",
+    "effect": "アカンプリス&コラボレーター効果アップ (IL 版 +12〜+21%)",
+    "source": "wiki.ffo.jp/html/23294.html・32991.html",
+    "timing_basis": "作者の THF_gear.lua の sets.precast.JA['コラボレーター'] に ＳＫボンネット+2",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＲＤボンネット+1"
+     },
+     {
+      "ja": "ＲＤボンネット+2"
+     },
+     {
+      "ja": "スカルカボンネット"
+     },
+     {
+      "ja": "ＳＫボンネット+1"
+     },
+     {
+      "ja": "ＳＫボンネット+2"
+     },
+     {
+      "ja": "ＳＫボンネット+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Conspirator",
+    "ability_ja": "コンスピレーター",
+    "slot": "body",
+    "timing": "use",
+    "effect": "コンスピレーター性能アップ",
+    "source": "wiki.ffo.jp/html/23294.html・32991.html",
+    "timing_basis": "GearSwap に指定なし。根拠なし",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＲＤベスト+1"
+     },
+     {
+      "ja": "ＲＤベスト+2"
+     },
+     {
+      "ja": "ＳＫベスト+1"
+     },
+     {
+      "ja": "ＳＫベスト+2"
+     },
+     {
+      "ja": "ＳＫベスト+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Sneak Attack",
+    "ability_ja": "不意打ち",
+    "slot": "hands",
+    "timing": "while_active",
+    "buff": {
+     "id": 65,
+     "en": "Sneak Attack",
+     "ja": "不意打ち"
+    },
+    "effect": "不意打ちダメージアップ (IL 版は不意打ち+20〜+30)",
+    "source": "wiki.ffo.jp/html/23294.html・32991.html",
+    "timing_basis": "common/THF_gear.lua の sets.buff['不意打ち'] に ＳＫアムレット+2",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＲＤアムレット+1"
+     },
+     {
+      "ja": "ＲＤアムレット+2"
+     },
+     {
+      "ja": "スカルカアムレット"
+     },
+     {
+      "ja": "ＳＫアムレット+1"
+     },
+     {
+      "ja": "ＳＫアムレット+2"
+     },
+     {
+      "ja": "ＳＫアムレット+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Despoil",
+    "ability_ja": "ぶんどる",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "ぶんどる+3〜+5 (IL 版 +7〜+13)",
+    "source": "wiki.ffo.jp/html/23294.html・32991.html",
+    "timing_basis": "作者の THF_gear.lua の sets.precast.JA['ぶんどる'] に ＳＫキュロット+2",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＲＤキュロット+1"
+     },
+     {
+      "ja": "ＲＤキュロット+2"
+     },
+     {
+      "ja": "スカルカキュロット"
+     },
+     {
+      "ja": "ＳＫキュロット+1"
+     },
+     {
+      "ja": "ＳＫキュロット+2"
+     },
+     {
+      "ja": "ＳＫキュロット+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Despoil",
+    "ability_ja": "ぶんどる",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "ぶんどる効果アップ (IL 版 ぶんどる効果+5〜+8)",
+    "source": "wiki.ffo.jp/html/23294.html・32991.html",
+    "timing_basis": "作者の THF_gear.lua の sets.precast.JA['ぶんどる'] に ＳＫプーレーヌ+2",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＲＤプーレーヌ+1"
+     },
+     {
+      "ja": "ＲＤプーレーヌ+2"
+     },
+     {
+      "ja": "スカルカプーレーヌ"
+     },
+     {
+      "ja": "ＳＫプーレーヌ+1"
+     },
+     {
+      "ja": "ＳＫプーレーヌ+2"
+     },
+     {
+      "ja": "ＳＫプーレーヌ+3"
+     }
+    ]
+   }
+  ],
+  "PLD": [
+   {
+    "ability_en": "Rampart",
+    "ability_ja": "ランパート",
+    "slot": "head",
+    "timing": "use",
+    "effect": "ランパート効果アップ (IL: ランパート効果時間+30)",
+    "source": "wiki.ffo.jp/html/2067.html・30825.html",
+    "timing_basis": "作者の PLD_gear.lua の sets.precast.JA['ランパート'] に ＣＢコロネット+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ヴァラーコロネット"
+     },
+     {
+      "ja": "ＶＬコロネット+1"
+     },
+     {
+      "ja": "ＶＬコロネット+2"
+     },
+     {
+      "ja": "カバラリコロネット"
+     },
+     {
+      "ja": "ＣＢコロネット+1"
+     },
+     {
+      "ja": "ＣＢコロネット+2"
+     },
+     {
+      "ja": "ＣＢコロネット+3"
+     },
+     {
+      "ja": "ＣＢコロネット+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Rampart",
+    "ability_ja": "ランパート",
+    "slot": "head",
+    "timing": "use",
+    "requires": "メリットポイントで アイアンウィル を習得している必要がある",
+    "effect": "アイアンウィル (メリット特性: ランパートを使ったときに効く) アイアンウィル効果アップ (ランパートの詠唱中断率ダウン)",
+    "source": "wiki.ffo.jp/html/2067.html・30825.html",
+    "timing_basis": "ランパートに付く効果。同じ頭を作者は sets.precast.JA['ランパート'] で着ている (アイアンウィル単独の記述は無い) / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＶＬコロネット+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "カバラリコロネット"
+     },
+     {
+      "ja": "ＣＢコロネット+1"
+     },
+     {
+      "ja": "ＣＢコロネット+2"
+     },
+     {
+      "ja": "ＣＢコロネット+3"
+     },
+     {
+      "ja": "ＣＢコロネット+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Cover",
+    "ability_ja": "かばう",
+    "slot": "body",
+    "timing": "use",
+    "effect": "かばう性能アップ (IL: かばう:被物理ダメージMP変換+32〜41)",
+    "source": "wiki.ffo.jp/html/2067.html・30825.html",
+    "timing_basis": "作者の GearSwap に胴の指定なし・wiki に装備の時機の記述なし (MP変換は被弾時なので効果中ずっとの可能性あり) / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ヴァラーサーコート"
+     },
+     {
+      "ja": "ＶＬサーコート+1"
+     },
+     {
+      "ja": "ＶＬサーコート+2"
+     },
+     {
+      "ja": "カバラリサーコート"
+     },
+     {
+      "ja": "ＣＢサーコート+1"
+     },
+     {
+      "ja": "ＣＢサーコート+2"
+     },
+     {
+      "ja": "ＣＢサーコート+3"
+     },
+     {
+      "ja": "ＣＢサーコート+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Fealty",
+    "ability_ja": "フィールティ",
+    "slot": "body",
+    "timing": "use",
+    "effect": "フィールティ効果アップ",
+    "source": "wiki.ffo.jp/html/2067.html・30825.html",
+    "timing_basis": "sets.precast.JA['フィールティ'] に ＣＢサーコート+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＶＬサーコート+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "カバラリサーコート"
+     },
+     {
+      "ja": "ＣＢサーコート+1"
+     },
+     {
+      "ja": "ＣＢサーコート+2"
+     },
+     {
+      "ja": "ＣＢサーコート+3"
+     },
+     {
+      "ja": "ＣＢサーコート+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Shield Bash",
+    "ability_ja": "シールドバッシュ",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "シールドバッシュ+10〜+35 (IL +2 以上はシールドバッシュ:ディスペル)",
+    "source": "wiki.ffo.jp/html/2067.html・30825.html",
+    "timing_basis": "sets.precast.JA['シールドバッシュ'] に ＣＢガントレ+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ヴァラーガントレ"
+     },
+     {
+      "ja": "ＶＬガントレ+1"
+     },
+     {
+      "ja": "ＶＬガントレ+2"
+     },
+     {
+      "ja": "カバラリガントレ"
+     },
+     {
+      "ja": "ＣＢガントレ+1"
+     },
+     {
+      "ja": "ＣＢガントレ+2"
+     },
+     {
+      "ja": "ＣＢガントレ+3"
+     },
+     {
+      "ja": "ＣＢガントレ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Chivalry",
+    "ability_ja": "シバルリー",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "シバルリー効果アップ",
+    "source": "wiki.ffo.jp/html/2067.html・30825.html",
+    "timing_basis": "sets.precast.JA['シバルリー'] に ＣＢガントレ+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＶＬガントレ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "カバラリガントレ"
+     },
+     {
+      "ja": "ＣＢガントレ+1"
+     },
+     {
+      "ja": "ＣＢガントレ+2"
+     },
+     {
+      "ja": "ＣＢガントレ+3"
+     },
+     {
+      "ja": "ＣＢガントレ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Invincible",
+    "ability_ja": "インビンシブル",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "インビンシブル効果アップ",
+    "source": "wiki.ffo.jp/html/2067.html・30825.html",
+    "timing_basis": "sets.precast.JA['インビンシブル'] に ＣＢブリーチズ+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＶＬブリーチズ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "カバラリブリーチズ"
+     },
+     {
+      "ja": "ＣＢブリーチズ+1"
+     },
+     {
+      "ja": "ＣＢブリーチズ+2"
+     },
+     {
+      "ja": "ＣＢブリーチズ+3"
+     },
+     {
+      "ja": "ＣＢブリーチズ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Sentinel",
+    "ability_ja": "センチネル",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "センチネル効果アップ (IL: センチネル+10〜+25)",
+    "source": "wiki.ffo.jp/html/2067.html・30825.html",
+    "timing_basis": "sets.precast.JA['センチネル'] に ＣＢレギンス+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ヴァラーレギンス"
+     },
+     {
+      "ja": "ＶＬレギンス+1"
+     },
+     {
+      "ja": "ＶＬレギンス+2"
+     },
+     {
+      "ja": "カバラリレギンス"
+     },
+     {
+      "ja": "ＣＢレギンス+1"
+     },
+     {
+      "ja": "ＣＢレギンス+2"
+     },
+     {
+      "ja": "ＣＢレギンス+3"
+     },
+     {
+      "ja": "ＣＢレギンス+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Sentinel",
+    "ability_ja": "センチネル",
+    "slot": "feet",
+    "timing": "use",
+    "requires": "メリットポイントで ガーディアン を習得している必要がある",
+    "effect": "ガーディアン (メリット特性: センチネルを使ったときに効く) ガーディアン効果アップ (センチネル中の敵対心低下を緩和)",
+    "source": "wiki.ffo.jp/html/2067.html・30825.html",
+    "timing_basis": "センチネルに付く効果。同じ足を作者は sets.precast.JA['センチネル'] で着ている (ガーディアン単独の記述は無い) / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＶＬレギンス+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "カバラリレギンス"
+     },
+     {
+      "ja": "ＣＢレギンス+1"
+     },
+     {
+      "ja": "ＣＢレギンス+2"
+     },
+     {
+      "ja": "ＣＢレギンス+3"
+     },
+     {
+      "ja": "ＣＢレギンス+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Divine Emblem",
+    "ability_ja": "神聖の印",
+    "slot": "feet",
+    "timing": "cast",
+    "effect": "神聖の印効果アップ (敵対心+5〜+21・次の神聖魔法に乗る)",
+    "source": "wiki.ffo.jp/html/23295.html・33052.html",
+    "timing_basis": "wiki.ffo.jp/html/19970.html: 神聖の印は次に使う神聖魔法の命中・敵対心を上げる。足の神聖の印効果アップは敵対心+N (いつ着るかの記述は無い) → 効果が乗る神聖魔法の詠唱中 (着弾時) に着る。作者・ぐりーずさんの GearSwap も sets.buff['神聖の印'] (効果中の装備)",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 438,
+     "en": "Divine Emblem",
+     "ja": "神聖の印"
+    },
+    "items": [
+     {
+      "ja": "ＣＤサバトン+1"
+     },
+     {
+      "ja": "ＣＤサバトン+2"
+     },
+     {
+      "ja": "シバリエサバトン"
+     },
+     {
+      "ja": "ＣＶサバトン+1"
+     },
+     {
+      "ja": "ＣＶサバトン+2"
+     },
+     {
+      "ja": "ＣＶサバトン+3"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Magic"
+   }
+  ],
+  "DRK": [
+   {
+    "ability_en": "Dark Seal",
+    "ability_ja": "ダークシール",
+    "slot": "head",
+    "timing": "while_active",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "ダークシール効果アップ (使用時の暗黒魔法の効果時間が延びる)",
+    "source": "wiki.ffo.jp/html/3548.html・31256.html",
+    "timing_basis": "作者の DRK_gear.lua の sets.buff['ダークシール'] に ＦＬバーゴネット+1",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 345,
+     "en": "Dark Seal",
+     "ja": "ダークシール"
+    },
+    "items": [
+     {
+      "ja": "ＡＢバーゴネット+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ファレバーゴネット"
+     },
+     {
+      "ja": "ＦＬバーゴネット+1"
+     },
+     {
+      "ja": "ＦＬバーゴネット+2"
+     },
+     {
+      "ja": "ＦＬバーゴネット+3"
+     },
+     {
+      "ja": "ＦＬバーゴネット+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Blood Weapon",
+    "ability_ja": "ブラッドウェポン",
+    "slot": "body",
+    "timing": "use",
+    "effect": "ブラッドウェポン効果アップ (効果時間 +10 秒)",
+    "source": "wiki.ffo.jp/html/3548.html・31256.html",
+    "timing_basis": "wiki (31256): 効果時間が10秒延びる = 使用時に決まる効果時間。作者の GearSwap に指定なし",
+    "timing_confidence": "wiki",
+    "items": [
+     {
+      "ja": "ＡＢキュイラス+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ファレキュイラス"
+     },
+     {
+      "ja": "ＦＬキュイラス+1"
+     },
+     {
+      "ja": "ＦＬキュイラス+2"
+     },
+     {
+      "ja": "ＦＬキュイラス+3"
+     },
+     {
+      "ja": "ＦＬキュイラス+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Diabolic Eye",
+    "ability_ja": "ディアボリクアイ",
+    "slot": "hands",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "ディアボリクアイ効果アップ (効果時間が延びる)",
+    "source": "wiki.ffo.jp/html/3548.html・31256.html",
+    "timing_basis": "wiki (31256): 能力値1につき効果時間が延びる = 使用時に決まる。作者の GearSwap に指定なし",
+    "timing_confidence": "wiki",
+    "items": [
+     {
+      "ja": "ＡＢガントレット+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ファレガントレット"
+     },
+     {
+      "ja": "ＦＬガントレット+1"
+     },
+     {
+      "ja": "ＦＬガントレット+2"
+     },
+     {
+      "ja": "ＦＬガントレット+3"
+     },
+     {
+      "ja": "ＦＬガントレット+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Muted Soul",
+    "ability_ja": "ミューテッドソウル",
+    "slot": "legs",
+    "timing": "merit",
+    "set_path": "sets.merit.MutedSoul",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "ミューテッドソウル効果アップ (暗黒の効果中の残心が延びる・装備中のみ有効)",
+    "source": "wiki.ffo.jp/html/3548.html・31256.html",
+    "timing_basis": "wiki (31256): 装備中のみ有効。メリットの特性 (job_traits 79)",
+    "timing_confidence": "wiki",
+    "items": [
+     {
+      "ja": "ＡＢフランチャー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ファレフランチャー"
+     },
+     {
+      "ja": "ＦＬフランチャー+1"
+     },
+     {
+      "ja": "ＦＬフランチャー+2"
+     },
+     {
+      "ja": "ＦＬフランチャー+3"
+     },
+     {
+      "ja": "ＦＬフランチャー+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Last Resort",
+    "ability_ja": "ラストリゾート",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "ラストリゾートの効果アップ",
+    "source": "wiki.ffo.jp/html/3548.html",
+    "timing_basis": "作者は sets.precast.JA['ラストリゾート'] に足を入れているが別の系統 (ＦＬソルレット+3)。アビス系の時機の記述なし / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "アビスソルレット"
+     },
+     {
+      "ja": "ＡＢソルレット+1"
+     },
+     {
+      "ja": "ＡＢソルレット+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Last Resort",
+    "ability_ja": "ラストリゾート",
+    "slot": "feet",
+    "timing": "use",
+    "requires": "メリットポイントで デスペレートブロー を習得している必要がある",
+    "effect": "デスペレートブロー (メリット特性: ラストリゾートを使ったときに効く) デスペレートブロー効果アップ (ラストリゾート効果中のモクシャが増える・装備中のみ有効)",
+    "source": "wiki.ffo.jp/html/3548.html・31256.html",
+    "timing_basis": "ぐりーずさん (ktgreeds/GearSwap) の GearSwap では sets.precast.JA['ラストリゾート'] に入っている → 使う瞬間に合わせる (作者判断 2026-10-26)",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＡＢソルレット+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ファレソルレット"
+     },
+     {
+      "ja": "ＦＬソルレット+1"
+     },
+     {
+      "ja": "ＦＬソルレット+2"
+     },
+     {
+      "ja": "ＦＬソルレット+3"
+     },
+     {
+      "ja": "ＦＬソルレット+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Nether Void",
+    "ability_ja": "ネザーヴォイド",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "ネザーヴォイド効果アップ (IL: ネザーヴォイド+30〜)",
+    "source": "wiki.ffo.jp/html/23296.html・33062.html",
+    "timing_basis": "作者の DRK_gear.lua の sets.precast.JA['ネザーヴォイド'] に ＨＴフランチャ+2 (sets.buff にも入っている)。wiki (33062) もアビリティ使用時に装備していればよいと記載",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＢＬフランチャー+1"
+     },
+     {
+      "ja": "ＢＬフランチャー+2"
+     },
+     {
+      "ja": "ヒーズンフランチャ"
+     },
+     {
+      "ja": "ＨＴフランチャ+1"
+     },
+     {
+      "ja": "ＨＴフランチャ+2"
+     },
+     {
+      "ja": "ＨＴフランチャ+3"
+     }
+    ]
+   }
+  ],
+  "BRD": [
+   {
+    "ability_en": "Con Anima",
+    "ability_ja": "コンアニマ",
+    "slot": "head",
+    "timing": "merit",
+    "set_path": "sets.merit.ConAnima",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "コンアニマ効果アップ (能力値1につき強化系の呪歌効果中、自身の被物理ダメージ-1%・装備枠とは別枠乗算)",
+    "source": "wiki.ffo.jp/html/31257.html",
+    "timing_basis": "res の job_traits / merit_points にある特性 (歌唱中に常時効く)",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ビフラウンドリト"
+     },
+     {
+      "ja": "ＢＩラウンドリト+1"
+     },
+     {
+      "ja": "ＢＩラウンドリト+2"
+     },
+     {
+      "ja": "ＢＩラウンドリト+3"
+     },
+     {
+      "ja": "ＢＩラウンドリト+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Troubadour",
+    "ability_ja": "トルバドゥール",
+    "slot": "body",
+    "timing": "use",
+    "effect": "トルバドゥール効果アップ (能力値1につき効果時間+4秒)",
+    "source": "wiki.ffo.jp/html/31257.html",
+    "timing_basis": "効果時間の延長は使用時に決まる (wiki に着替えの記述なし)。作者の sets.precast.JA['トルバドゥール'] は空",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ビフジュストコル"
+     },
+     {
+      "ja": "ＢＩジュストコル+1"
+     },
+     {
+      "ja": "ＢＩジュストコル+2"
+     },
+     {
+      "ja": "ＢＩジュストコル+3"
+     },
+     {
+      "ja": "ＢＩジュストコル+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Con Brio",
+    "ability_ja": "コンブリオ",
+    "slot": "hands",
+    "timing": "merit",
+    "set_path": "sets.merit.ConBrio",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "コンブリオ効果アップ (能力値1につき強化系の呪歌効果中、自身の被魔法ダメージ-1%・装備枠とは別枠乗算)",
+    "source": "wiki.ffo.jp/html/31257.html",
+    "timing_basis": "res の job_traits / merit_points にある特性 (歌唱中に常時効く)",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ビフカフス"
+     },
+     {
+      "ja": "ＢＩカフス+1"
+     },
+     {
+      "ja": "ＢＩカフス+2"
+     },
+     {
+      "ja": "ＢＩカフス+3"
+     },
+     {
+      "ja": "ＢＩカフス+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Soul Voice",
+    "ability_ja": "ソウルボイス",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "ソウルボイス効果アップ (効果時間+30秒)",
+    "source": "wiki.ffo.jp/html/31257.html",
+    "timing_basis": "効果時間の延長は使用時に決まる。作者の sets.precast.JA['ソウルボイス'] は空",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ビフキャニオンズ"
+     },
+     {
+      "ja": "ＢＩキャニオンズ+1"
+     },
+     {
+      "ja": "ＢＩキャニオンズ+2"
+     },
+     {
+      "ja": "ＢＩキャニオンズ+3"
+     },
+     {
+      "ja": "ＢＩキャニオンズ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Nightingale",
+    "ability_ja": "ナイチンゲール",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "ナイチンゲール効果アップ (能力値1につき効果時間+4秒)",
+    "source": "wiki.ffo.jp/html/31257.html",
+    "timing_basis": "効果時間の延長は使用時に決まる。作者の sets.precast.JA['ナイチンゲール'] は空",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ビフスリッパー"
+     },
+     {
+      "ja": "ＢＩスリッパー+1"
+     },
+     {
+      "ja": "ＢＩスリッパー+2"
+     },
+     {
+      "ja": "ＢＩスリッパー+3"
+     },
+     {
+      "ja": "ＢＩスリッパー+4"
+     }
+    ]
+   }
+  ],
+  "RNG": [
+   {
+    "ability_en": "Flashy Shot",
+    "ability_ja": "フラッシーショット",
+    "slot": "hands",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "フラッシーショット効果アップ (能力値に応じて距離補正の緩和)",
+    "source": "wiki.ffo.jp/html/3551.html・31258.html",
+    "timing_basis": "wiki に着替えの記述なし",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＳＣブレーサー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アルケブレーサー"
+     },
+     {
+      "ja": "ＡＲブレーサー+1"
+     },
+     {
+      "ja": "ＡＲブレーサー+2"
+     },
+     {
+      "ja": "ＡＲブレーサー+3"
+     },
+     {
+      "ja": "ＡＲブレーサー+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Eagle Eye Shot",
+    "ability_ja": "イーグルアイ",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "イーグルアイ効果アップ (ダメージ増加)",
+    "source": "wiki.ffo.jp/html/3551.html・31258.html",
+    "timing_basis": "使用時の 1 発の攻撃なので使う瞬間 (wiki に着替えの記述なし)",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＳＣブラッカエ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アルケブラッカエ"
+     },
+     {
+      "ja": "ＡＲブラッカエ+1"
+     },
+     {
+      "ja": "ＡＲブラッカエ+2"
+     },
+     {
+      "ja": "ＡＲブラッカエ+3"
+     },
+     {
+      "ja": "ＡＲブラッカエ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Stealth Shot",
+    "ability_ja": "ステルスショット",
+    "slot": "feet",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "ステルスショット効果アップ (能力値に応じて敵対心を低下)",
+    "source": "wiki.ffo.jp/html/3551.html・31258.html",
+    "timing_basis": "wiki に着替えの記述なし",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＳＣソックス+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "アルケソックス"
+     },
+     {
+      "ja": "ＡＲソックス+1"
+     },
+     {
+      "ja": "ＡＲソックス+2"
+     },
+     {
+      "ja": "ＡＲソックス+3"
+     },
+     {
+      "ja": "ＡＲソックス+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Double Shot",
+    "ability_ja": "ダブルショット",
+    "slot": "head",
+    "timing": "cast",
+    "effect": "ダブルショット効果アップ (NQ の文言)・IL 版は「ダブルショットの敵対心-52〜58」",
+    "source": "wiki.ffo.jp/html/23299.html・33127.html",
+    "timing_basis": "作者の RNG.lua も job_post_midcast (遠隔攻撃) で sets.buff['ダブルショット'] を着る (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 433,
+     "en": "Double Shot",
+     "ja": "ダブルショット"
+    },
+    "items": [
+     {
+      "ja": "ＳＹガペット+1"
+     },
+     {
+      "ja": "ＳＹガペット+2"
+     },
+     {
+      "ja": "アミニガペット"
+     },
+     {
+      "ja": "ＡＭガペット+1"
+     },
+     {
+      "ja": "ＡＭガペット+2"
+     },
+     {
+      "ja": "ＡＭガペット+3"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Ranged Attack"
+   },
+   {
+    "ability_en": "Velocity Shot",
+    "ability_ja": "ベロシティショット",
+    "slot": "body",
+    "timing": "cast",
+    "effect": "ベロシティショット効果アップ (スナップショットと飛攻アップの効果が上昇)・IL 版は「ベロシティショット+5〜11%」",
+    "source": "wiki.ffo.jp/html/23299.html・33127.html",
+    "timing_basis": "効果中のスナップショット (遠隔攻撃の構え = precast) と飛攻 (midcast) が上がる → 両方で着る (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 371,
+     "en": "Velocity Shot",
+     "ja": "ベロシティショット"
+    },
+    "items": [
+     {
+      "ja": "ＳＹカバン+1"
+     },
+     {
+      "ja": "ＳＹカバン+2"
+     },
+     {
+      "ja": "アミニカバン"
+     },
+     {
+      "ja": "ＡＭカバン+1"
+     },
+     {
+      "ja": "ＡＭカバン+2"
+     },
+     {
+      "ja": "ＡＭカバン+3"
+     }
+    ],
+    "cast_phase": "both",
+    "cast_on": "Ranged Attack"
+   },
+   {
+    "ability_en": "Bounty Shot",
+    "ability_ja": "バウンティショット",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "バウンティショット効果アップ (トレジャーハンター 2→3)・IL 版は「バウンティショット+1〜4」",
+    "source": "wiki.ffo.jp/html/23299.html・33127.html",
+    "timing_basis": "使用時に敵へ付与 (wiki に着替えの記述なし)。作者の common の sets.precast.JA['バウンティショット'] は空",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＳＹグロブレト+1"
+     },
+     {
+      "ja": "ＳＹグロブレト+2"
+     },
+     {
+      "ja": "アミニグロブレト"
+     },
+     {
+      "ja": "ＡＭグロブレト+1"
+     },
+     {
+      "ja": "ＡＭグロブレト+2"
+     },
+     {
+      "ja": "ＡＭグロブレト+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Unlimited Shot",
+    "ability_ja": "エンドレスショット",
+    "slot": "feet",
+    "timing": "cast",
+    "effect": "エンドレスショット効果アップ (使用時の遠隔攻撃が必ず適正距離の威力になる)",
+    "source": "wiki.ffo.jp/html/23299.html・33127.html",
+    "timing_basis": "効果中の遠隔攻撃が必ず適正距離の威力になる → 遠隔攻撃中に着る (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 115,
+     "en": "Unlimited Shot",
+     "ja": "エンドレスショット"
+    },
+    "items": [
+     {
+      "ja": "ＳＹボティヨン+1"
+     },
+     {
+      "ja": "ＳＹボティヨン+2"
+     },
+     {
+      "ja": "アミニボティヨン"
+     },
+     {
+      "ja": "ＡＭボティヨン+1"
+     },
+     {
+      "ja": "ＡＭボティヨン+2"
+     },
+     {
+      "ja": "ＡＭボティヨン+3"
+     }
+    ],
+    "cast_phase": "midcast",
+    "cast_on": "Ranged Attack"
+   }
+  ],
+  "SAM": [
+   {
+    "ability_en": "Meditate",
+    "ability_ja": "黙想",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "黙想効果アップ (IL版: 黙想効果時間+8・極/越は+12)",
+    "source": "wiki.ffo.jp/html/3554.html・30918.html",
+    "timing_basis": "作者の SAM_gear.lua の sets.precast.JA['黙想'] に極左近士筒篭手",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "早乙女筒篭手"
+     },
+     {
+      "ja": "早乙女筒篭手改"
+     },
+     {
+      "ja": "真早乙女筒篭手"
+     },
+     {
+      "ja": "左近士筒篭手"
+     },
+     {
+      "ja": "左近士筒篭手改"
+     },
+     {
+      "ja": "真左近士筒篭手"
+     },
+     {
+      "ja": "極左近士筒篭手"
+     },
+     {
+      "ja": "越左近士筒篭手"
+     }
+    ]
+   },
+   {
+    "ability_en": "Blade Bash",
+    "ability_ja": "峰打ち",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "峰打ち効果アップ",
+    "requires": "メリットポイントで習得が必要",
+    "source": "wiki.ffo.jp/html/3554.html・30918.html",
+    "timing_basis": "作者の SAM_gear.lua の sets.precast.JA['峰打ち'] に極左近士筒篭手",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "真早乙女筒篭手",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "左近士筒篭手"
+     },
+     {
+      "ja": "左近士筒篭手改"
+     },
+     {
+      "ja": "真左近士筒篭手"
+     },
+     {
+      "ja": "極左近士筒篭手"
+     },
+     {
+      "ja": "越左近士筒篭手"
+     }
+    ]
+   },
+   {
+    "ability_en": "Third Eye",
+    "ability_ja": "心眼",
+    "slot": "legs",
+    "timing": "while_active",
+    "effect": "心眼性能アップ (IL版: 心眼:カウンター発動率+35・カウンターダメージ+16〜25)",
+    "source": "wiki.ffo.jp/html/3554.html・30918.html",
+    "timing_basis": "作者の SAM_gear.lua の sets.buff['心眼'] に極左近士板佩楯",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 67,
+     "en": "Third Eye",
+     "ja": "心眼"
+    },
+    "items": [
+     {
+      "ja": "早乙女板佩楯"
+     },
+     {
+      "ja": "早乙女板佩楯改"
+     },
+     {
+      "ja": "真早乙女板佩楯"
+     },
+     {
+      "ja": "左近士板佩楯"
+     },
+     {
+      "ja": "左近士板佩楯改"
+     },
+     {
+      "ja": "真左近士板佩楯"
+     },
+     {
+      "ja": "極左近士板佩楯"
+     },
+     {
+      "ja": "越左近士板佩楯"
+     }
+    ]
+   },
+   {
+    "ability_en": "Shikikoyo",
+    "ability_ja": "士気昂揚",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "士気昂揚効果アップ",
+    "requires": "メリットポイントで習得が必要",
+    "source": "wiki.ffo.jp/html/3554.html・30918.html",
+    "timing_basis": "作者の SAM_gear.lua の sets.precast.JA['士気昂揚'] に極左近士板佩楯",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "真早乙女板佩楯",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "左近士板佩楯"
+     },
+     {
+      "ja": "左近士板佩楯改"
+     },
+     {
+      "ja": "真左近士板佩楯"
+     },
+     {
+      "ja": "極左近士板佩楯"
+     },
+     {
+      "ja": "越左近士板佩楯"
+     }
+    ]
+   },
+   {
+    "ability_en": "Meikyo Shisui",
+    "ability_ja": "明鏡止水",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "明鏡止水効果アップ",
+    "source": "wiki.ffo.jp/html/3554.html・30918.html",
+    "timing_basis": "作者の SAM_gear.lua の sets.precast.JA['明鏡止水'] に越左近士筒脛当 (ただしスロットが legs= と書かれている)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "真早乙女筒脛当",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "左近士筒脛当"
+     },
+     {
+      "ja": "左近士筒脛当改"
+     },
+     {
+      "ja": "真左近士筒脛当"
+     },
+     {
+      "ja": "極左近士筒脛当"
+     },
+     {
+      "ja": "越左近士筒脛当"
+     }
+    ]
+   },
+   {
+    "ability_en": "Ikishoten",
+    "ability_ja": "意気衝天",
+    "slot": "head",
+    "timing": "merit",
+    "set_path": "sets.merit.Ikishoten",
+    "effect": "意気衝天効果アップ",
+    "requires": "メリットポイントで習得が必要",
+    "source": "wiki.ffo.jp/html/3554.html・30918.html",
+    "timing_basis": "res では job_traits (id 85) と merit_points (2756) にある特性 (残心のTP獲得量アップ)",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "真早乙女桃形兜",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "左近士桃形兜"
+     },
+     {
+      "ja": "左近士桃形兜改"
+     },
+     {
+      "ja": "真左近士桃形兜"
+     },
+     {
+      "ja": "極左近士桃形兜"
+     },
+     {
+      "ja": "越左近士桃形兜"
+     }
+    ]
+   },
+   {
+    "ability_en": "Overwhelm",
+    "ability_ja": "正正堂堂",
+    "slot": "body",
+    "timing": "merit",
+    "set_path": "sets.merit.Overwhelm",
+    "effect": "正正堂堂効果アップ",
+    "requires": "メリットポイントで習得が必要",
+    "source": "wiki.ffo.jp/html/3554.html・30918.html",
+    "timing_basis": "res では job_traits (id 86) と merit_points (2758) にある特性 (正面からの WS ダメージボーナス)。実際は WS の瞬間に効く可能性あり",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "真早乙女胴丸",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "左近士胴丸"
+     },
+     {
+      "ja": "左近士胴丸改"
+     },
+     {
+      "ja": "真左近士胴丸"
+     },
+     {
+      "ja": "極左近士胴丸"
+     },
+     {
+      "ja": "越左近士胴丸"
+     }
+    ]
+   },
+   {
+    "ability_en": "Seigan",
+    "ability_ja": "星眼",
+    "slot": "head",
+    "timing": "while_active",
+    "effect": "星眼効果アップ (IL版: 星眼時のカウンター発動率+12〜18)",
+    "source": "wiki.ffo.jp/html/23300.html・33128.html",
+    "timing_basis": "作者の SAM_gear.lua の sets.buff['星眼'] に極春日烏帽子形兜",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 354,
+     "en": "Seigan",
+     "ja": "星眼"
+    },
+    "items": [
+     {
+      "ja": "雲海烏帽子形兜改"
+     },
+     {
+      "ja": "真雲海烏帽子形兜"
+     },
+     {
+      "ja": "春日烏帽子形兜"
+     },
+     {
+      "ja": "春日烏帽子形兜改"
+     },
+     {
+      "ja": "真春日烏帽子形兜"
+     },
+     {
+      "ja": "極春日烏帽子形兜"
+     }
+    ]
+   },
+   {
+    "ability_en": "Sekkanoki",
+    "ability_ja": "石火之機",
+    "slot": "hands",
+    "timing": "while_active",
+    "effect": "石火之機効果アップ (IL版: 残TPに応じたTPボーナス+100%)",
+    "source": "wiki.ffo.jp/html/23300.html・33128.html",
+    "timing_basis": "作者の SAM_gear.lua の sets.buff['石火之機'] に極春日筒篭手 (ただしスロットが legs= と書かれている)",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 408,
+     "en": "Sekkanoki",
+     "ja": "石火之機"
+    },
+    "items": [
+     {
+      "ja": "雲海筒篭手改"
+     },
+     {
+      "ja": "真雲海筒篭手"
+     },
+     {
+      "ja": "春日筒篭手"
+     },
+     {
+      "ja": "春日筒篭手改"
+     },
+     {
+      "ja": "真春日筒篭手"
+     },
+     {
+      "ja": "極春日筒篭手"
+     }
+    ]
+   },
+   {
+    "ability_en": "Hasso",
+    "ability_ja": "八双",
+    "slot": "legs",
+    "timing": "while_active",
+    "effect": "八双効果アップ (NQ: ヘイスト+1%・IL版: 八双時のヘイスト+2〜3%)",
+    "source": "wiki.ffo.jp/html/23300.html・33128.html",
+    "timing_basis": "wiki に「八双時のヘイスト」とあり効果中に着ている必要がある。作者の sets.buff['八双'] は脇戸でコメントアウト中で春日脚は無し",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 353,
+     "en": "Hasso",
+     "ja": "八双"
+    },
+    "items": [
+     {
+      "ja": "雲海板佩楯改"
+     },
+     {
+      "ja": "真雲海板佩楯"
+     },
+     {
+      "ja": "春日板佩楯"
+     },
+     {
+      "ja": "春日板佩楯改"
+     },
+     {
+      "ja": "真春日板佩楯"
+     },
+     {
+      "ja": "極春日板佩楯"
+     }
+    ]
+   },
+   {
+    "ability_en": "Sengikori",
+    "ability_ja": "先義後利",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "先義後利効果アップ (IL版: 先義後利+10〜13)",
+    "source": "wiki.ffo.jp/html/23300.html・33128.html",
+    "timing_basis": "作者の SAM_gear.lua の sets.precast.JA['先義後利'] に極春日筒脛当 (ただしスロットが legs= と書かれている。common 側には空の sets.buff['先義後利'] もある)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "雲海筒脛当改"
+     },
+     {
+      "ja": "真雲海筒脛当"
+     },
+     {
+      "ja": "春日筒脛当"
+     },
+     {
+      "ja": "春日筒脛当改"
+     },
+     {
+      "ja": "真春日筒脛当"
+     },
+     {
+      "ja": "極春日筒脛当"
+     }
+    ]
+   }
+  ],
+  "DRG": [
+   {
+    "ability_en": "Deep Breathing",
+    "ability_ja": "ディープブリージング",
+    "slot": "head",
+    "timing": "use",
+    "effect": "ディープブリージング効果アップ",
+    "requires": "メリットポイントで習得が必要",
+    "source": "wiki.ffo.jp/html/1922.html・30826.html",
+    "timing_basis": "根拠なし (作者の GearSwap に無し。次のブレスの時に効く可能性あり)",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＷＭアーメット+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "テロスレアーメット"
+     },
+     {
+      "ja": "ＰＴアーメット+1"
+     },
+     {
+      "ja": "ＰＴアーメット+2"
+     },
+     {
+      "ja": "ＰＴアーメット+3"
+     },
+     {
+      "ja": "ＰＴアーメット+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Spirit Surge",
+    "ability_ja": "竜剣",
+    "slot": "body",
+    "timing": "use",
+    "effect": "竜剣効果アップ",
+    "source": "wiki.ffo.jp/html/1922.html・30826.html",
+    "timing_basis": "根拠なし (作者の GearSwap に無し) / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＷＭメイル+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "テロスレメイル"
+     },
+     {
+      "ja": "ＰＴメイル+1"
+     },
+     {
+      "ja": "ＰＴメイル+2"
+     },
+     {
+      "ja": "ＰＴメイル+3"
+     },
+     {
+      "ja": "ＰＴメイル+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Angon",
+    "ability_ja": "アンゴン",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "アンゴン効果アップ",
+    "requires": "メリットポイントで習得が必要",
+    "source": "wiki.ffo.jp/html/1922.html・30826.html",
+    "timing_basis": "根拠なし (作者の GearSwap に無し) / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＷＭフィンガー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "テロスレフィンガー"
+     },
+     {
+      "ja": "ＰＴフィンガー+1"
+     },
+     {
+      "ja": "ＰＴフィンガー+2"
+     },
+     {
+      "ja": "ＰＴフィンガー+3"
+     },
+     {
+      "ja": "ＰＴフィンガー+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "High Jump",
+    "ability_ja": "ハイジャンプ",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "ハイジャンプ効果アップ (IL版: ハイジャンプの敵対心減少量+25〜29%)",
+    "source": "wiki.ffo.jp/html/1922.html・30826.html",
+    "timing_basis": "ジャンプは使った瞬間に効く攻撃 (作者の sets.precast.JA['ハイジャンプ'] は空) / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ウィルムブレー"
+     },
+     {
+      "ja": "ＷＭブレー+1"
+     },
+     {
+      "ja": "ＷＭブレー+2"
+     },
+     {
+      "ja": "テロスレブレー"
+     },
+     {
+      "ja": "ＰＴブレー+1"
+     },
+     {
+      "ja": "ＰＴブレー+2"
+     },
+     {
+      "ja": "ＰＴブレー+3"
+     },
+     {
+      "ja": "ＰＴブレー+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Strafe",
+    "ability_ja": "ストレイフ",
+    "slot": "legs",
+    "timing": "merit",
+    "set_path": "sets.merit.Strafe",
+    "effect": "ストレイフ効果アップ",
+    "requires": "メリットポイントで習得が必要",
+    "source": "wiki.ffo.jp/html/1922.html・30826.html",
+    "timing_basis": "res では job_traits (id 89)・merit_points (2886: 飛竜のブレスの命中アップ) の特性",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＷＭブレー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "テロスレブレー"
+     },
+     {
+      "ja": "ＰＴブレー+1"
+     },
+     {
+      "ja": "ＰＴブレー+2"
+     },
+     {
+      "ja": "ＰＴブレー+3"
+     },
+     {
+      "ja": "ＰＴブレー+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Spirit Link",
+    "ability_ja": "スピリットリンク",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "エンパシー (メリット特性: スピリットリンクを使ったときに効く) エンパシー効果アップ",
+    "requires": "メリットポイントで エンパシー を習得している必要がある",
+    "source": "wiki.ffo.jp/html/1922.html・30826.html",
+    "timing_basis": "ぐりーずさん (ktgreeds/GearSwap) の GearSwap では sets.precast.JA['スピリットリンク'] に入っている → 使う瞬間に合わせる (作者判断 2026-10-26)",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＷＭグリーヴ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "テロスレグリーヴ"
+     },
+     {
+      "ja": "ＰＴグリーヴ+1"
+     },
+     {
+      "ja": "ＰＴグリーヴ+2"
+     },
+     {
+      "ja": "ＰＴグリーヴ+3"
+     },
+     {
+      "ja": "ＰＴグリーヴ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Spirit Link",
+    "ability_ja": "スピリットリンク",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "スピリットリンク効果アップ (IL版: スピリットリンク+10〜16%・スピリットリンク性能アップ)",
+    "source": "wiki.ffo.jp/html/23301.html・33130.html",
+    "timing_basis": "使った瞬間に飛竜の HP を回復するアビリティ (作者の sets.precast.JA['スピリットリンク'] は空) / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＬＣバンブレス+1"
+     },
+     {
+      "ja": "ＬＣバンブレス+2"
+     },
+     {
+      "ja": "ペルタスバンブレス"
+     },
+     {
+      "ja": "ＰＥバンブレス+1"
+     },
+     {
+      "ja": "ＰＥバンブレス+2"
+     },
+     {
+      "ja": "ＰＥバンブレス+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Spirit Jump",
+    "ability_ja": "スピリットジャンプ",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "スピリットジャンプ効果アップ (IL版: スピリットジャンプ攻撃力+13〜19%)",
+    "source": "wiki.ffo.jp/html/23301.html・33130.html",
+    "timing_basis": "ジャンプは使った瞬間の攻撃 (作者の sets.precast.JA['スピリットジャンプ'] は空) / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＬＣキュイソー+1"
+     },
+     {
+      "ja": "ＬＣキュイソー+2"
+     },
+     {
+      "ja": "ペルタスキュイソー"
+     },
+     {
+      "ja": "ＰＥキュイソー+1"
+     },
+     {
+      "ja": "ＰＥキュイソー+2"
+     },
+     {
+      "ja": "ＰＥキュイソー+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Soul Jump",
+    "ability_ja": "ソウルジャンプ",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "ソウルジャンプ効果アップ (IL版: ソウルジャンプ攻撃力+13〜19%)",
+    "source": "wiki.ffo.jp/html/23301.html・33130.html",
+    "timing_basis": "ジャンプは使った瞬間の攻撃 / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＬＣキュイソー+1"
+     },
+     {
+      "ja": "ＬＣキュイソー+2"
+     },
+     {
+      "ja": "ペルタスキュイソー"
+     },
+     {
+      "ja": "ＰＥキュイソー+1"
+     },
+     {
+      "ja": "ＰＥキュイソー+2"
+     },
+     {
+      "ja": "ＰＥキュイソー+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Spirit Jump",
+    "ability_ja": "スピリットジャンプ",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "スピリットジャンプ時TPボーナス (IL版: スピリットジャンプTP+60〜90)",
+    "source": "wiki.ffo.jp/html/23301.html・33130.html",
+    "timing_basis": "ジャンプは使った瞬間の攻撃 / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＬＣシンバルド+1"
+     },
+     {
+      "ja": "ＬＣシンバルド+2"
+     },
+     {
+      "ja": "ペルタスシンバルド"
+     },
+     {
+      "ja": "ＰＥシンバルド+1"
+     },
+     {
+      "ja": "ＰＥシンバルド+2"
+     },
+     {
+      "ja": "ＰＥシンバルド+3"
+     }
+    ]
+   }
+  ],
+  "COR": [
+   {
+    "ability_en": "Phantom Roll",
+    "ability_ja": "ファントムロール",
+    "slot": "head",
+    "timing": "use",
+    "set_path": "sets.precast.CorsairRoll",
+    "effect": "ファントムロール性能アップ (IL 版: ファントムロール性能+50)",
+    "source": "wiki.ffo.jp/html/16108.html・30924.html",
+    "timing_basis": "作者の COR_gear.lua に sets.precast.CorsairRoll があり、ロールは使う瞬間に効果が決まる",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "コモドアトリコルヌ"
+     },
+     {
+      "ja": "ＣＭトリコルヌ+1"
+     },
+     {
+      "ja": "ＣＭトリコルヌ+2"
+     },
+     {
+      "ja": "ラヌントリコルヌ"
+     },
+     {
+      "ja": "ＬＡトリコルヌ+1"
+     },
+     {
+      "ja": "ＬＡトリコルヌ+2"
+     },
+     {
+      "ja": "ＬＡトリコルヌ+3"
+     },
+     {
+      "ja": "ＬＡトリコルヌ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Winning Streak",
+    "ability_ja": "ウィニングストリーク",
+    "slot": "head",
+    "timing": "merit",
+    "set_path": "sets.merit.WinningStreak",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "ウィニングストリーク効果アップ",
+    "source": "wiki.ffo.jp/html/16108.html・30924.html",
+    "timing_basis": "res では job_traits (id 92) と merit_points (3076) にある特性 (ロールの効果時間延長)",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "ＣＭトリコルヌ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ラヌントリコルヌ"
+     },
+     {
+      "ja": "ＬＡトリコルヌ+1"
+     },
+     {
+      "ja": "ＬＡトリコルヌ+2"
+     },
+     {
+      "ja": "ＬＡトリコルヌ+3"
+     },
+     {
+      "ja": "ＬＡトリコルヌ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Random Deal",
+    "ability_ja": "ランダムディール",
+    "slot": "body",
+    "timing": "use",
+    "effect": "ランダムディール効果アップ (IL 版: +50)",
+    "source": "wiki.ffo.jp/html/16108.html・30924.html",
+    "timing_basis": "作者の COR_gear.lua の sets.precast.JA[\"ランダムディール\"] に ＬＡフラック+4",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "コモドアフラック"
+     },
+     {
+      "ja": "ＣＭフラック+1"
+     },
+     {
+      "ja": "ＣＭフラック+2"
+     },
+     {
+      "ja": "ラヌンフラック"
+     },
+     {
+      "ja": "ＬＡフラック+1"
+     },
+     {
+      "ja": "ＬＡフラック+2"
+     },
+     {
+      "ja": "ＬＡフラック+3"
+     },
+     {
+      "ja": "ＬＡフラック+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Random Deal",
+    "ability_ja": "ランダムディール",
+    "slot": "body",
+    "timing": "use",
+    "requires": "メリットポイントで ローデッドデッキ を習得している必要がある",
+    "effect": "ローデッドデッキ (メリット特性: ランダムディールを使ったときに効く) ローデッドデッキ効果アップ",
+    "source": "wiki.ffo.jp/html/16108.html・30924.html",
+    "timing_basis": "ぐりーずさん (ktgreeds/GearSwap) の GearSwap では sets.precast.JA['ランダムディール'] に入っている → 使う瞬間に合わせる (作者判断 2026-10-26)",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "ＣＭフラック+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ラヌンフラック"
+     },
+     {
+      "ja": "ＬＡフラック+1"
+     },
+     {
+      "ja": "ＬＡフラック+2"
+     },
+     {
+      "ja": "ＬＡフラック+3"
+     },
+     {
+      "ja": "ＬＡフラック+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Fold",
+    "ability_ja": "フォールド",
+    "slot": "hands",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "フォールド効果アップ",
+    "source": "wiki.ffo.jp/html/16108.html・30924.html",
+    "timing_basis": "作者の COR_gear.lua の sets.precast.JA[\"フォールド\"] に ＬＡガントリー+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＣＭガントリー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ラヌンガントリー"
+     },
+     {
+      "ja": "ＬＡガントリー+1"
+     },
+     {
+      "ja": "ＬＡガントリー+2"
+     },
+     {
+      "ja": "ＬＡガントリー+3"
+     },
+     {
+      "ja": "ＬＡガントリー+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Snake Eye",
+    "ability_ja": "スネークアイ",
+    "slot": "legs",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "スネークアイ効果アップ",
+    "source": "wiki.ffo.jp/html/16108.html・30924.html",
+    "timing_basis": "作者の COR_gear.lua の sets.precast.JA[\"スネークアイ\"] に ＬＡトルーズ+1",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＣＭトルーズ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ラヌントルーズ"
+     },
+     {
+      "ja": "ＬＡトルーズ+1"
+     },
+     {
+      "ja": "ＬＡトルーズ+2"
+     },
+     {
+      "ja": "ＬＡトルーズ+3"
+     },
+     {
+      "ja": "ＬＡトルーズ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Wild Card",
+    "ability_ja": "ワイルドカード",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "ワイルドカード効果アップ",
+    "source": "wiki.ffo.jp/html/16108.html・30924.html",
+    "timing_basis": "作者の COR_gear.lua の sets.precast.JA[\"ワイルドカード\"] に ＬＡブーツ+4",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＣＭブーツ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ラヌンブーツ"
+     },
+     {
+      "ja": "ＬＡブーツ+1"
+     },
+     {
+      "ja": "ＬＡブーツ+2"
+     },
+     {
+      "ja": "ＬＡブーツ+3"
+     },
+     {
+      "ja": "ＬＡブーツ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Blitzer's Roll",
+    "ability_ja": "ブリッツァロール",
+    "slot": "head",
+    "timing": "use",
+    "effect": "ブリッツァロール効果アップ (ＮＡ+1 は「時々」)",
+    "source": "wiki.ffo.jp/html/23304.html・33205.html",
+    "timing_basis": "作者の COR_gear.lua の sets.precast.CorsairRoll['プリッツアロール'] (綴りは原文のまま) に ＣＳトリコルヌ+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＮＡトリコルヌ+1",
+      "note": "時々効果アップ"
+     },
+     {
+      "ja": "ＮＡトリコルヌ+2"
+     },
+     {
+      "ja": "シャスートリコルヌ"
+     },
+     {
+      "ja": "ＣＳトリコルヌ+1"
+     },
+     {
+      "ja": "ＣＳトリコルヌ+2"
+     },
+     {
+      "ja": "ＣＳトリコルヌ+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Tactician's Roll",
+    "ability_ja": "タクティックロール",
+    "slot": "body",
+    "timing": "use",
+    "effect": "タクティックロール効果アップ (ＮＡ+1 は「時々」)",
+    "source": "wiki.ffo.jp/html/23304.html・33205.html",
+    "timing_basis": "作者の COR_gear.lua の sets.precast.CorsairRoll['タクティックロール'] に ＣＳフラック+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＮＡフラック+1",
+      "note": "時々効果アップ"
+     },
+     {
+      "ja": "ＮＡフラック+2"
+     },
+     {
+      "ja": "シャスーフラック"
+     },
+     {
+      "ja": "ＣＳフラック+1"
+     },
+     {
+      "ja": "ＣＳフラック+2"
+     },
+     {
+      "ja": "ＣＳフラック+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Phantom Roll",
+    "ability_ja": "ファントムロール",
+    "slot": "hands",
+    "timing": "use",
+    "set_path": "sets.precast.CorsairRoll",
+    "effect": "ファントムロール効果時間延長 (IL 版: +45/+50/+55/+60)",
+    "source": "wiki.ffo.jp/html/23304.html・33205.html",
+    "timing_basis": "sets.precast.CorsairRoll (ロール使用時に効果時間が決まる)。手の ＣＳガントリー+3 は 作者 ではアライズロール用に記載",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＮＡガントリー+1"
+     },
+     {
+      "ja": "ＮＡガントリー+2"
+     },
+     {
+      "ja": "シャスーガントリー"
+     },
+     {
+      "ja": "ＣＳガントリー+1"
+     },
+     {
+      "ja": "ＣＳガントリー+2"
+     },
+     {
+      "ja": "ＣＳガントリー+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Allies' Roll",
+    "ability_ja": "アライズロール",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "アライズロール効果アップ (ＮＡ+1 は「時々」)",
+    "source": "wiki.ffo.jp/html/23304.html・33205.html",
+    "timing_basis": "作者の COR_gear.lua の sets.precast.CorsairRoll['アライズロール'] に ＣＳガントリー+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＮＡガントリー+1",
+      "note": "時々効果アップ"
+     },
+     {
+      "ja": "ＮＡガントリー+2"
+     },
+     {
+      "ja": "シャスーガントリー"
+     },
+     {
+      "ja": "ＣＳガントリー+1"
+     },
+     {
+      "ja": "ＣＳガントリー+2"
+     },
+     {
+      "ja": "ＣＳガントリー+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Caster's Roll",
+    "ability_ja": "キャスターズロール",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "キャスターズロール効果アップ (ＮＡ+1 は「時々」)",
+    "source": "wiki.ffo.jp/html/23304.html・33205.html",
+    "timing_basis": "作者の COR_gear.lua の sets.precast.CorsairRoll['キャスターズロール'] に ＣＳトルーズ+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＮＡトルーズ+1",
+      "note": "時々効果アップ"
+     },
+     {
+      "ja": "ＮＡトルーズ+2"
+     },
+     {
+      "ja": "シャスートルーズ"
+     },
+     {
+      "ja": "ＣＳトルーズ+1"
+     },
+     {
+      "ja": "ＣＳトルーズ+2"
+     },
+     {
+      "ja": "ＣＳトルーズ+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Courser's Roll",
+    "ability_ja": "コアサーズロール",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "コアサーズロール効果アップ (ＮＡ+1 は「時々」)",
+    "source": "wiki.ffo.jp/html/23304.html・33205.html",
+    "timing_basis": "作者の COR_gear.lua の sets.precast.CorsairRoll['コアサーズロール'] に ＣＳブーツ+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＮＡブーツ+1",
+      "note": "時々効果アップ"
+     },
+     {
+      "ja": "ＮＡブーツ+2"
+     },
+     {
+      "ja": "シャスーブーツ"
+     },
+     {
+      "ja": "ＣＳブーツ+1"
+     },
+     {
+      "ja": "ＣＳブーツ+2"
+     },
+     {
+      "ja": "ＣＳブーツ+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Quick Draw",
+    "ability_ja": "クイックドロー",
+    "slot": "feet",
+    "timing": "use",
+    "set_path": "sets.precast.CorsairShot",
+    "effect": "クイックドロー能力アップ (IL 版: +22/+25/+28/+31)",
+    "source": "wiki.ffo.jp/html/23304.html・33205.html",
+    "timing_basis": "作者の COR_gear.lua に sets.precast.CorsairShot がある",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＮＡブーツ+1"
+     },
+     {
+      "ja": "ＮＡブーツ+2"
+     },
+     {
+      "ja": "シャスーブーツ"
+     },
+     {
+      "ja": "ＣＳブーツ+1"
+     },
+     {
+      "ja": "ＣＳブーツ+2"
+     },
+     {
+      "ja": "ＣＳブーツ+3"
+     }
+    ]
+   }
+  ],
+  "DNC": [
+   {
+    "ability_en": "Waltz",
+    "ability_ja": "ワルツ",
+    "slot": "head",
+    "timing": "use",
+    "set_path": "sets.precast.Waltz",
+    "effect": "ワルツ回復量+5% (+2 は +7%)",
+    "source": "wiki.ffo.jp/html/16613.html",
+    "timing_basis": "作者の DNC_gear.lua に sets.precast.Waltz (中身は空)。IL 版ページ (30926) ではワルツ回復量の記載を確認できず、エトワール世代だけ",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "エトワールティアラ"
+     },
+     {
+      "ja": "ＥＴティアラ+1"
+     },
+     {
+      "ja": "ＥＴティアラ+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Trance",
+    "ability_ja": "トランス",
+    "slot": "head",
+    "timing": "use",
+    "effect": "トランス効果アップ (効果時間+20秒)",
+    "source": "wiki.ffo.jp/html/16613.html・30926.html",
+    "timing_basis": "作者の DNC_gear.lua に sets.precast.JA['トランス'] (中身は空)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＥＴティアラ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ホロスティアラ"
+     },
+     {
+      "ja": "ＨＯティアラ+1"
+     },
+     {
+      "ja": "ＨＯティアラ+2"
+     },
+     {
+      "ja": "ＨＯティアラ+3"
+     },
+     {
+      "ja": "ＨＯティアラ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Violent Flourish",
+    "ability_ja": "V.フラリッシュ",
+    "slot": "body",
+    "timing": "use",
+    "effect": "V.フラリッシュ効果アップ",
+    "source": "wiki.ffo.jp/html/16613.html",
+    "timing_basis": "作者の DNC_gear.lua に sets.precast.Flourish1['V.フラリッシュ'] (中身は空)。IL 版ページでは記載を確認できず",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "エトワールカザク"
+     },
+     {
+      "ja": "ＥＴカザク+1"
+     },
+     {
+      "ja": "ＥＴカザク+2",
+      "note": "オーグメントの性能として記載"
+     }
+    ]
+   },
+   {
+    "ability_en": "No Foot Rise",
+    "ability_ja": "ノーフットライズ",
+    "slot": "body",
+    "timing": "use",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "ノーフットライズ効果アップ (能力値1につき得TP+50)",
+    "source": "wiki.ffo.jp/html/16613.html・30926.html",
+    "timing_basis": "作者の DNC_gear.lua に sets.precast.JA['ノーフットライズ'] (中身は空)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＥＴカザク+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ホロスカザク"
+     },
+     {
+      "ja": "ＨＯカザク+1"
+     },
+     {
+      "ja": "ＨＯカザク+2"
+     },
+     {
+      "ja": "ＨＯカザク+3"
+     },
+     {
+      "ja": "ＨＯカザク+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Fan Dance",
+    "ability_ja": "扇の舞い",
+    "slot": "hands",
+    "timing": "while_active",
+    "requires": "メリットポイントで習得が必要",
+    "buff": {
+     "id": 411,
+     "en": "Fan Dance",
+     "ja": "扇の舞い"
+    },
+    "effect": "扇の舞い効果アップ",
+    "source": "wiki.ffo.jp/html/16613.html・30926.html",
+    "timing_basis": "wiki 30926 に「剣の舞い効果アップ」「扇の舞い効果アップ」は装備中のみ有効とある",
+    "timing_confidence": "wiki",
+    "items": [
+     {
+      "ja": "ＥＴバングル+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ホロスバングル"
+     },
+     {
+      "ja": "ＨＯバングル+1"
+     },
+     {
+      "ja": "ＨＯバングル+2"
+     },
+     {
+      "ja": "ＨＯバングル+3"
+     },
+     {
+      "ja": "ＨＯバングル+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Jig",
+    "ability_ja": "ジグ",
+    "slot": "legs",
+    "timing": "use",
+    "set_path": "sets.precast.Jig",
+    "effect": "ジグ効果時間アップ",
+    "source": "wiki.ffo.jp/html/16613.html",
+    "timing_basis": "作者の DNC_gear.lua に sets.precast.Jig (中身は空)。IL 版ページでは記載を確認できず",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "エトワールタイツ"
+     },
+     {
+      "ja": "ＥＴタイツ+1"
+     },
+     {
+      "ja": "ＥＴタイツ+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Saber Dance",
+    "ability_ja": "剣の舞い",
+    "slot": "legs",
+    "timing": "while_active",
+    "requires": "メリットポイントで習得が必要",
+    "buff": {
+     "id": 410,
+     "en": "Saber Dance",
+     "ja": "剣の舞い"
+    },
+    "effect": "剣の舞い効果アップ",
+    "source": "wiki.ffo.jp/html/16613.html・30926.html",
+    "timing_basis": "作者の DNC_gear.lua に sets.buff['剣の舞'] (中身は空・名前は res の「剣の舞い」と違う)。wiki 30926 にも装備中のみ有効とある",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＥＴタイツ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ホロスタイツ"
+     },
+     {
+      "ja": "ＨＯタイツ+1"
+     },
+     {
+      "ja": "ＨＯタイツ+2"
+     },
+     {
+      "ja": "ＨＯタイツ+3"
+     },
+     {
+      "ja": "ＨＯタイツ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Step",
+    "ability_ja": "ステップ",
+    "slot": "feet",
+    "timing": "use",
+    "set_path": "sets.precast.Step",
+    "effect": "ステップ命中率アップ",
+    "source": "wiki.ffo.jp/html/16613.html",
+    "timing_basis": "作者の DNC_gear.lua に sets.precast.Step (中身は空)。IL 版ページでは記載を確認できず",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "エトワールシュー"
+     },
+     {
+      "ja": "ＥＴトーシュー+1"
+     },
+     {
+      "ja": "ＥＴトーシュー+2"
+     }
+    ]
+   },
+   {
+    "ability_en": "Closed Position",
+    "ability_ja": "Ｃ・ポジション",
+    "slot": "feet",
+    "timing": "merit",
+    "set_path": "sets.merit.ClosedPosition",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "Ｃ・ポジション効果アップ (能力値1につき正面から攻撃する時にストアTP+3)",
+    "source": "wiki.ffo.jp/html/16613.html・30926.html",
+    "timing_basis": "res では job_traits (id 96) と merit_points (3206) にある特性",
+    "timing_confidence": "wiki",
+    "items": [
+     {
+      "ja": "ＥＴトーシュー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ホロストーシュー"
+     },
+     {
+      "ja": "ＨＯトーシュー+1"
+     },
+     {
+      "ja": "ＨＯトーシュー+2"
+     },
+     {
+      "ja": "ＨＯトーシュー+3"
+     },
+     {
+      "ja": "ＨＯトーシュー+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Climactic Flourish",
+    "ability_ja": "C.フラリッシュ",
+    "slot": "head",
+    "timing": "cast",
+    "buff": {
+     "id": 443,
+     "en": "Climactic Flourish",
+     "ja": "C.フラリッシュ"
+    },
+    "effect": "C.フラリッシュ効果アップ (IL 版: C.フラリッシュ:クリティカルヒット+1)",
+    "source": "wiki.ffo.jp/html/23306.html・33208.html",
+    "timing_basis": "作者の DNC.lua も job_post_precast (WS) で sets.buff['C.フラリッシュ'] を着る (2026-10-26 見直し: 待機・戦闘中に重ねるだけでは、行動の装備に上書きされて外れる)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＣＡティアラ+1"
+     },
+     {
+      "ja": "ＣＡティアラ+2"
+     },
+     {
+      "ja": "マクレレティアラ"
+     },
+     {
+      "ja": "ＭＣティアラ+1"
+     },
+     {
+      "ja": "ＭＣティアラ+2"
+     },
+     {
+      "ja": "ＭＣティアラ+3"
+     }
+    ],
+    "cast_phase": "precast",
+    "cast_on": "WeaponSkill"
+   },
+   {
+    "ability_en": "Striking Flourish",
+    "ability_ja": "S.フラリッシュ",
+    "slot": "body",
+    "timing": "use",
+    "effect": "S.フラリッシュ効果アップ (IL 版: S.フラリッシュ:ダブルアタックのクリティカルヒット+55〜70%)",
+    "source": "wiki.ffo.jp/html/23306.html・33208.html",
+    "timing_basis": "作者の DNC_gear.lua の sets.precast.Flourish3['S.フラリッシュ'] (中身は空)。効果は次の攻撃に乗るため while_active (buff 468) の可能性あり",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＣＡカザク+1"
+     },
+     {
+      "ja": "ＣＡカザク+2"
+     },
+     {
+      "ja": "マクレレカザク"
+     },
+     {
+      "ja": "ＭＣカザク+1"
+     },
+     {
+      "ja": "ＭＣカザク+2"
+     },
+     {
+      "ja": "ＭＣカザク+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Reverse Flourish",
+    "ability_ja": "R.フラリッシュ",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "R.フラリッシュ効果アップ (IL 版: R.フラリッシュ+10〜+14)",
+    "source": "wiki.ffo.jp/html/23306.html・33208.html",
+    "timing_basis": "作者の DNC_gear.lua の sets.precast.Flourish2['R.フラリッシュ'] (中身は空)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＣＡバングル+1"
+     },
+     {
+      "ja": "ＣＡバングル+2"
+     },
+     {
+      "ja": "マクレレバングル"
+     },
+     {
+      "ja": "ＭＣバングル+1"
+     },
+     {
+      "ja": "ＭＣバングル+2"
+     },
+     {
+      "ja": "ＭＣバングル+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Feather Step",
+    "ability_ja": "フェザーステップ",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "フェザーステップ効果アップ (IL 版: フェザーステップ+3〜+6)",
+    "source": "wiki.ffo.jp/html/23306.html・33208.html",
+    "timing_basis": "作者の DNC_gear.lua の sets.precast.Step['フェザーステップ'] (中身は空)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＣＡトーシュー+1"
+     },
+     {
+      "ja": "ＣＡトーシュー+2"
+     },
+     {
+      "ja": "マクレレトーシュー"
+     },
+     {
+      "ja": "ＭＣトーシュー+1"
+     },
+     {
+      "ja": "ＭＣトーシュー+2"
+     },
+     {
+      "ja": "ＭＣトーシュー+3"
+     }
+    ]
+   }
+  ],
+  "SCH": [
+   {
+    "ability_en": "Altruism",
+    "ability_ja": "不惜身命の章",
+    "slot": "head",
+    "timing": "cast",
+    "effect": "不惜身命の章&一心精進の章効果アップ",
+    "source": "wiki.ffo.jp/html/16612.html・30928.html",
+    "timing_basis": "wiki.ffo.jp/html/30928.html (固有のプロパティ): 「アビリティ使用時ではなく、魔法着弾時に装備している必要がある」→ 詠唱中 (着弾まで) に着る",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 412,
+     "en": "Altruism",
+     "ja": "不惜身命の章"
+    },
+    "items": [
+     {
+      "ja": "ＡＧボード+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ペダゴギボード"
+     },
+     {
+      "ja": "ＰＤボード+1"
+     },
+     {
+      "ja": "ＰＤボード+2"
+     },
+     {
+      "ja": "ＰＤボード+3"
+     },
+     {
+      "ja": "ＰＤボード+4"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Focalization",
+    "ability_ja": "一心精進の章",
+    "slot": "head",
+    "timing": "cast",
+    "effect": "不惜身命の章&一心精進の章効果アップ",
+    "source": "wiki.ffo.jp/html/16612.html・30928.html",
+    "timing_basis": "wiki.ffo.jp/html/30928.html (固有のプロパティ): 「アビリティ使用時ではなく、魔法着弾時に装備している必要がある」→ 詠唱中 (着弾まで) に着る",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 413,
+     "en": "Focalization",
+     "ja": "一心精進の章"
+    },
+    "items": [
+     {
+      "ja": "ＡＧボード+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ペダゴギボード"
+     },
+     {
+      "ja": "ＰＤボード+1"
+     },
+     {
+      "ja": "ＰＤボード+2"
+     },
+     {
+      "ja": "ＰＤボード+3"
+     },
+     {
+      "ja": "ＰＤボード+4"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Sublimation",
+    "ability_ja": "机上演習",
+    "slot": "body",
+    "timing": "while_active",
+    "effect": "机上演習+ (蓄積中の消費HP・変換MPに加算。ペダゴギ系は机上演習+3)",
+    "source": "wiki.ffo.jp/html/16612.html・30928.html",
+    "timing_basis": "wiki.ffo.jp/html/30928.html: 机上演習+ は「アビリティ使用時ではなく、装備中のみ有効」→ 蓄積中ずっと着る (作者の SCH.lua の作りとも一致)",
+    "timing_confidence": "wiki",
+    "items": [
+     {
+      "ja": "アギュトガウン"
+     },
+     {
+      "ja": "ＡＧガウン+1"
+     },
+     {
+      "ja": "ＡＧガウン+2"
+     },
+     {
+      "ja": "ペダゴギガウン"
+     },
+     {
+      "ja": "ＰＤガウン+1"
+     },
+     {
+      "ja": "ＰＤガウン+2"
+     },
+     {
+      "ja": "ＰＤガウン+3"
+     },
+     {
+      "ja": "ＰＤガウン+4"
+     }
+    ],
+    "buff": {
+     "id": 187,
+     "en": "Sublimation: Activated",
+     "ja": "机上演習:蓄積中"
+    }
+   },
+   {
+    "ability_en": "Enlightenment",
+    "ability_ja": "大悟徹底",
+    "slot": "body",
+    "timing": "use",
+    "effect": "大悟徹底効果アップ",
+    "source": "wiki.ffo.jp/html/16612.html・30928.html",
+    "timing_basis": "wiki.ffo.jp/html/30928.html (固有のプロパティ): 大悟徹底効果アップは「能力値1につき該当する魔法スキル+2」(いつ着るかの記述は無い)・作者確認: 発動時に装備していれば効く",
+    "timing_confidence": "author",
+    "items": [
+     {
+      "ja": "ＡＧガウン+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ペダゴギガウン"
+     },
+     {
+      "ja": "ＰＤガウン+1"
+     },
+     {
+      "ja": "ＰＤガウン+2"
+     },
+     {
+      "ja": "ＰＤガウン+3"
+     },
+     {
+      "ja": "ＰＤガウン+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Tranquility",
+    "ability_ja": "天衣無縫の章",
+    "slot": "hands",
+    "timing": "cast",
+    "effect": "天衣無縫の章&無憂無風の章効果アップ",
+    "source": "wiki.ffo.jp/html/16612.html・30928.html",
+    "timing_basis": "wiki.ffo.jp/html/30928.html (固有のプロパティ): 「アビリティ使用時ではなく、魔法着弾時に装備している必要がある」→ 詠唱中 (着弾まで) に着る",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 414,
+     "en": "Tranquility",
+     "ja": "天衣無縫の章"
+    },
+    "items": [
+     {
+      "ja": "ＡＧブレーサー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ペダゴギブレーサー"
+     },
+     {
+      "ja": "ＰＤブレーサー+1"
+     },
+     {
+      "ja": "ＰＤブレーサー+2"
+     },
+     {
+      "ja": "ＰＤブレーサー+3"
+     },
+     {
+      "ja": "ＰＤブレーサー+4"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Equanimity",
+    "ability_ja": "無憂無風の章",
+    "slot": "hands",
+    "timing": "cast",
+    "effect": "天衣無縫の章&無憂無風の章効果アップ",
+    "source": "wiki.ffo.jp/html/16612.html・30928.html",
+    "timing_basis": "wiki.ffo.jp/html/30928.html (固有のプロパティ): 「アビリティ使用時ではなく、魔法着弾時に装備している必要がある」→ 詠唱中 (着弾まで) に着る",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 415,
+     "en": "Equanimity",
+     "ja": "無憂無風の章"
+    },
+    "items": [
+     {
+      "ja": "ＡＧブレーサー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ペダゴギブレーサー"
+     },
+     {
+      "ja": "ＰＤブレーサー+1"
+     },
+     {
+      "ja": "ＰＤブレーサー+2"
+     },
+     {
+      "ja": "ＰＤブレーサー+3"
+     },
+     {
+      "ja": "ＰＤブレーサー+4"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Tabula Rasa",
+    "ability_ja": "連環計",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "連環計効果アップ",
+    "source": "wiki.ffo.jp/html/16612.html・30928.html",
+    "timing_basis": "wiki.ffo.jp/html/30928.html (固有のプロパティ): 連環計効果アップは「効果時間+30秒」(いつ着るかの記述は無い・使う瞬間のまま)",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "ＡＧパンツ+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ペダゴギパンツ"
+     },
+     {
+      "ja": "ＰＤパンツ+1"
+     },
+     {
+      "ja": "ＰＤパンツ+2"
+     },
+     {
+      "ja": "ＰＤパンツ+3"
+     },
+     {
+      "ja": "ＰＤパンツ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Celerity",
+    "ability_ja": "電光石火の章",
+    "slot": "feet",
+    "timing": "cast",
+    "effect": "天候:電光石火の章&疾風迅雷の章効果アップ",
+    "source": "wiki.ffo.jp/html/16612.html",
+    "timing_basis": "wiki.ffo.jp/html/30928.html (固有のプロパティ): 「天候が一致する魔法を使用する時のみ詠唱時間・再詠唱時間を更に短縮」「アビリティ使用時ではなく、魔法使用時に装備している必要がある」→ 詠唱時間 (詠唱開始) と再詠唱時間 (詠唱の終わり) の両方に効くよう、詠唱開始と詠唱中の両方で着る",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 362,
+     "en": "Celerity",
+     "ja": "電光石火の章"
+    },
+    "items": [
+     {
+      "ja": "アギュトローファー"
+     },
+     {
+      "ja": "ＡＧローファー+1"
+     },
+     {
+      "ja": "ＡＧローファー+2"
+     },
+     {
+      "ja": "ペダゴギローファー"
+     },
+     {
+      "ja": "ＰＤローファー+1"
+     },
+     {
+      "ja": "ＰＤローファー+2"
+     },
+     {
+      "ja": "ＰＤローファー+3"
+     },
+     {
+      "ja": "ＰＤローファー+4"
+     }
+    ],
+    "cast_phase": "both"
+   },
+   {
+    "ability_en": "Alacrity",
+    "ability_ja": "疾風迅雷の章",
+    "slot": "feet",
+    "timing": "cast",
+    "effect": "天候:電光石火の章&疾風迅雷の章効果アップ",
+    "source": "wiki.ffo.jp/html/16612.html",
+    "timing_basis": "wiki.ffo.jp/html/30928.html (固有のプロパティ): 「天候が一致する魔法を使用する時のみ詠唱時間・再詠唱時間を更に短縮」「アビリティ使用時ではなく、魔法使用時に装備している必要がある」→ 詠唱時間 (詠唱開始) と再詠唱時間 (詠唱の終わり) の両方に効くよう、詠唱開始と詠唱中の両方で着る",
+    "timing_confidence": "wiki",
+    "buff": {
+     "id": 363,
+     "en": "Alacrity",
+     "ja": "疾風迅雷の章"
+    },
+    "items": [
+     {
+      "ja": "アギュトローファー"
+     },
+     {
+      "ja": "ＡＧローファー+1"
+     },
+     {
+      "ja": "ＡＧローファー+2"
+     },
+     {
+      "ja": "ペダゴギローファー"
+     },
+     {
+      "ja": "ＰＤローファー+1"
+     },
+     {
+      "ja": "ＰＤローファー+2"
+     },
+     {
+      "ja": "ＰＤローファー+3"
+     },
+     {
+      "ja": "ＰＤローファー+4"
+     }
+    ],
+    "cast_phase": "both"
+   },
+   {
+    "ability_en": "Stormsurge",
+    "ability_ja": "陣頭指揮",
+    "slot": "feet",
+    "timing": "spell",
+    "set_path": "sets.Stormsurge",
+    "requires": "メリットポイントで習得が必要",
+    "effect": "陣頭指揮効果アップ",
+    "source": "wiki.ffo.jp/html/16612.html・30928.html",
+    "timing_basis": "作者確認 (2026-10-27): 陣頭指揮効果アップの足は、陣の魔法 (熱波の陣など) を唱えるときに履いている必要がある。作者はマクロの部位着替え (足 → 陣の魔法) で履いている。GearSwap の詠唱の開始 (precast) は魔法を送る前に着替えるので同じ働き。ファストキャストの装備で上書きされないよう、詠唱の開始と詠唱中の両方で履く / wiki.ffo.jp/html/30928.html: 陣頭指揮効果アップは「能力値1につき対応するステータス+1」",
+    "timing_confidence": "author",
+    "items": [
+     {
+      "ja": "ＡＧローファー+2",
+      "note": "オーグメントしたものだけ"
+     },
+     {
+      "ja": "ペダゴギローファー"
+     },
+     {
+      "ja": "ＰＤローファー+1"
+     },
+     {
+      "ja": "ＰＤローファー+2"
+     },
+     {
+      "ja": "ＰＤローファー+3"
+     },
+     {
+      "ja": "ＰＤローファー+4"
+     }
+    ],
+    "set_label": "陣頭指揮の足 (陣の魔法を唱えるとき)"
+   },
+   {
+    "ability_en": "Rapture",
+    "ability_ja": "意気昂然の章",
+    "slot": "head",
+    "timing": "cast",
+    "effect": "意気昂然の章&気炎万丈の章効果アップ (IL: +12〜+21)",
+    "source": "wiki.ffo.jp/html/23307.html・33244.html",
+    "timing_basis": "作者の SCH_gear.lua の sets.buff['意気昂然の章'] = ＡＢボネット+2 / 作者の SCH.lua は job_post_midcast で効果中の章の sets.buff を着る作り → 詠唱中に着る",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 364,
+     "en": "Rapture",
+     "ja": "意気昂然の章"
+    },
+    "items": [
+     {
+      "ja": "ＳＶボネット+1"
+     },
+     {
+      "ja": "ＳＶボネット+2"
+     },
+     {
+      "ja": "アバテルボネット"
+     },
+     {
+      "ja": "ＡＢボネット+1"
+     },
+     {
+      "ja": "ＡＢボネット+2"
+     },
+     {
+      "ja": "ＡＢボネット+3"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Ebullience",
+    "ability_ja": "気炎万丈の章",
+    "slot": "head",
+    "timing": "cast",
+    "effect": "意気昂然の章&気炎万丈の章効果アップ (IL: +12〜+21)",
+    "source": "wiki.ffo.jp/html/23307.html・33244.html",
+    "timing_basis": "作者の SCH_gear.lua の sets.buff['気炎万丈の章'] = ＡＢボネット+2 / 作者の SCH.lua は job_post_midcast で効果中の章の sets.buff を着る作り → 詠唱中に着る",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 365,
+     "en": "Ebullience",
+     "ja": "気炎万丈の章"
+    },
+    "items": [
+     {
+      "ja": "ＳＶボネット+1"
+     },
+     {
+      "ja": "ＳＶボネット+2"
+     },
+     {
+      "ja": "アバテルボネット"
+     },
+     {
+      "ja": "ＡＢボネット+1"
+     },
+     {
+      "ja": "ＡＢボネット+2"
+     },
+     {
+      "ja": "ＡＢボネット+3"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Perpetuance",
+    "ability_ja": "令狸執鼠の章",
+    "slot": "hands",
+    "timing": "cast",
+    "effect": "令狸執鼠の章&震天動地の章効果アップ (IL: 令狸執鼠+50〜65%)",
+    "source": "wiki.ffo.jp/html/23307.html・33244.html",
+    "timing_basis": "作者の SCH_gear.lua の sets.buff['令狸執鼠の章'] = ＡＢブレーサー+2 / 作者の SCH.lua は job_post_midcast で効果中の章の sets.buff を着る作り → 詠唱中に着る",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 469,
+     "en": "Perpetuance",
+     "ja": "令狸執鼠の章"
+    },
+    "items": [
+     {
+      "ja": "ＳＶブレーサー+1"
+     },
+     {
+      "ja": "ＳＶブレーサー+2"
+     },
+     {
+      "ja": "アバテルブレーサー"
+     },
+     {
+      "ja": "ＡＢブレーサー+1"
+     },
+     {
+      "ja": "ＡＢブレーサー+2"
+     },
+     {
+      "ja": "ＡＢブレーサー+3"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Immanence",
+    "ability_ja": "震天動地の章",
+    "slot": "hands",
+    "timing": "cast",
+    "effect": "震天動地の章効果アップ",
+    "source": "作者確認",
+    "timing_basis": "作者確認 (2026-10-27): 震天動地の章の効果中に魔法を唱えるときは、ＡＣブレーサー系をつけている必要がある (作者の SCH_gear.lua の sets.buff['震天動地の章'] の手もＡＣブレーサー+3)",
+    "timing_confidence": "author",
+    "buff": {
+     "id": 470,
+     "en": "Immanence",
+     "ja": "震天動地の章"
+    },
+    "items": [
+     {
+      "ja": "ＡＣブレーサー+1"
+     },
+     {
+      "ja": "ＡＣブレーサー+2"
+     },
+     {
+      "ja": "ＡＣブレーサー+3"
+     },
+     {
+      "ja": "ＡＣブレーサー+4"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Penury",
+    "ability_ja": "簡素清貧の章",
+    "slot": "legs",
+    "timing": "cast",
+    "effect": "簡素清貧の章&勤倹小心の章効果アップ (IL: +3〜+6)",
+    "source": "wiki.ffo.jp/html/23307.html・33244.html",
+    "timing_basis": "作者の SCH_gear.lua の sets.buff['簡素清貧の章'] = ＡＢパンツ+2 / 作者の SCH.lua は job_post_midcast で効果中の章の sets.buff を着る作り → 詠唱中に着る",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 360,
+     "en": "Penury",
+     "ja": "簡素清貧の章"
+    },
+    "items": [
+     {
+      "ja": "ＳＶパンツ+1"
+     },
+     {
+      "ja": "ＳＶパンツ+2"
+     },
+     {
+      "ja": "アバテルパンツ"
+     },
+     {
+      "ja": "ＡＢパンツ+1"
+     },
+     {
+      "ja": "ＡＢパンツ+2"
+     },
+     {
+      "ja": "ＡＢパンツ+3"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Parsimony",
+    "ability_ja": "勤倹小心の章",
+    "slot": "legs",
+    "timing": "cast",
+    "effect": "簡素清貧の章&勤倹小心の章効果アップ (IL: +3〜+6)",
+    "source": "wiki.ffo.jp/html/23307.html・33244.html",
+    "timing_basis": "作者の SCH_gear.lua の sets.buff['勤倹小心の章'] = ＡＢパンツ+2 / 作者の SCH.lua は job_post_midcast で効果中の章の sets.buff を着る作り → 詠唱中に着る",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 361,
+     "en": "Parsimony",
+     "ja": "勤倹小心の章"
+    },
+    "items": [
+     {
+      "ja": "ＳＶパンツ+1"
+     },
+     {
+      "ja": "ＳＶパンツ+2"
+     },
+     {
+      "ja": "アバテルパンツ"
+     },
+     {
+      "ja": "ＡＢパンツ+1"
+     },
+     {
+      "ja": "ＡＢパンツ+2"
+     },
+     {
+      "ja": "ＡＢパンツ+3"
+     }
+    ],
+    "cast_phase": "midcast"
+   },
+   {
+    "ability_en": "Klimaform",
+    "ability_ja": "虚誘掩殺の策",
+    "slot": "feet",
+    "timing": "cast",
+    "effect": "虚誘掩殺の策効果アップ (IL: +10〜+25)",
+    "source": "wiki.ffo.jp/html/23307.html・33244.html",
+    "timing_basis": "作者の SCH_gear.lua の sets.buff['虚誘掩殺の策'] = ＡＢローファー+2 / 作者の SCH.lua は job_post_midcast で効果中の章の sets.buff を着る作り → 詠唱中に着る",
+    "timing_confidence": "author_gearswap",
+    "buff": {
+     "id": 407,
+     "en": "Klimaform",
+     "ja": "虚誘掩殺の策"
+    },
+    "items": [
+     {
+      "ja": "ＳＶローファー+1"
+     },
+     {
+      "ja": "ＳＶローファー+2"
+     },
+     {
+      "ja": "アバテルローファー"
+     },
+     {
+      "ja": "ＡＢローファー+1"
+     },
+     {
+      "ja": "ＡＢローファー+2"
+     },
+     {
+      "ja": "ＡＢローファー+3"
+     }
+    ],
+    "cast_phase": "midcast"
+   }
+  ],
+  "GEO": [
+   {
+    "ability_en": "Bolster",
+    "ability_ja": "ボルスター",
+    "slot": "body",
+    "timing": "use",
+    "effect": "ボルスター効果アップ",
+    "source": "wiki.ffo.jp/html/30936.html",
+    "timing_basis": "common/GEO_gear.lua の sets.precast.JA[\"ボルスター\"] に ＢＡチュニック+1",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "バグアチュニック"
+     },
+     {
+      "ja": "ＢＡチュニック+1"
+     },
+     {
+      "ja": "ＢＡチュニック+2"
+     },
+     {
+      "ja": "ＢＡチュニック+3"
+     },
+     {
+      "ja": "ＢＡチュニック+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Mending Halation",
+    "ability_ja": "メンドハレイション",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "メンドハレイション効果アップ",
+    "source": "wiki.ffo.jp/html/30936.html",
+    "timing_basis": "common/GEO_gear.lua の sets.precast.JA[\"メンドハレイション\"] に ＢＡパンツ+3",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "バグアパンツ"
+     },
+     {
+      "ja": "ＢＡパンツ+1"
+     },
+     {
+      "ja": "ＢＡパンツ+2"
+     },
+     {
+      "ja": "ＢＡパンツ+3"
+     },
+     {
+      "ja": "ＢＡパンツ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Radial Arcana",
+    "ability_ja": "レイディアルアルカナ",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "レイディアルアルカナ効果アップ",
+    "source": "wiki.ffo.jp/html/30936.html",
+    "timing_basis": "common/GEO_gear.lua の sets.precast.JA[\"レイディアルアルカナ\"] に ＢＡサンダル+3",
+    "timing_confidence": "author_gearswap",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "バグアサンダル"
+     },
+     {
+      "ja": "ＢＡサンダル+1"
+     },
+     {
+      "ja": "ＢＡサンダル+2"
+     },
+     {
+      "ja": "ＢＡサンダル+3"
+     },
+     {
+      "ja": "ＢＡサンダル+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Concentric Pulse",
+    "ability_ja": "コンセントリクパルス",
+    "slot": "head",
+    "timing": "use",
+    "effect": "コンセントリクパルス性能アップ (+2 以降のみ)",
+    "source": "wiki.ffo.jp/html/30936.html",
+    "timing_basis": "作者の GearSwap に無し・wiki に装備タイミングの記述なし / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "ＢＡガレーロ+2"
+     },
+     {
+      "ja": "ＢＡガレーロ+3"
+     },
+     {
+      "ja": "ＢＡガレーロ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Full Circle",
+    "ability_ja": "フルサークル",
+    "slot": "head",
+    "timing": "use",
+    "effect": "フルサークル+1〜+4 (世代で増える)",
+    "source": "wiki.ffo.jp/html/33321.html",
+    "timing_basis": "common/GEO_gear.lua の sets.precast.JA[\"フルサークル\"] に ＡＺフード+3",
+    "timing_confidence": "author_gearswap",
+    "items": [
+     {
+      "ja": "アジムスフード"
+     },
+     {
+      "ja": "ＡＺフード+1"
+     },
+     {
+      "ja": "ＡＺフード+2"
+     },
+     {
+      "ja": "ＡＺフード+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Primeval Zeal",
+    "ability_ja": "プライムジール",
+    "slot": "head",
+    "timing": "merit",
+    "set_path": "sets.merit.PrimevalZeal",
+    "effect": "プライムジール効果アップ (メリット特性)",
+    "source": "wiki.ffo.jp/html/30936.html",
+    "timing_basis": "メリットポイントの特性 (res/merit_points.lua 3398) で常時効く",
+    "timing_confidence": "low",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "バグアガレーロ"
+     },
+     {
+      "ja": "ＢＡガレーロ+1"
+     },
+     {
+      "ja": "ＢＡガレーロ+2"
+     },
+     {
+      "ja": "ＢＡガレーロ+3"
+     },
+     {
+      "ja": "ＢＡガレーロ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Curative Recantation",
+    "ability_ja": "キュアリカント",
+    "slot": "hands",
+    "timing": "merit",
+    "set_path": "sets.merit.CurativeRecantation",
+    "effect": "キュアリカント効果アップ (メリット特性・フルサークルに回復効果)",
+    "source": "wiki.ffo.jp/html/30936.html",
+    "timing_basis": "メリットポイントの特性 (res/merit_points.lua 3396)。フルサークル時に効く特性なので use の可能性もあり",
+    "timing_confidence": "low",
+    "requires": "メリットポイントで習得が必要",
+    "items": [
+     {
+      "ja": "バグアミテーヌ"
+     },
+     {
+      "ja": "ＢＡミテーヌ+1"
+     },
+     {
+      "ja": "ＢＡミテーヌ+2"
+     },
+     {
+      "ja": "ＢＡミテーヌ+3"
+     },
+     {
+      "ja": "ＢＡミテーヌ+4"
+     }
+    ]
+   }
+  ],
+  "RUN": [
+   {
+    "ability_en": "Battuta",
+    "ability_ja": "バットゥタ",
+    "slot": "head",
+    "timing": "use",
+    "effect": "バットゥタ効果アップ",
+    "source": "wiki.ffo.jp/html/30937.html",
+    "timing_basis": "作者の RUN の GearSwap が無く、wiki に装備タイミングの記述なし (効果中ずっとの可能性あり・buff 570)",
+    "timing_confidence": "low",
+    "items": [
+     {
+      "ja": "フサルクバンド"
+     },
+     {
+      "ja": "ＦＵバンド+1"
+     },
+     {
+      "ja": "ＦＵバンド+2"
+     },
+     {
+      "ja": "ＦＵバンド+3"
+     },
+     {
+      "ja": "ＦＵバンド+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Elemental Sforzo",
+    "ability_ja": "E.スフォルツォ",
+    "slot": "body",
+    "timing": "use",
+    "effect": "E.スフォルツォ効果アップ",
+    "source": "wiki.ffo.jp/html/30937.html",
+    "timing_basis": "作者の RUN の GearSwap が無く、wiki に装備タイミングの記述なし / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "フサルクコート"
+     },
+     {
+      "ja": "ＦＵコート+1"
+     },
+     {
+      "ja": "ＦＵコート+2"
+     },
+     {
+      "ja": "ＦＵコート+3"
+     },
+     {
+      "ja": "ＦＵコート+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Rayke",
+    "ability_ja": "レイク",
+    "slot": "feet",
+    "timing": "use",
+    "effect": "レイク効果アップ",
+    "source": "wiki.ffo.jp/html/30937.html",
+    "timing_basis": "作者の RUN の GearSwap が無く、wiki に装備タイミングの記述なし / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "フサルクブーツ"
+     },
+     {
+      "ja": "ＦＵブーツ+1"
+     },
+     {
+      "ja": "ＦＵブーツ+2"
+     },
+     {
+      "ja": "ＦＵブーツ+3"
+     },
+     {
+      "ja": "ＦＵブーツ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Vivacious Pulse",
+    "ability_ja": "ビベイシャス",
+    "slot": "head",
+    "timing": "use",
+    "effect": "ビベイシャス性能アップ",
+    "source": "wiki.ffo.jp/html/33332.html",
+    "timing_basis": "作者の RUN の GearSwap が無く、wiki に装備タイミングの記述なし (即時効果のアビリティ) / ぐりーずさんの GearSwap でも precast",
+    "timing_confidence": "greeds",
+    "items": [
+     {
+      "ja": "エリラズガレア"
+     },
+     {
+      "ja": "ＥＲガレア+1"
+     },
+     {
+      "ja": "ＥＲガレア+2"
+     },
+     {
+      "ja": "ＥＲガレア+3"
+     }
+    ]
+   },
+   {
+    "ability_en": "Swordplay",
+    "ability_ja": "ソードプレイ",
+    "slot": "hands",
+    "timing": "use",
+    "effect": "スライトソード (メリット特性: ソードプレイを使ったときに効く) スライトソード効果アップ (メリット特性)",
+    "source": "wiki.ffo.jp/html/30937.html",
+    "timing_basis": "ぐりーずさん (ktgreeds/GearSwap) の GearSwap では sets.precast.JA['ソードプレイ'] に入っている → 使う瞬間に合わせる (作者判断 2026-10-26)",
+    "timing_confidence": "greeds",
+    "requires": "メリットポイントで スライトソード を習得している必要がある",
+    "items": [
+     {
+      "ja": "フサルクミトン"
+     },
+     {
+      "ja": "ＦＵミトン+1"
+     },
+     {
+      "ja": "ＦＵミトン+2"
+     },
+     {
+      "ja": "ＦＵミトン+3"
+     },
+     {
+      "ja": "ＦＵミトン+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Valiance",
+    "ability_ja": "ヴァリエンス",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "インスパイア (メリット特性: ヴァリエンスを使ったときに効く) インスパイア効果アップ (メリット特性・ヴァレション/ヴァリエンスにファストキャスト)",
+    "source": "wiki.ffo.jp/html/30937.html",
+    "timing_basis": "ぐりーずさん (ktgreeds/GearSwap) の GearSwap では sets.precast.JA['ヴァリエンス'] に入っている → 使う瞬間に合わせる (作者判断 2026-10-26)",
+    "timing_confidence": "greeds",
+    "requires": "メリットポイントで インスパイア を習得している必要がある",
+    "items": [
+     {
+      "ja": "フサルクトラウザ"
+     },
+     {
+      "ja": "ＦＵトラウザ+1"
+     },
+     {
+      "ja": "ＦＵトラウザ+2"
+     },
+     {
+      "ja": "ＦＵトラウザ+3"
+     },
+     {
+      "ja": "ＦＵトラウザ+4"
+     }
+    ]
+   },
+   {
+    "ability_en": "Vallation",
+    "ability_ja": "ヴァレション",
+    "slot": "legs",
+    "timing": "use",
+    "effect": "インスパイア (メリット特性: ヴァレションを使ったときに効く) インスパイア効果アップ (メリット特性・ヴァレション/ヴァリエンスにファストキャスト)",
+    "source": "wiki.ffo.jp/html/30937.html",
+    "timing_basis": "ぐりーずさん (ktgreeds/GearSwap) の GearSwap では sets.precast.JA['ヴァレション'] に入っている → 使う瞬間に合わせる (作者判断 2026-10-26)",
+    "timing_confidence": "greeds",
+    "requires": "メリットポイントで インスパイア を習得している必要がある",
+    "items": [
+     {
+      "ja": "フサルクトラウザ"
+     },
+     {
+      "ja": "ＦＵトラウザ+1"
+     },
+     {
+      "ja": "ＦＵトラウザ+2"
+     },
+     {
+      "ja": "ＦＵトラウザ+3"
+     },
+     {
+      "ja": "ＦＵトラウザ+4"
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+tests/local_paths.json
+gearswapkit_settings.json
+*_kit.json

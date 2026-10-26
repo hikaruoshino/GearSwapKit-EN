@@ -1,0 +1,39 @@
+name: 動作報告 / Works for me (or not)
+description: 動いた・動かなかった、の一言だけでも大歓迎です / Even a one-line "it worked" is welcome
+title: "[報告 / Report] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **日本語**: 「動きました」だけの報告も助かります。分かる項目だけ埋めてください。
+        **English**: A short "it works" report helps a lot. Fill in only what you know.
+  - type: dropdown
+    id: result
+    attributes:
+      label: 結果 / Result
+      options:
+        - 動いた / It worked
+        - 一部動いた / Partly worked
+        - 動かなかった / It did not work
+    validations:
+      required: true
+  - type: dropdown
+    id: client
+    attributes:
+      label: FFXI クライアントの言語 / Client language
+      options:
+        - 日本語 / Japanese
+        - English
+        - その他 / Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: アドオンの版 / Addon version
+      description: README や読み込み時のメッセージに出ている版 (例 v0.2.0) / e.g. v0.2.0
+  - type: textarea
+    id: notes
+    attributes:
+      label: ひとこと / Notes
+      description: どこで使ったか、気づいたことなど (任意) / Where you used it, anything you noticed (optional)

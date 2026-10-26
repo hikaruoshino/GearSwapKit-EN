@@ -1,0 +1,1780 @@
+{
+ "_source": "2026-10-26 取得。召喚士: https://wiki.ffo.jp/html/332.html (契約の履行の一覧) / https://wiki.ffo.jp/html/4316.html / https://wiki.ffo.jp/html/4317.html。獣使い: https://wiki.ffo.jp/html/33868.html (/bstpet 種族ごとの技名) / https://wiki.ffo.jp/html/18158.html (しじをさせろ・強化技の表) / https://wiki.ffo.jp/html/3325.html。獣使いの物理/魔法/弱体の区分は一覧ページに載っておらず、技ごとのページは開いていない (強化技は 18158 の表と一致)。名前とid は Windower res/job_abilities.lua。2026-10-26 追加 (獣使いの技ごとに確認): https://wiki.ffo.jp/html/24610.html https://wiki.ffo.jp/html/24472.html https://wiki.ffo.jp/html/23657.html https://wiki.ffo.jp/html/2248.html https://wiki.ffo.jp/html/9799.html https://wiki.ffo.jp/html/3061.html https://wiki.ffo.jp/html/17455.html https://wiki.ffo.jp/html/26308.html https://wiki.ffo.jp/html/32753.html https://wiki.ffo.jp/html/32095.html https://wiki.ffo.jp/html/12824.html https://wiki.ffo.jp/html/1464.html https://wiki.ffo.jp/html/2477.html https://wiki.ffo.jp/html/23441.html https://wiki.ffo.jp/html/33980.html https://wiki.ffo.jp/html/38025.html https://wiki.ffo.jp/html/32665.html",
+ "SMN": [
+  {
+   "id": 512,
+   "en": "Healing Ruby",
+   "ja": "ルビーの癒し",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 513,
+   "en": "Poison Nails",
+   "ja": "ポイズンネイル",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 514,
+   "en": "Shining Ruby",
+   "ja": "ルビーの輝き",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 515,
+   "en": "Glittering Ruby",
+   "ja": "ルビーの煌き",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 516,
+   "en": "Meteorite",
+   "ja": "プチメテオ",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 517,
+   "en": "Healing Ruby II",
+   "ja": "ルビーの癒しII",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 518,
+   "en": "Searing Light",
+   "ja": "シアリングライト",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 519,
+   "en": "Holy Mist",
+   "ja": "ホーリーミスト",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 520,
+   "en": "Soothing Ruby",
+   "ja": "ルビーの安らぎ",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 521,
+   "en": "Regal Scratch",
+   "ja": "リーガルスクラッチ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 522,
+   "en": "Mewing Lullaby",
+   "ja": "ミュインララバイ",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 523,
+   "en": "Eerie Eye",
+   "ja": "イアリーアイ",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 524,
+   "en": "Level ? Holy",
+   "ja": "レベル？ホーリー",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 525,
+   "en": "Raise II",
+   "ja": "レイズII",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 526,
+   "en": "Reraise II",
+   "ja": "リレイズII",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 527,
+   "en": "Altana's Favor",
+   "ja": "アルタナフェーバー",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 528,
+   "en": "Moonlit Charge",
+   "ja": "ムーンリットチャージ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 529,
+   "en": "Crescent Fang",
+   "ja": "クレセントファング",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 530,
+   "en": "Lunar Cry",
+   "ja": "ルナークライ",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 531,
+   "en": "Lunar Roar",
+   "ja": "ルナーロア",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki: 敵の強化 (魔法効果) を消す。敵にかけるので debuff https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 532,
+   "en": "Ecliptic Growl",
+   "ja": "上弦の唸り",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 533,
+   "en": "Ecliptic Howl",
+   "ja": "下弦の咆哮",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 534,
+   "en": "Eclipse Bite",
+   "ja": "エクリプスバイト",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 536,
+   "en": "Howling Moon",
+   "ja": "ハウリングムーン",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 537,
+   "en": "Lunar Bay",
+   "ja": "ルナーベイ",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 538,
+   "en": "Heavenward Howl",
+   "ja": "ヘヴンズハウル",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 539,
+   "en": "Impact",
+   "ja": "インパクト",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 544,
+   "en": "Punch",
+   "ja": "パンチ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 545,
+   "en": "Fire II",
+   "ja": "ファイアII",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 546,
+   "en": "Burning Strike",
+   "ja": "バーニングストライク",
+   "type": "BloodPactRage",
+   "kind": "physical",
+   "note": "物理+火属性ダメージの複合 (wiki: 打属性物理攻撃＋火属性ダメージ)"
+  },
+  {
+   "id": 547,
+   "en": "Double Punch",
+   "ja": "ダブルパンチ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 548,
+   "en": "Crimson Howl",
+   "ja": "紅蓮の咆哮",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 549,
+   "en": "Fire IV",
+   "ja": "ファイアIV",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 550,
+   "en": "Flaming Crush",
+   "ja": "フレイムクラッシュ",
+   "type": "BloodPactRage",
+   "kind": "physical",
+   "note": "物理+火属性ダメージの複合 (wiki: 3回攻撃＋火属性ダメージ)"
+  },
+  {
+   "id": 551,
+   "en": "Meteor Strike",
+   "ja": "メテオストライク",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 552,
+   "en": "Inferno",
+   "ja": "インフェルノ",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 553,
+   "en": "Inferno Howl",
+   "ja": "灼熱の咆哮",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 554,
+   "en": "Conflag Strike",
+   "ja": "コンフラグストライク",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 560,
+   "en": "Rock Throw",
+   "ja": "ロックスロー",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 561,
+   "en": "Stone II",
+   "ja": "ストーンII",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 562,
+   "en": "Rock Buster",
+   "ja": "ロックバスター",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 563,
+   "en": "Megalith Throw",
+   "ja": "メガリススロー",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 564,
+   "en": "Earthen Ward",
+   "ja": "大地の守り",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 565,
+   "en": "Stone IV",
+   "ja": "ストーンIV",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 566,
+   "en": "Mountain Buster",
+   "ja": "マウンテンバスター",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 567,
+   "en": "Geocrush",
+   "ja": "ジオクラッシュ",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 568,
+   "en": "Earthen Fury",
+   "ja": "アースフューリー",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 569,
+   "en": "Earthen Armor",
+   "ja": "大地の鎧",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 570,
+   "en": "Crag Throw",
+   "ja": "クラッグスロー",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 576,
+   "en": "Barracuda Dive",
+   "ja": "バラクーダダイブ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 577,
+   "en": "Water II",
+   "ja": "ウォータII",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 578,
+   "en": "Tail Whip",
+   "ja": "テールウィップ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 579,
+   "en": "Spring Water",
+   "ja": "湧水",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 580,
+   "en": "Slowga",
+   "ja": "スロウガ",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 581,
+   "en": "Water IV",
+   "ja": "ウォータIV",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 582,
+   "en": "Spinning Dive",
+   "ja": "スピニングダイブ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 583,
+   "en": "Grand Fall",
+   "ja": "グランドフォール",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 584,
+   "en": "Tidal Wave",
+   "ja": "タイダルウェイブ",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 585,
+   "en": "Tidal Roar",
+   "ja": "タイダルロア",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 586,
+   "en": "Soothing Current",
+   "ja": "スージングカレント",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 592,
+   "en": "Claw",
+   "ja": "クロー",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 593,
+   "en": "Aero II",
+   "ja": "エアロII",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 594,
+   "en": "Whispering Wind",
+   "ja": "風の囁き",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 595,
+   "en": "Hastega",
+   "ja": "ヘイスガ",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 596,
+   "en": "Aerial Armor",
+   "ja": "真空の鎧",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 597,
+   "en": "Aero IV",
+   "ja": "エアロIV",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 598,
+   "en": "Predator Claws",
+   "ja": "プレデタークロー",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 599,
+   "en": "Wind Blade",
+   "ja": "ウインドブレード",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 600,
+   "en": "Aerial Blast",
+   "ja": "エリアルブラスト",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 601,
+   "en": "Fleet Wind",
+   "ja": "真空の具足",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 602,
+   "en": "Hastega II",
+   "ja": "ヘイスガII",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 608,
+   "en": "Axe Kick",
+   "ja": "アクスキック",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 609,
+   "en": "Blizzard II",
+   "ja": "ブリザドII",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 610,
+   "en": "Frost Armor",
+   "ja": "凍てつく鎧",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 611,
+   "en": "Sleepga",
+   "ja": "スリプガ",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 612,
+   "en": "Double Slap",
+   "ja": "ダブルスラップ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 613,
+   "en": "Blizzard IV",
+   "ja": "ブリザドIV",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 614,
+   "en": "Rush",
+   "ja": "ラッシュ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 615,
+   "en": "Heavenly Strike",
+   "ja": "ヘヴンリーストライク",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 616,
+   "en": "Diamond Dust",
+   "ja": "ダイヤモンドダスト",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 617,
+   "en": "Diamond Storm",
+   "ja": "ダイヤモンドストーム",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 618,
+   "en": "Crystal Blessing",
+   "ja": "クリスタルブレシング",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 624,
+   "en": "Shock Strike",
+   "ja": "ショックストライク",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 625,
+   "en": "Thunder II",
+   "ja": "サンダーII",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 626,
+   "en": "Rolling Thunder",
+   "ja": "雷鼓",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 627,
+   "en": "Thunderspark",
+   "ja": "サンダースパーク",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 628,
+   "en": "Lightning Armor",
+   "ja": "雷電の鎧",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 629,
+   "en": "Thunder IV",
+   "ja": "サンダーIV",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 630,
+   "en": "Chaotic Strike",
+   "ja": "カオスストライク",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 631,
+   "en": "Thunderstorm",
+   "ja": "サンダーストーム",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 632,
+   "en": "Judgment Bolt",
+   "ja": "ジャッジボルト",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 633,
+   "en": "Shock Squall",
+   "ja": "スタンガ",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 634,
+   "en": "Volt Strike",
+   "ja": "ボルトストライク",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 639,
+   "en": "Healing Breath IV",
+   "ja": "ヒールブレスIV",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "飛竜の回復技 (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 640,
+   "en": "Healing Breath",
+   "ja": "ヒールブレス",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "飛竜の回復技 (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 641,
+   "en": "Healing Breath II",
+   "ja": "ヒールブレスII",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "飛竜の回復技 (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 642,
+   "en": "Healing Breath III",
+   "ja": "ヒールブレスIII",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "飛竜の回復技 (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 643,
+   "en": "Remove Poison",
+   "ja": "キュアポイズン",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "飛竜の回復技 (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 644,
+   "en": "Remove Blindness",
+   "ja": "キュアブラインド",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "飛竜の回復技 (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 645,
+   "en": "Remove Paralysis",
+   "ja": "キュアパラライズ",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "飛竜の回復技 (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 646,
+   "en": "Flame Breath",
+   "ja": "フレイムブレス",
+   "type": "BloodPactRage",
+   "kind": "magical",
+   "note": "飛竜の属性ブレス (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 647,
+   "en": "Frost Breath",
+   "ja": "フロストブレス",
+   "type": "BloodPactRage",
+   "kind": "magical",
+   "note": "飛竜の属性ブレス (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 648,
+   "en": "Gust Breath",
+   "ja": "ガストブレス",
+   "type": "BloodPactRage",
+   "kind": "magical",
+   "note": "飛竜の属性ブレス (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 649,
+   "en": "Sand Breath",
+   "ja": "サンドブレス",
+   "type": "BloodPactRage",
+   "kind": "magical",
+   "note": "飛竜の属性ブレス (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 650,
+   "en": "Lightning Breath",
+   "ja": "ライトニングブレス",
+   "type": "BloodPactRage",
+   "kind": "magical",
+   "note": "飛竜の属性ブレス (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 651,
+   "en": "Hydro Breath",
+   "ja": "ハイドロブレス",
+   "type": "BloodPactRage",
+   "kind": "magical",
+   "note": "飛竜の属性ブレス (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 652,
+   "en": "Super Climb",
+   "ja": "スーパークライム",
+   "type": "BloodPactRage",
+   "kind": "unknown",
+   "note": "飛竜の技 (res では BloodPactRage)。召喚士の履行ではなく、分類不明"
+  },
+  {
+   "id": 653,
+   "en": "Remove Curse",
+   "ja": "キュアカーズ",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "飛竜の回復技 (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 654,
+   "en": "Remove Disease",
+   "ja": "キュアウィルス",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "飛竜の回復技 (res では BloodPactRage)。召喚士の履行ではない"
+  },
+  {
+   "id": 656,
+   "en": "Camisado",
+   "ja": "カミサドー",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 657,
+   "en": "Somnolence",
+   "ja": "ソムノレンス",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki: 敵にヘヴィ。直接ダメージなし (wiki 4316 の例外)。debuff https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 658,
+   "en": "Nightmare",
+   "ja": "ナイトメア",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki: 範囲の睡眠に闇のスリップダメージが付く。主は弱体なので debuff https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 659,
+   "en": "Ultimate Terror",
+   "ja": "アルティメットテラー",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 660,
+   "en": "Noctoshield",
+   "ja": "ノクトシールド",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 661,
+   "en": "Dream Shroud",
+   "ja": "ドリームシュラウド",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 662,
+   "en": "Nether Blast",
+   "ja": "ネザーブラスト",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 663,
+   "en": "Cacodemonia",
+   "ja": "カコデモニア",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 664,
+   "en": "Ruinous Omen",
+   "ja": "ルイナスオーメン",
+   "type": "BloodPactRage",
+   "kind": "magical",
+   "note": "HP を割合で減らす技。wiki に物理/魔法の記載なし。魔法として扱った"
+  },
+  {
+   "id": 665,
+   "en": "Night Terror",
+   "ja": "ナイトテラー",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 666,
+   "en": "Pavor Nocturnus",
+   "ja": "パボルノクターナス",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 667,
+   "en": "Blindside",
+   "ja": "ブラインドサイド",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 668,
+   "en": "Deconstruction",
+   "ja": "ディコンストラクション",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "アストラルフロウ限定の召喚獣 (アトモス・オーディン) の履行は、召喚魔法スキルの装備で実行する (作者判断 2026-10-27)。セットを選ぶための分類で、効果の種類とは別 / 前の記録: wiki: 敵の強化を 1 つ吸収する。敵にかけるので debuff (味方への付与は Chronoshift) https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 669,
+   "en": "Chronoshift",
+   "ja": "クロノシフト",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "アストラルフロウ限定の召喚獣 (アトモス・オーディン) の履行は、召喚魔法スキルの装備で実行する (作者判断 2026-10-27)。セットを選ぶための分類で、効果の種類とは別 / 前の記録: wiki: 吸収した強化をパーティに付与する。buff https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 670,
+   "en": "Zantetsuken",
+   "ja": "斬鉄剣",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "アストラルフロウ限定の召喚獣 (アトモス・オーディン) の履行は、召喚魔法スキルの装備で実行する (作者判断 2026-10-27)。セットを選ぶための分類で、効果の種類とは別 / 前の記録: 即死 (NM には MP 依存のダメージ)。物理/魔法の記載なし"
+  },
+  {
+   "id": 671,
+   "en": "Perfect Defense",
+   "ja": "絶対防御",
+   "type": "BloodPactRage",
+   "kind": "buff",
+   "note": "wiki: Rage だが被ダメージカット・状態異常レジストアップの強化。buff https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 773,
+   "en": "Pacifying Ruby",
+   "ja": "ルビーの贖罪",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki: 敵対心を減らす (味方側の効果)。buff https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 780,
+   "en": "Regal Gash",
+   "ja": "リーガルガッシュ",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 960,
+   "en": "Clarsach Call",
+   "ja": "クラーサクコール",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 961,
+   "en": "Welt",
+   "ja": "ウェルト",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 962,
+   "en": "Katabatic Blades",
+   "ja": "疾風の刃",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 963,
+   "en": "Lunatic Voice",
+   "ja": "ルナティックボイス",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 964,
+   "en": "Roundhouse",
+   "ja": "ラウンドハウス",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  },
+  {
+   "id": 965,
+   "en": "Chinook",
+   "ja": "シヌーク",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 966,
+   "en": "Bitter Elegy",
+   "ja": "修羅のエレジー",
+   "type": "BloodPactWard",
+   "kind": "debuff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 967,
+   "en": "Sonic Buffet",
+   "ja": "ソニックバフェット",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 968,
+   "en": "Tornado II",
+   "ja": "トルネドII",
+   "type": "BloodPactRage",
+   "kind": "magical"
+  },
+  {
+   "id": 969,
+   "en": "Wind's Blessing",
+   "ja": "風の守り",
+   "type": "BloodPactWard",
+   "kind": "buff",
+   "note": "wiki の験術欄で確認 https://wiki.ffo.jp/html/332.html"
+  },
+  {
+   "id": 970,
+   "en": "Hysteric Assault",
+   "ja": "ヒステリックアサルト",
+   "type": "BloodPactRage",
+   "kind": "physical"
+  }
+ ],
+ "BST": [
+  {
+   "id": 672,
+   "en": "Foot Kick",
+   "ja": "フットキック",
+   "kind": "physical"
+  },
+  {
+   "id": 673,
+   "en": "Dust Cloud",
+   "ja": "土煙",
+   "kind": "magical"
+  },
+  {
+   "id": 674,
+   "en": "Whirl Claws",
+   "ja": "爪旋風脚",
+   "kind": "physical"
+  },
+  {
+   "id": 675,
+   "en": "Head Butt",
+   "ja": "ヘッドバット",
+   "kind": "physical"
+  },
+  {
+   "id": 676,
+   "en": "Dream Flower",
+   "ja": "夢想花",
+   "kind": "debuff"
+  },
+  {
+   "id": 677,
+   "en": "Wild Oats",
+   "ja": "種まき",
+   "kind": "physical"
+  },
+  {
+   "id": 678,
+   "en": "Leaf Dagger",
+   "ja": "リーフダガー",
+   "kind": "physical"
+  },
+  {
+   "id": 679,
+   "en": "Scream",
+   "ja": "スクリーム",
+   "kind": "debuff"
+  },
+  {
+   "id": 680,
+   "en": "Roar",
+   "ja": "咆哮",
+   "kind": "debuff"
+  },
+  {
+   "id": 681,
+   "en": "Razor Fang",
+   "ja": "レイザーファング",
+   "kind": "physical"
+  },
+  {
+   "id": 682,
+   "en": "Claw Cyclone",
+   "ja": "クローサイクロン",
+   "kind": "physical"
+  },
+  {
+   "id": 683,
+   "en": "Tail Blow",
+   "ja": "テイルブロー",
+   "kind": "physical"
+  },
+  {
+   "id": 684,
+   "en": "Fireball",
+   "ja": "ファイアボール",
+   "kind": "magical"
+  },
+  {
+   "id": 685,
+   "en": "Blockhead",
+   "ja": "ブロックヘッド",
+   "kind": "physical"
+  },
+  {
+   "id": 686,
+   "en": "Brain Crush",
+   "ja": "ブレインクラッシュ",
+   "kind": "physical",
+   "note": "wiki: 物理ダメージ+静寂 https://wiki.ffo.jp/html/12824.html"
+  },
+  {
+   "id": 687,
+   "en": "Infrasonics",
+   "ja": "超低周波",
+   "kind": "debuff"
+  },
+  {
+   "id": 688,
+   "en": "Secretion",
+   "ja": "体液分泌",
+   "kind": "buff"
+  },
+  {
+   "id": 689,
+   "en": "Lamb Chop",
+   "ja": "頭突き",
+   "kind": "physical"
+  },
+  {
+   "id": 690,
+   "en": "Rage",
+   "ja": "レイジ",
+   "kind": "buff"
+  },
+  {
+   "id": 691,
+   "en": "Sheep Charge",
+   "ja": "シープチャージ",
+   "kind": "physical"
+  },
+  {
+   "id": 692,
+   "en": "Sheep Song",
+   "ja": "シープソング",
+   "kind": "debuff"
+  },
+  {
+   "id": 693,
+   "en": "Bubble Shower",
+   "ja": "バブルシャワー",
+   "kind": "magical"
+  },
+  {
+   "id": 694,
+   "en": "Bubble Curtain",
+   "ja": "バブルカーテン",
+   "kind": "buff"
+  },
+  {
+   "id": 695,
+   "en": "Big Scissors",
+   "ja": "ビッグシザー",
+   "kind": "physical"
+  },
+  {
+   "id": 696,
+   "en": "Scissor Guard",
+   "ja": "シザーガード",
+   "kind": "buff"
+  },
+  {
+   "id": 697,
+   "en": "Metallic Body",
+   "ja": "メタルボディ",
+   "kind": "buff"
+  },
+  {
+   "id": 698,
+   "en": "Needleshot",
+   "ja": "ニードルショット",
+   "kind": "physical"
+  },
+  {
+   "id": 699,
+   "en": "??? Needles",
+   "ja": "針？本",
+   "kind": "physical",
+   "note": "wiki: 範囲内の敵に合計ダメージランダムの物理ダメージ (本文には固定ダメージとも) https://wiki.ffo.jp/html/1464.html"
+  },
+  {
+   "id": 700,
+   "en": "Frogkick",
+   "ja": "フロッグキック",
+   "kind": "physical"
+  },
+  {
+   "id": 701,
+   "en": "Spore",
+   "ja": "スポア",
+   "kind": "debuff"
+  },
+  {
+   "id": 702,
+   "en": "Queasyshroom",
+   "ja": "マヨイタケ",
+   "kind": "magical"
+  },
+  {
+   "id": 703,
+   "en": "Numbshroom",
+   "ja": "シビレタケ",
+   "kind": "magical"
+  },
+  {
+   "id": 704,
+   "en": "Shakeshroom",
+   "ja": "オドリタケ",
+   "kind": "magical"
+  },
+  {
+   "id": 705,
+   "en": "Silence Gas",
+   "ja": "サイレスガス",
+   "kind": "magical"
+  },
+  {
+   "id": 706,
+   "en": "Dark Spore",
+   "ja": "ダークスポア",
+   "kind": "magical"
+  },
+  {
+   "id": 707,
+   "en": "Power Attack",
+   "ja": "パワーアタック",
+   "kind": "physical"
+  },
+  {
+   "id": 708,
+   "en": "Hi-Freq Field",
+   "ja": "高周波フィールド",
+   "kind": "debuff"
+  },
+  {
+   "id": 709,
+   "en": "Rhino Attack",
+   "ja": "ライノアタック",
+   "kind": "physical"
+  },
+  {
+   "id": 710,
+   "en": "Rhino Guard",
+   "ja": "ライノガード",
+   "kind": "buff"
+  },
+  {
+   "id": 711,
+   "en": "Spoil",
+   "ja": "スポイル",
+   "kind": "debuff"
+  },
+  {
+   "id": 712,
+   "en": "Cursed Sphere",
+   "ja": "カースドスフィア",
+   "kind": "magical"
+  },
+  {
+   "id": 713,
+   "en": "Venom",
+   "ja": "毒液",
+   "kind": "magical"
+  },
+  {
+   "id": 714,
+   "en": "Sandblast",
+   "ja": "サンドブラスト",
+   "kind": "debuff"
+  },
+  {
+   "id": 715,
+   "en": "Sandpit",
+   "ja": "サンドピット",
+   "kind": "debuff"
+  },
+  {
+   "id": 716,
+   "en": "Venom Spray",
+   "ja": "ベノムスプレー",
+   "kind": "debuff",
+   "note": "wiki: 前方範囲に毒 (直接ダメージの記載なし) https://wiki.ffo.jp/html/24610.html"
+  },
+  {
+   "id": 717,
+   "en": "Mandibular Bite",
+   "ja": "M.バイト",
+   "kind": "physical"
+  },
+  {
+   "id": 718,
+   "en": "Soporific",
+   "ja": "サペリフィック",
+   "kind": "debuff"
+  },
+  {
+   "id": 719,
+   "en": "Gloeosuccus",
+   "ja": "グロオーサケス",
+   "kind": "debuff"
+  },
+  {
+   "id": 720,
+   "en": "Palsy Pollen",
+   "ja": "パルジィパレン",
+   "kind": "debuff"
+  },
+  {
+   "id": 721,
+   "en": "Geist Wall",
+   "ja": "ガイストウォール",
+   "kind": "debuff"
+  },
+  {
+   "id": 722,
+   "en": "Numbing Noise",
+   "ja": "ナビングノイズ",
+   "kind": "debuff"
+  },
+  {
+   "id": 723,
+   "en": "Nimble Snap",
+   "ja": "ニンブルスナップ",
+   "kind": "physical"
+  },
+  {
+   "id": 724,
+   "en": "Cyclotail",
+   "ja": "サイクロテール",
+   "kind": "physical"
+  },
+  {
+   "id": 725,
+   "en": "Toxic Spit",
+   "ja": "トクシックスピット",
+   "kind": "debuff",
+   "note": "wiki: 単体を毒にするだけ https://wiki.ffo.jp/html/24472.html"
+  },
+  {
+   "id": 726,
+   "en": "Double Claw",
+   "ja": "ダブルクロー",
+   "kind": "physical"
+  },
+  {
+   "id": 727,
+   "en": "Grapple",
+   "ja": "グラップル",
+   "kind": "physical"
+  },
+  {
+   "id": 728,
+   "en": "Spinning Top",
+   "ja": "スピニングトップ",
+   "kind": "physical"
+  },
+  {
+   "id": 729,
+   "en": "Filamented Hold",
+   "ja": "F.ホールド",
+   "kind": "debuff"
+  },
+  {
+   "id": 730,
+   "en": "Chaotic Eye",
+   "ja": "カオティックアイ",
+   "kind": "debuff"
+  },
+  {
+   "id": 731,
+   "en": "Blaster",
+   "ja": "ブラスター",
+   "kind": "debuff"
+  },
+  {
+   "id": 732,
+   "en": "Suction",
+   "ja": "吸着",
+   "kind": "physical"
+  },
+  {
+   "id": 733,
+   "en": "Drainkiss",
+   "ja": "ドレインキッス",
+   "kind": "magical",
+   "note": "wiki: HP吸収 (物理/魔法の記載なし)。吸収は魔法の決まりで magical https://wiki.ffo.jp/html/23657.html / https://wiki.ffo.jp/html/2248.html"
+  },
+  {
+   "id": 734,
+   "en": "Snow Cloud",
+   "ja": "雪煙",
+   "kind": "magical"
+  },
+  {
+   "id": 735,
+   "en": "Wild Carrot",
+   "ja": "ワイルドカロット",
+   "kind": "buff"
+  },
+  {
+   "id": 736,
+   "en": "Sudden Lunge",
+   "ja": "サドンランジ",
+   "kind": "physical",
+   "note": "wiki: 物理ダメージ+スタン+ノックバック https://wiki.ffo.jp/html/17455.html"
+  },
+  {
+   "id": 737,
+   "en": "Spiral Spin",
+   "ja": "スパイラルスピン",
+   "kind": "physical"
+  },
+  {
+   "id": 738,
+   "en": "Noisome Powder",
+   "ja": "ノイサムパウダー",
+   "kind": "debuff"
+  },
+  {
+   "id": 740,
+   "en": "Acid Mist",
+   "ja": "アシッドミスト",
+   "kind": "magical",
+   "note": "wiki: 自身の周囲の敵に水属性ダメージ+攻撃力ダウン https://wiki.ffo.jp/html/2248.html"
+  },
+  {
+   "id": 741,
+   "en": "TP Drainkiss",
+   "ja": "TP吸収キッス",
+   "kind": "debuff"
+  },
+  {
+   "id": 743,
+   "en": "Scythe Tail",
+   "ja": "サイズテール",
+   "kind": "physical"
+  },
+  {
+   "id": 744,
+   "en": "Ripper Fang",
+   "ja": "リッパーファング",
+   "kind": "physical"
+  },
+  {
+   "id": 745,
+   "en": "Chomp Rush",
+   "ja": "噛みつきラッシュ",
+   "kind": "physical"
+  },
+  {
+   "id": 746,
+   "en": "Charged Whisker",
+   "ja": "チャージドホイスカー",
+   "kind": "magical"
+  },
+  {
+   "id": 747,
+   "en": "Purulent Ooze",
+   "ja": "ピュルラントウーズ",
+   "kind": "magical"
+  },
+  {
+   "id": 748,
+   "en": "Corrosive Ooze",
+   "ja": "コローシブウーズ",
+   "kind": "magical"
+  },
+  {
+   "id": 749,
+   "en": "Back Heel",
+   "ja": "バックヒール",
+   "kind": "physical"
+  },
+  {
+   "id": 750,
+   "en": "Jettatura",
+   "ja": "ジェタチュラ",
+   "kind": "debuff"
+  },
+  {
+   "id": 751,
+   "en": "Choke Breath",
+   "ja": "チョークブレス",
+   "kind": "physical",
+   "note": "wiki: 物理ダメージ+麻痺+静寂、ブレスダメージではない https://wiki.ffo.jp/html/9799.html"
+  },
+  {
+   "id": 752,
+   "en": "Fantod",
+   "ja": "ファンタッド",
+   "kind": "buff"
+  },
+  {
+   "id": 753,
+   "en": "Tortoise Stomp",
+   "ja": "トータスストンプ",
+   "kind": "physical"
+  },
+  {
+   "id": 754,
+   "en": "Harden Shell",
+   "ja": "甲羅強化",
+   "kind": "buff"
+  },
+  {
+   "id": 755,
+   "en": "Aqua Breath",
+   "ja": "アクアブレス",
+   "kind": "magical"
+  },
+  {
+   "id": 756,
+   "en": "Wing Slap",
+   "ja": "ウィングスラップ",
+   "kind": "physical"
+  },
+  {
+   "id": 757,
+   "en": "Beak Lunge",
+   "ja": "ビークランジ",
+   "kind": "physical"
+  },
+  {
+   "id": 758,
+   "en": "Intimidate",
+   "ja": "威嚇",
+   "kind": "debuff"
+  },
+  {
+   "id": 759,
+   "en": "Recoil Dive",
+   "ja": "リコイルダイブ",
+   "kind": "physical"
+  },
+  {
+   "id": 760,
+   "en": "Water Wall",
+   "ja": "ウォーターウォール",
+   "kind": "buff"
+  },
+  {
+   "id": 761,
+   "en": "Sensilla Blades",
+   "ja": "センシラブレード",
+   "kind": "physical"
+  },
+  {
+   "id": 762,
+   "en": "Tegmina Buffet",
+   "ja": "テグミナバフェット",
+   "kind": "physical"
+  },
+  {
+   "id": 763,
+   "en": "Molting Plumage",
+   "ja": "モルトプルメイジ",
+   "kind": "magical"
+  },
+  {
+   "id": 764,
+   "en": "Swooping Frenzy",
+   "ja": "スワープフレンジー",
+   "kind": "physical"
+  },
+  {
+   "id": 765,
+   "en": "Sweeping Gouge",
+   "ja": "スイープガウジ",
+   "kind": "physical"
+  },
+  {
+   "id": 766,
+   "en": "Zealous Snort",
+   "ja": "ゼラススノート",
+   "kind": "buff",
+   "note": "wiki: ヘイスト・魔法防御力アップ・カウンターアップ・ガード率アップ (強化技の表) https://wiki.ffo.jp/html/18158.html"
+  },
+  {
+   "id": 767,
+   "en": "Pentapeck",
+   "ja": "ペンタペック",
+   "kind": "physical"
+  },
+  {
+   "id": 768,
+   "en": "Tickling Tendrils",
+   "ja": "ティックルテンドリル",
+   "kind": "physical"
+  },
+  {
+   "id": 769,
+   "en": "Stink Bomb",
+   "ja": "スティンクボム",
+   "kind": "magical"
+  },
+  {
+   "id": 770,
+   "en": "Nectarous Deluge",
+   "ja": "ネクターデルージュ",
+   "kind": "magical"
+  },
+  {
+   "id": 771,
+   "en": "Nepenthic Plunge",
+   "ja": "ネペンシックプランジ",
+   "kind": "magical",
+   "note": "wiki: 扇範囲に水属性ダメージ+ドラウン・ヘヴィ https://wiki.ffo.jp/html/32095.html"
+  },
+  {
+   "id": 772,
+   "en": "Somersault",
+   "ja": "サマーソルト",
+   "kind": "physical"
+  },
+  {
+   "id": 774,
+   "en": "Foul Waters",
+   "ja": "ファウルウォーター",
+   "kind": "magical"
+  },
+  {
+   "id": 775,
+   "en": "Pestilent Plume",
+   "ja": "ペステレントプルーム",
+   "kind": "magical",
+   "note": "wiki: 扇範囲に闇属性ダメージ+悪疫・暗闇・魔防ダウン https://wiki.ffo.jp/html/32753.html"
+  },
+  {
+   "id": 776,
+   "en": "Pecking Flurry",
+   "ja": "ペッキングフラリー",
+   "kind": "physical"
+  },
+  {
+   "id": 777,
+   "en": "Sickle Slash",
+   "ja": "シックルスラッシュ",
+   "kind": "physical"
+  },
+  {
+   "id": 778,
+   "en": "Acid Spray",
+   "ja": "アシッドスプレー",
+   "kind": "magical"
+  },
+  {
+   "id": 779,
+   "en": "Spider Web",
+   "ja": "スパイダーウェブ",
+   "kind": "debuff"
+  },
+  {
+   "id": 781,
+   "en": "Infected Leech",
+   "ja": "I.サッカー",
+   "kind": "magical",
+   "note": "wiki: 扇範囲の HP 吸収 (固定819)+悪疫。吸収は魔法の決まりで magical https://wiki.ffo.jp/html/33980.html"
+  },
+  {
+   "id": 782,
+   "en": "Gloom Spray",
+   "ja": "グルームスプレー",
+   "kind": "magical"
+  },
+  {
+   "id": 786,
+   "en": "Disembowel",
+   "ja": "ディスエンバウエル",
+   "kind": "physical"
+  },
+  {
+   "id": 787,
+   "en": "Extirpating Salvo",
+   "ja": "E.サルヴォ",
+   "kind": "physical"
+  },
+  {
+   "id": 788,
+   "en": "Venom Shower",
+   "ja": "ベノムシャワー",
+   "kind": "magical",
+   "note": "wiki: 周囲に水属性ダメージ+毒・防御力ダウン https://wiki.ffo.jp/html/38025.html"
+  },
+  {
+   "id": 789,
+   "en": "Mega Scissors",
+   "ja": "メガシザース",
+   "kind": "physical"
+  },
+  {
+   "id": 790,
+   "en": "Frenzied Rage",
+   "ja": "怒髪",
+   "kind": "buff"
+  },
+  {
+   "id": 791,
+   "en": "Rhinowrecker",
+   "ja": "ライノレッカー",
+   "kind": "physical",
+   "note": "wiki: 物理ダメージ+ノックバック https://wiki.ffo.jp/html/26308.html"
+  },
+  {
+   "id": 792,
+   "en": "Fluid Toss",
+   "ja": "フルイドスルー",
+   "kind": "physical",
+   "note": "wiki: 物理ダメージ (空蝉で回避可) https://wiki.ffo.jp/html/2477.html"
+  },
+  {
+   "id": 793,
+   "en": "Fluid Spread",
+   "ja": "フルイドスプレッド",
+   "kind": "physical",
+   "note": "wiki: 物理ダメージ (空蝉で回避可) https://wiki.ffo.jp/html/23441.html"
+  },
+  {
+   "id": 794,
+   "en": "Digest",
+   "ja": "消化",
+   "kind": "magical",
+   "note": "wiki: 単体に吸収 (物理/魔法の記載なし)。吸収は魔法の決まりで magical https://wiki.ffo.jp/html/3061.html"
+  },
+  {
+   "id": 795,
+   "en": "Crossthrash",
+   "ja": "クロススラッシュ",
+   "kind": "physical"
+  },
+  {
+   "id": 796,
+   "en": "Predatory Glare",
+   "ja": "プレダトリグレア",
+   "kind": "debuff"
+  },
+  {
+   "id": 797,
+   "en": "Hoof Volley",
+   "ja": "フーフボレー",
+   "kind": "physical"
+  },
+  {
+   "id": 798,
+   "en": "Nihility Song",
+   "ja": "ニヒリティソング",
+   "kind": "debuff"
+  }
+ ]
+}
