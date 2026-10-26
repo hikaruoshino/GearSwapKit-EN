@@ -8,6 +8,10 @@ After about six months of planning, testing, and plenty of trial and error, Gear
 
 > The app runs in English or Japanese (pick one the first time you launch it; switch any time from **Language / 言語** at the top). In English it writes Lua for the **English client**.
 
+![GearSwapKit main window: a Paladin idle set](images/main.jpg)
+
+![Language picker on first launch](images/language.jpg)
+
 ---
 
 ## Before you start
@@ -44,6 +48,18 @@ For gear searches (job ability gear, weapon cycles, ammo), also run `//gs export
 - **Lockstyle**: set a lockstyle number and it's applied after the file loads.
 - **Fast Cast math**: adds up the Fast Cast on your precast set and warns you when you're wasting slots past the 80% cap (counting the Red Mage trait and /RDM).
 - **Your work is saved**: the kit saves when you close it and reopens your last session next time.
+
+Picking a weapon skill for its own set:
+
+![Add per skill: weapon skill dropdown](images/ws_dropdown.jpg)
+
+Job ability gear the kit found in a Paladin's inventory:
+
+![Job ability gear picker](images/job_ability_gear.jpg)
+
+Choosing weapons for the cycle, in the order you want them:
+
+![Weapon cycle picker (Summoner)](images/weapon_cycle.jpg)
 
 ## Job-specific features
 
