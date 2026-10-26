@@ -98,3 +98,5 @@ MIT (see `LICENSE`).
 ## Feedback
 
 Bug reports and "does it work on my job?" reports go in [Issues](../../issues).
+
+Missing a set you'd like? Say, a Thief set for a particular situation — open an issue and describe it, and I'll look at adding it to the kit.
