@@ -44,5 +44,14 @@ local w = equipped[#equipped]
 check(w and w.main == '元の剣' and w.sub == '元の盾', "唱えたあと、元の剣と盾に戻す")
 check(env.phalanx_weapons == nil, "戻したら、覚えた武器を消す")
 
+-- ファランクスII (赤魔道士・自分にも仲間にも): Mote はファランクスのセットで唱えるので、同じく武器を覚えて戻す
+env.player.equipment.main, env.player.equipment.sub = '元の剣', '元の盾'
+env.job_post_midcast({english = 'Phalanx II', action_type = 'Magic', target = {type = 'PLAYER'}}, {}, nil, {})
+check(env.phalanx_weapons and env.phalanx_weapons.main == '元の剣', "ファランクスII でも、唱える前の剣と盾を覚える")
+equipped = {}
+env.job_post_aftercast({english = 'Phalanx II', target = {type = 'PLAYER'}}, {}, nil, {})
+w = equipped[#equipped]
+check(w and w.main == '元の剣' and w.sub == '元の盾' and env.phalanx_weapons == nil, "ファランクスII を唱えたあとも、元の剣と盾に戻す")
+
 io.write(string.format("%s 魔法のファランクスの武器 (Lua): 失敗 %d 件\n", fails == 0 and "OK" or "NG", fails))
 os.exit(fails == 0 and 0 or 1)

@@ -29,7 +29,7 @@ from i18n import L
 from project import Project, RECEIVED_KIND
 
 APP_NAME = "GearSwapKit"
-VERSION = "1.2.1"
+VERSION = "1.2.2"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")
@@ -836,7 +836,7 @@ class App:
                 skipped = False     # ナイトの対魔法・状態異常耐性は、武器も着替える
             if slot == "main" and self.project.job == "PUP" and e["path"] in (G.PUP_WS_SET, "sets.precast.JA.Maneuver"):
                 skipped = False     # からくり士のオートマトンの WS は、メイン (シュコアトルなど) も持ち替える
-            if slot in ("main", "sub", "range") and (e["path"].startswith("sets.midcast.Increased") or e["path"] in ("sets.Sleep", G.PHALANX_SET)):
+            if slot in ("main", "sub", "range") and (e["path"].startswith("sets.midcast.Increased") or e["path"] in ("sets.Sleep",) + G.PHALANX_SETS):
                 skipped = False     # 受ける強化 (剣・盾の被ファランクス+ など) と睡眠から起きる装備は、武器も持ち替える (generator.py の keep_for と同じ)
             lines.append("%s\t%s%s" % (slot_name(slot), self.item_name(it.name),
                                          L("   ← 武器は出力に含めません", "   ← weapons are left out of the Lua") if skipped else ""))

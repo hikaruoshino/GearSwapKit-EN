@@ -76,7 +76,7 @@ All of these are opt-in (a checkbox or a mode), so they stay out of your way if 
 - Enmity, max-enmity, spell interruption and Cure sets. Abilities with no set of their own use your enmity gear.
 - **3-stage swap**: Fast Cast at precast, spell interruption while casting, then your Cure or enmity gear right before the spell lands. Timed from your Fast Cast; adjust with `//gs c landadjust 0.4`.
 - Magic-defense and status-resist sets you toggle with `//gs c toggle Magical` / `StatusResist`, including the sword and shield; turning them off puts your chosen weapons back.
-- Phalanx with Phalanx+ weapons (1.2.1): the Phalanx spell set and the Phalanx-received set keep the sword and shield from your export. Your weapons from before go back on when the spell lands, or when you finish casting it yourself. If you'd rather not lose TP, drop the weapons from the export or the Lua.
+- Phalanx with Phalanx+ weapons (1.2.1; Phalanx II since 1.2.2): the Phalanx and Phalanx II spell sets and the Phalanx-received set keep the sword and shield from your export. Your weapons from before go back on when the spell lands, or when you finish casting it yourself. If you'd rather not lose TP, drop the weapons from the export or the Lua.
 
 **Puppetmaster**
 - Automaton tank and automaton Store TP modes for idle and engaged.

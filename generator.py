@@ -797,6 +797,8 @@ STATUS_OVERLAYS = [("Doom", "死の宣告", "sets.midcast.IncreasedCursna", "bot
 # メインとサブも着替えるセット (対魔法の武器・盾)。オフにしたら、武器の切り替えで選んでいる武器に戻す
 PLD_WEAPON_SETS = ("sets.idle.Magical", "sets.StatusResist")
 PHALANX_SET = "sets.midcast['Phalanx']"     # 魔法のファランクス (剣・盾のファランクス+ も持ち替える)
+# ファランクス・ファランクスII (赤魔道士) のセット。どちらも剣・盾を持ち替え、唱えたあとに戻す
+PHALANX_SETS = (PHALANX_SET, "sets.midcast['Phalanx II']")
 PLD_LAND_ADJUST = 0.30     # 着弾の何秒前に着弾の装備へ替えるか (作者の PLD.lua の実測: 0.30 秒で 10/10)
 PLD_SUB_RDM_FC = 15        # サポ赤のファストキャストの特性 (%)
 
@@ -1329,7 +1331,7 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
         if job == "PUP" and path == "sets.precast.JA.Maneuver":
             return tuple(keep_slots) + ("main",)
         # 受ける強化の装備と魔法のファランクスは、武器も持ち替える (ナイトの剣・盾のファランクス+ など。TP を減らしたくなければ、export か Lua から外す)
-        if path.startswith("sets.midcast.Increased") or path == PHALANX_SET:
+        if path.startswith("sets.midcast.Increased") or path in PHALANX_SETS:
             return tuple(keep_slots) + ("main", "sub", "range")
         # 睡眠から起きる装備は、プライムウェポン (武器) も持ち替える
         if path == "sets.Sleep":
@@ -1359,15 +1361,15 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     # 学者: 陣頭指揮の足は、陣の魔法の詠唱の開始と詠唱中に履く (マクロの部位着替えと同じ。ファストキャストの装備の上から)
     # 魔法のファランクス: 剣・盾を持ち替えるときは、唱える前の武器を覚えて、唱えたあとに戻す
     # (待機・戦闘中のセットには武器を入れていないので、行動の後の着替えだけでは武器が戻らないため)
-    phalanx_weapons = PHALANX_SET in emitted_paths and bool(set(used[PHALANX_SET]) & {"main", "sub", "range"})
+    phalanx_weapons = any(p in emitted_paths and set(used[p]) & {"main", "sub", "range"} for p in PHALANX_SETS)
     phalanx_mid = ([L("    -- 魔法のファランクスで剣・盾を持ち替えるので、持ち替える前の武器を覚える",
                       "    -- Phalanx swaps sword / shield, so remember the weapons from before"),
-                    "    if spell.english == 'Phalanx' then",
+                    "    if spell.english == 'Phalanx' or spell.english == 'Phalanx II' then",   # Mote はファランクスII もファランクスのセットで唱える
                     "        phalanx_weapons = phalanx_weapons or {main = player.equipment.main, sub = player.equipment.sub, range = player.equipment.range}",
                     "    end"] if phalanx_weapons else [])
     phalanx_after = ([L("    -- 魔法のファランクスを唱えたあとは、持ち替える前の武器に戻す",
                         "    -- After Phalanx, go back to the weapons from before"),
-                      "    if phalanx_weapons and spell.english == 'Phalanx' then",
+                      "    if phalanx_weapons and (spell.english == 'Phalanx' or spell.english == 'Phalanx II') then",
                       "        equip(phalanx_weapons)",
                       "        phalanx_weapons = nil",
                       "    end"] if phalanx_weapons else [])

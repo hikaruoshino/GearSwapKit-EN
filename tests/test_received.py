@@ -153,16 +153,28 @@ if os.path.exists(LUAC):
         sys.stdout.buffer.write(r.stdout + r.stderr)
         check(r.returncode == 0, "模擬 GearSwap で、魔法のファランクスの武器の持ち替えと戻りが正しい")
 
-# サクパタソードを装備できるジョブ (res の jobs: 赤魔道士・ナイト・青魔道士) では、どれも剣・盾を出力して戻す
+# 赤魔道士がファランクスII だけのセットを足したときも、剣・盾を出力して、唱えたあとに戻す
+p2p = Project("RDM")
+p2p.add_pair(2, "Phalanx II", "ファランクスII")
+# プリュウェン (盾) はナイト専用なので、赤魔道士は剣だけ
+p2p.assign(p2p.path_for(2, "Phalanx II"), EP.parse_equipped_set('sets.exported={ main="サクパタソード", head="ファランクス帽" }'))
+lua_p2 = p2p.to_lua()
+check(p2p.path_for(2, "Phalanx II") == "sets.midcast['Phalanx II']", "ファランクスII のセットの名前")
+check('main="サクパタソード"' in lua_p2, "ファランクスII だけのセットでも、剣を出力する")
+check("phalanx_weapons" in lua_p2, "ファランクスII だけのセットでも、唱えたあとに武器を戻す仕組みを出す")
+
+# サクパタソードを装備できるジョブ (res の jobs: 赤魔道士・ナイト・青魔道士) では、どれも武器を出力して戻す
+# (盾のプリュウェンはナイト専用なので、ナイトだけ盾も入れる)
 for job in ("RDM", "PLD", "BLU"):
+    gear = 'main="サクパタソード", sub="プリュウェン"' if job == "PLD" else 'main="サクパタソード"'
     pj = Project(job)
     pj.add_pair(RECEIVED_KIND, "IncreasedPhalanx", "被ファランクス")
-    pj.assign("sets.midcast.IncreasedPhalanx", EP.parse_equipped_set('sets.exported={ main="サクパタソード", sub="プリュウェン" }'))
+    pj.assign("sets.midcast.IncreasedPhalanx", EP.parse_equipped_set('sets.exported={ %s }' % gear))
     pj.add_pair(2, "Phalanx", "ファランクス")
-    pj.assign(pj.path_for(2, "Phalanx"), EP.parse_equipped_set('sets.exported={ main="サクパタソード", sub="プリュウェン" }'))
+    pj.assign(pj.path_for(2, "Phalanx"), EP.parse_equipped_set('sets.exported={ %s }' % gear))
     lj = pj.to_lua()
     check(lj.count('main="サクパタソード"') == 2 and "received_save" in lj and "phalanx_weapons" in lj,
-          "%s: 被ファランクスと魔法のファランクスで、剣・盾を出力して戻す" % job)
+          "%s: 被ファランクスと魔法のファランクスで、武器を出力して戻す" % job)
 
 if fails:
     sys.stdout.buffer.write(("FAILED %d 件\n" % len(fails)).encode("utf-8"))
