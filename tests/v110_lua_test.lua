@@ -17,7 +17,7 @@ local env = {
     set_combine = function(a, b) local r = {} for k, v in pairs(a or {}) do r[k] = v end for k, v in pairs(b or {}) do r[k] = v end return r end,
     player = {equipment = {}, sub_job = sub, main_job = job, status = "Engaged"},
     get_midcast_set = function() return {} end, midaction = function() return false end,
-    windower = {ffxi = {get_player = function() return {} end}, register_event = function() end},
+    windower = {ffxi = {get_player = function() return {} end}, register_event = function() end, raw_register_event = function() end},
     pairs = pairs, ipairs = ipairs, string = string, table = table, tostring = tostring, type = type, tonumber = tonumber, math = math,
 }
 setmetatable(env, {__index = _G})
@@ -26,6 +26,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
+if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
 local S = env.sets
 
 local function has(list, v) for _, x in ipairs(list or {}) do if x == v then return true end end return false end

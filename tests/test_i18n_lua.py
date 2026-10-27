@@ -56,6 +56,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
+if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
 local function cast(el, dist, skill, map)
     worn = {}
     env.job_post_midcast({action_type = 'Magic', element = el, skill = skill or 'Elemental Magic', english = 'Fire V',

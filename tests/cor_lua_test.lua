@@ -24,6 +24,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
+if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
 local S = env.sets
 
 check(S.midcast.RA == S.RA_STP and S.RA_STP.head == "STP帽", "sets.midcast.RA は遠隔攻撃 (STP)")

@@ -17,14 +17,47 @@ WEAPON_SLOTS = ('main', 'sub', 'range', 'ammo')
 HEADER_JA = """-- {title}
 -- GearSwapKit で作成した {job} 用の GearSwap ファイル ({date})。
 -- 使い方: このファイルを GearSwap の data フォルダー (data/{job}.lua) に置き、//lua r gearswap か、ジョブを変えて読み込みます。
--- 装備の名前は日本語です (set_language('japanese'))。装備を変えたいときは、init_gear_sets の中の名前を書き換えます。
+-- 装備の名前は日本語です (set_language('japanese'))。装備を変えたいときは、一番下の init_gear_sets の中の名前を書き換えます。
 -- 武器 ({weapon_slots}) は、{weapons}
 """
 HEADER = HEADER_JA      # 互換のため (日本語の見出し)
+
+
+# ファイルの分け方の説明と、装備のセットの前後の印 (ジョブ_gear.lua に写すとき、印のあいだをそのまま写せばよいように)
+def SYSTEM_SECTION_NOTE(job):
+    return [
+        "",
+        L("-- このファイルは 2 つに分かれています。", "-- This file has two parts."),
+        L("--   1. システム (このすぐ下から): 着替えの仕組みです。普段は書き換えません。",
+          "--   1. System (right below): the gear-swap logic. You normally do not edit it."),
+        L("--   2. 装備のセット (ファイルの一番下の init_gear_sets): 装備の名前を書き換えるのは、ここです。",
+          "--   2. Gear sets (init_gear_sets at the very bottom): this is where you change item names."),
+        L("-- 装備のセットを別のファイルに分けるときは、data/キャラ名/%s_gear.lua を作成して、一番下の「装備のセット ここから」から" % job,
+          "-- To keep the gear sets in a separate file, create data/<character name>/%s_gear.lua and paste everything" % job),
+        L("--   「ここまで」の印までを丸ごとコピペします。GearSwap は、そちらの装備のセットを使います。",
+          "--   from \"GEAR SETS BEGIN\" down to \"GEAR SETS END\" at the bottom. GearSwap then uses the sets in that file."),
+        "",
+        L("-- ======== システム ここから (着替えの仕組み。普段は書き換えません) ========",
+          "-- ======== SYSTEM BEGIN (gear-swap logic; normally no need to edit) ========"),
+    ]
+
+
+def GEAR_SECTION_BEGIN(job):
+    return [L("-- ======== システム ここまで ========", "-- ======== SYSTEM END ========"),
+            "",
+            L("-- ======== 装備のセット ここから ========", "-- ======== GEAR SETS BEGIN ========"),
+            L("-- /キャラ名/%s_gear.lua を作成して、ここから下 (「装備のセット ここまで」の印まで) を丸々コピペすれば、そのまま使用できます。" % job,
+              "-- Create /<character name>/%s_gear.lua and paste everything from here down (to GEAR SETS END) as is; it works without changes." % job)]
+
+
+def GEAR_SECTION_END():
+    return [L("-- ======== 装備のセット ここまで ========", "-- ======== GEAR SETS END ========")]
+
+
 HEADER_EN = """-- {title}
 -- GearSwap file for {job}, made with GearSwapKit ({date}).
 -- Usage: put this file in your GearSwap data folder (data/{job}.lua), then //lua r gearswap or change jobs to load it.
--- To change gear, edit the item names inside init_gear_sets.
+-- To change gear, edit the item names inside init_gear_sets at the bottom.
 -- Weapons ({weapon_slots}): {weapons}
 """
 
@@ -356,15 +389,18 @@ def _cast_reg(casts):
 import set_catalog as _SC
 
 
-def received_blocks(emitted, manual=()):
+def received_blocks(emitted, manual=(), weapons=False):
     """被強化の装備 (sets.midcast.IncreasedPhalanx / IncreasedProtect / IncreasedShell) の Lua。
-    戻り値: (ファイルの先頭の行, init_gear_sets の最後の行, job_post_midcast の中の行)。セットが無ければ空。
-    ほかの人が自分に唱え始めたら (action パケットの詠唱開始) 着て、着弾・中断 (または 8 秒) で gs c update を送って戻す。"""
+    戻り値: (ファイルの先頭の行, init_gear_sets の最後の行, job_post_midcast の中の行,
+            job_self_command の中の行, job_post_aftercast の中の行)。セットが無ければ空。
+    ほかの人が自分に唱え始めたら (action パケットの詠唱開始) 着て、着弾・中断 (または 8 秒) で gs c update を送って戻す。
+    weapons: 受ける強化のセットに武器 (main / sub / range) が入っている (ナイトの剣・盾など)。着る前の武器を覚えて、戻すときに着直す
+    (待機・戦闘中のセットには武器を入れていないので、gs c update だけでは武器が戻らないため)。"""
     # manual (自動で着替えない) のものは、セットだけを出して、反応の仕組みには登録しない
     use = [(name, ids, aoe) for name, _ja, ids, aoe in _SC.RECEIVED
            if "sets.midcast.%s" % name in emitted and name not in manual]
     if not use:
-        return [], [], []
+        return [], [], [], [], []
     top = [
         L("-- 受ける強化の装備 (被ファランクス・被プロテス・被シェル): ほかの人が自分に唱え始めたら着て、届いたら元に戻します。",
           "-- Received-buff gear (Phalanx / Protect / Shell received): worn when someone starts casting on you, removed when it lands."),
@@ -390,17 +426,23 @@ def received_blocks(emitted, manual=()):
         "        if now > v.until_time then received_casters[id] = nil else name = v.set end",
         "    end",
         "    if name then",
-        "        send_command('gs equip sets.midcast.' .. name)",
+        ("        send_command('gs c received_save; gs equip sets.midcast.' .. name)" if weapons else
+         "        send_command('gs equip sets.midcast.' .. name)"),
         "        received_on = name",
         "    elseif received_on then",
         "        received_on = nil",
-        "        send_command('gs c update')",
+        ("        send_command('gs c received_restore')" if weapons else "        send_command('gs c update')"),
         "    end",
         "end",
         "",
-        "windower.register_event('action', function(act)",
+        L("-- raw 版: GearSwap の register_event は呼ぶたびに装備の再計算 (refresh_globals) をする。action は全員分が届くので、使わない",
+          "-- raw version: GearSwap's register_event recomputes gear (refresh_globals) on every call; action fires for everyone, so don't use it"),
+        "windower.raw_register_event('action', function(act)",
+        "    local cat = act and act.category",
+        L("    if cat ~= 8 and cat ~= 6 and cat ~= 4 then return end   -- 近接・遠隔など、見ない行動は先に捨てる",
+          "    if cat ~= 8 and cat ~= 6 and cat ~= 4 then return end   -- drop actions we don't use (melee, ranged...) first"),
         "    local player = windower.ffxi.get_player()",
-        "    if not act or not player or act.actor_id == player.id then return end",
+        "    if not player or act.actor_id == player.id then return end",
         "    if act.category == 8 then",
         "        if act.param == CAST_INTERRUPT then",
         "            if received_casters[act.actor_id] then received_casters[act.actor_id] = nil; received_update() end",
@@ -438,10 +480,36 @@ def received_blocks(emitted, manual=()):
     reg.append("")
     mid = [L("    -- 自分で自分に唱えるときは、詠唱中に受ける強化の装備を着る",
              "    -- When casting on yourself, wear the received-buff gear in midcast"),
-           "    if spell and received_sets[spell.id] and spell.target and spell.target.type == 'SELF' then",
-           "        equip(sets.midcast[received_sets[spell.id]])",
-           "    end"]
-    return top, reg, mid
+           "    if spell and received_sets[spell.id] and spell.target and spell.target.type == 'SELF' then"]
+    save = "received_weapons = received_weapons or {main = player.equipment.main, sub = player.equipment.sub, range = player.equipment.range}"
+    if weapons:
+        mid += ["        " + save]
+    mid += ["        equip(sets.midcast[received_sets[spell.id]])",
+            "    end"]
+    cmds, after = [], []
+    if weapons:
+        # received_weapons は job_self_command (このファイルの上のほう) からも使うので、local にしない
+        cmds = [L("    -- //gs c received_save / received_restore: 受ける強化の装備で持ち替える前の武器を覚える・着直す",
+                  "    -- //gs c received_save / received_restore: remember / re-equip the weapons from before the received-buff gear"),
+                "    if cmdParams[1] == 'received_save' then",
+                "        " + save,
+                "        eventArgs.handled = true",
+                "        return",
+                "    end",
+                "    if cmdParams[1] == 'received_restore' then",
+                "        if received_weapons then equip(received_weapons) end",
+                "        received_weapons = nil",
+                "        handle_equipping_gear(player.status)",
+                "        eventArgs.handled = true",
+                "        return",
+                "    end"]
+        after = [L("    -- 自分で自分に唱えた受ける強化のあとは、持ち替える前の武器に戻す",
+                   "    -- After casting a received-buff spell on yourself, go back to the weapons from before"),
+                 "    if received_weapons and not received_on then",
+                 "        equip(received_weapons)",
+                 "        received_weapons = nil",
+                 "    end"]
+    return top, reg, mid, cmds, after
 
 
 def lockstyle_blocks(lockstyle):
@@ -728,6 +796,7 @@ STATUS_OVERLAYS = [("Doom", "死の宣告", "sets.midcast.IncreasedCursna", "bot
                    ("Avatar's Favor", "神獣の加護", "sets.idle.Avatar.Favor", "idle")]
 # メインとサブも着替えるセット (対魔法の武器・盾)。オフにしたら、武器の切り替えで選んでいる武器に戻す
 PLD_WEAPON_SETS = ("sets.idle.Magical", "sets.StatusResist")
+PHALANX_SET = "sets.midcast['Phalanx']"     # 魔法のファランクス (剣・盾のファランクス+ も持ち替える)
 PLD_LAND_ADJUST = 0.30     # 着弾の何秒前に着弾の装備へ替えるか (作者の PLD.lua の実測: 0.30 秒で 10/10)
 PLD_SUB_RDM_FC = 15        # サポ赤のファストキャストの特性 (%)
 
@@ -761,7 +830,8 @@ def pld_blocks(emitted, three_stage=False, fast_cast=0):
     if "sets.Enmity" in emitted:
         init += [L("    -- セットを作っていないアビリティは、敵対心の装備で使います",
                    "    -- Job abilities without their own set use the enmity set"),
-                 "    for slot, item in pairs(sets.Enmity) do",
+                 L("    for slot, item in pairs(sets.Enmity or {}) do   -- ジョブ_gear.lua で消しても止まらないように",
+                   "    for slot, item in pairs(sets.Enmity or {}) do   -- keeps working if removed in JOB_gear.lua"),
                  "        if type(slot) == 'string' and sets.precast.JA[slot] == nil then sets.precast.JA[slot] = item end",
                  "    end"]
     if "sets.midcast.interruption" in emitted:
@@ -1258,6 +1328,9 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
         # からくり士のマニューバは、メイン (乾坤圏など、マニューバを強化する武器) も持ち替える
         if job == "PUP" and path == "sets.precast.JA.Maneuver":
             return tuple(keep_slots) + ("main",)
+        # 受ける強化の装備と魔法のファランクスは、武器も持ち替える (ナイトの剣・盾のファランクス+ など。TP を減らしたくなければ、export か Lua から外す)
+        if path.startswith("sets.midcast.Increased") or path == PHALANX_SET:
+            return tuple(keep_slots) + ("main", "sub", "range")
         # 睡眠から起きる装備は、プライムウェポン (武器) も持ち替える
         if path == "sets.Sleep":
             return tuple(keep_slots) + ("main", "sub", "range")
@@ -1273,13 +1346,31 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.extend(waist["top"])
     cor = cor_blocks(emitted_paths)
     links = ranged_links(emitted_paths)
-    cmds = weapon_cmds + lock_cmds + ammo_cmds + pld["cmds"] + pup["cmds"]
+    # 受ける強化: job_self_command に武器を覚える・着直すコマンドを入れるので、先に作る
+    recv_weapons = any(p.startswith("sets.midcast.Increased") and set(used[p]) & {"main", "sub", "range"}
+                       for p in emitted_paths)
+    recv_top, recv_reg, recv_mid, recv_cmds, recv_after = received_blocks(emitted_paths, received_manual, recv_weapons)
+    cmds = weapon_cmds + lock_cmds + ammo_cmds + pld["cmds"] + pup["cmds"] + recv_cmds
     if cmds:
         out.append("function job_self_command(cmdParams, eventArgs)")
         out.extend(cmds)
         out.append("end")
         out.append("")
     # 学者: 陣頭指揮の足は、陣の魔法の詠唱の開始と詠唱中に履く (マクロの部位着替えと同じ。ファストキャストの装備の上から)
+    # 魔法のファランクス: 剣・盾を持ち替えるときは、唱える前の武器を覚えて、唱えたあとに戻す
+    # (待機・戦闘中のセットには武器を入れていないので、行動の後の着替えだけでは武器が戻らないため)
+    phalanx_weapons = PHALANX_SET in emitted_paths and bool(set(used[PHALANX_SET]) & {"main", "sub", "range"})
+    phalanx_mid = ([L("    -- 魔法のファランクスで剣・盾を持ち替えるので、持ち替える前の武器を覚える",
+                      "    -- Phalanx swaps sword / shield, so remember the weapons from before"),
+                    "    if spell.english == 'Phalanx' then",
+                    "        phalanx_weapons = phalanx_weapons or {main = player.equipment.main, sub = player.equipment.sub, range = player.equipment.range}",
+                    "    end"] if phalanx_weapons else [])
+    phalanx_after = ([L("    -- 魔法のファランクスを唱えたあとは、持ち替える前の武器に戻す",
+                        "    -- After Phalanx, go back to the weapons from before"),
+                      "    if phalanx_weapons and spell.english == 'Phalanx' then",
+                      "        equip(phalanx_weapons)",
+                      "        phalanx_weapons = nil",
+                      "    end"] if phalanx_weapons else [])
     storm = "sets.Stormsurge" in emitted_paths
     storm_lines = ([L("    -- 陣の魔法では、ファストキャストなどの装備の上から、陣頭指揮の足を履く",
                       "    -- Storm spells: wear the Stormsurge feet over fast cast gear"),
@@ -1292,7 +1383,6 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     if buff_top:
         out.extend(buff_top)
     out.extend(ws_blocks(emitted_paths, job))
-    recv_top, recv_reg, recv_mid = received_blocks(emitted_paths, received_manual)
     out.extend(recv_top)
     has_cast = "local function equip_cast_gear(phase, spell)" in "\n".join(buff_top)
     # クイックドローの装備は、矢弾 (ammo_pre) より先に着る (弾は使い分けの仕組みで替える)
@@ -1319,21 +1409,25 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
                  % ("" if is_en() else " or buffactive['エントラスト']"),
                  "        equip(sets.midcast.Entrust)",
                  "    end"] if job == "GEO" and "sets.midcast.Entrust" in emitted_paths else [])
-    post_mid = ((["    equip_cast_gear('midcast', spell)"] if has_cast else []) + recv_mid + pld["post_midcast"] + storm_lines
+    post_mid = ((["    equip_cast_gear('midcast', spell)"] if has_cast else []) + phalanx_mid + recv_mid + pld["post_midcast"] + storm_lines
                 + waist["post_midcast"] + entrust + other)
     post_pre = post_pre + holy
     if post_pre:
         out += ["function job_post_precast(spell, action, spellMap, eventArgs)"] + post_pre + ["end", ""]
     if post_mid:
         out += ["function job_post_midcast(spell, action, spellMap, eventArgs)"] + post_mid + ["end", ""]
-    after = ammo_after + pld["aftercast"] + man["aftercast"]
+    after = ammo_after + pld["aftercast"] + man["aftercast"] + recv_after + phalanx_after
     if after:
         out += ["function job_post_aftercast(spell, action, spellMap, eventArgs)"] + after + ["end", ""]
+    # 装備のセットを作ったあとに行う登録 (after_gear_sets) は、中身が決まってから、ここに差し込む
+    after_at = len(out)
     out.append("function get_sets()")
     out.append("    mote_include_version = 2")
-    out.append("    include('Mote-Include.lua')")
+    out.append(L("    include('Mote-Include.lua')   -- この中で ジョブ_gear.lua (あれば) を読み、init_gear_sets を呼びます",
+                 "    include('Mote-Include.lua')   -- loads JOB_gear.lua (if any) and calls init_gear_sets"))
     if not is_en():     # 英語クライアントは既定 (英語) のまま
         out.append("    set_language('japanese')")
+    call_at = len(out)
     out.append("end")
     out.append("")
     out.append("function job_setup()")
@@ -1364,6 +1458,7 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.extend(man["setup"])
     out.append("end")
     out.append("")
+    out.extend(GEAR_SECTION_BEGIN(job))
     out.append("function init_gear_sets()")
     out.extend(lock_init)
     if any(p.startswith(MERIT_BASE + ".") for p in emitted_paths):
@@ -1432,17 +1527,29 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     if "sets.midcast.Drain" in emitted and "sets.midcast.Aspir" not in emitted:
         alias_lines.append("    sets.midcast.Aspir = sets.midcast.Drain   -- %s" % L("アスピルも、ドレインの装備で唱える",
                                                                                 "Aspir uses the Drain gear"))
-    if alias_lines:
-        out.append(L("    -- 日本語名の別名 (標準の Mote-Include は英語名で、日本語名で探す改造版は日本語名で、セットを探します)",
-                     "    -- Fallback sets"))
-        out.extend(alias_lines)
-        out.append("")
-    out.extend(buff_reg)
-    out.extend(recv_reg)
-    out.extend(pld["init_tail"])
-    out.extend(cor["init_tail"])
+    if out[-1] == "":
+        out.pop()
     out.append("end")
+    out.extend(GEAR_SECTION_END())
     out.append("")
+    # 装備のセットを作ったあとに行う登録。init_gear_sets には入れない
+    # (init_gear_sets を ジョブ_gear.lua に写したとき、このファイルの local (buff_gear など) が見えずに止まるため)
+    post = []
+    if alias_lines:
+        post.append(L("    -- 日本語名の別名 (標準の Mote-Include は英語名で、日本語名で探す改造版は日本語名で、セットを探します)",
+                      "    -- Fallback sets"))
+        post.extend(alias_lines)
+        post.append("")
+    post += buff_reg + recv_reg + pld["init_tail"] + cor["init_tail"]
+    while post and post[-1] == "":
+        post.pop()
+    if post:
+        out.insert(call_at, "    after_gear_sets()")
+        out[after_at:after_at] = [
+            L("-- 装備のセットを作ったあとに行う登録です (get_sets から呼びます)。ジョブ_gear.lua には写さないでください。",
+              "-- Registration done after the gear sets are built (called from get_sets). Do not copy this into JOB_gear.lua."),
+            "function after_gear_sets()"] + post + ["end", ""]
+    out[1:1] = SYSTEM_SECTION_NOTE(job)
     text = "\n".join(out)
     # 英語クライアント: キーのスキル名を英語に (中で比べている sets.midcast['強化魔法'] などを壊さないよう、最後に置き換える)
     return _en_skill_keys(text) if is_en() else text

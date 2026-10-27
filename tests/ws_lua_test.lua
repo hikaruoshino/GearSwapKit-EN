@@ -18,6 +18,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
+if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
 
 local map = env.job_get_spell_map
 check(map({type = "WeaponSkill", english = "Leaden Salute", skill = "射撃"}) == "Magic", "レデンサリュート (射撃・魔法属性) は Magic")

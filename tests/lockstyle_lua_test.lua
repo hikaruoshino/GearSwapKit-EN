@@ -20,6 +20,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
+if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
 
 local found = false
 for _, c in ipairs(sent) do if c == "wait 5; gs c lockstyleset" then found = true end end

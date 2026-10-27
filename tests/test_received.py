@@ -83,7 +83,7 @@ p_only.add_pair(RECEIVED_KIND, "IncreasedPhalanx", "被ファランクス")
 p_only.assign("sets.midcast.IncreasedPhalanx", EP.parse_equipped_set('sets.exported={ body="ＴＡアバター+2" }'))
 p_only.set_received_auto("IncreasedPhalanx", False)
 lua_o = p_only.to_lua()
-check("windower.register_event" not in lua_o and "job_post_midcast" not in lua_o, "自動のものが無ければ、反応の仕組みは出さない")
+check("register_event" not in lua_o and "job_post_midcast" not in lua_o, "自動のものが無ければ、反応の仕組みは出さない")
 p_only.remove_custom("sets.midcast.IncreasedPhalanx")
 check(p_only.received_auto("IncreasedPhalanx"), "被ファランクスを消すと、「自動で着替えない」の設定も消える (足し直したら初めの状態)")
 
@@ -109,6 +109,60 @@ if os.path.exists(LUAC):
             r = subprocess.run([LUA51, os.path.join(HERE, "received_lua_test.lua"), p], capture_output=True)
             sys.stdout.buffer.write(r.stdout + r.stderr)
             check(r.returncode == 0, "模擬 GearSwap で、受けるときの着替えと戻りが正しい")
+
+# ナイトの被ファランクス: 剣・盾 (被ファランクス+) も出力し、届いたら元の武器に戻す (武器を外したい人は export か Lua から消す)
+pw = Project("PLD")
+pw.add_pair(RECEIVED_KIND, "IncreasedPhalanx", "被ファランクス")
+pw.assign("sets.midcast.IncreasedPhalanx",
+          EP.parse_equipped_set('sets.exported={ main="サクパタソード", sub="プリュウェン", body="ＴＡアバター+2" }'))
+lua_w = pw.to_lua()
+check('main="サクパタソード"' in lua_w and 'sub="プリュウェン"' in lua_w, "被ファランクスの剣と盾を出力する")
+check("received_save" in lua_w and "received_restore" in lua_w, "武器を覚える・着直す仕組みを出す")
+check("received_save" not in lua, "武器の無い受ける強化では、武器を覚える仕組みを出さない")
+if os.path.exists(LUAC):
+    d = tempfile.mkdtemp()
+    p = os.path.join(d, "PLD.lua")
+    with open(p, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(lua_w)
+    r = subprocess.run([LUAC, "-p", p], capture_output=True)
+    check(r.returncode == 0, "武器入りの PLD の Lua が luac を通る " + r.stderr.decode("utf-8", "replace"))
+    if os.path.exists(LUA51):
+        r = subprocess.run([LUA51, os.path.join(HERE, "received_weapons_lua_test.lua"), p], capture_output=True)
+        sys.stdout.buffer.write(r.stdout + r.stderr)
+        check(r.returncode == 0, "模擬 GearSwap で、武器入りの被ファランクスの着替えと武器の戻りが正しい")
+
+# 魔法のファランクス (自分で唱える): 剣・盾も出力し、唱えたあとに元の武器に戻す
+pp = Project("PLD")
+st, en, _ja = pp.resolve(2, "Phalanx")   # テストでは res を読まないので、英語名で選ぶ
+check(st == "ok" and en == "Phalanx", "技ごとの追加の「魔法」でファランクスを選べる")
+pp.add_pair(2, en, "ファランクス")
+pp.assign(pp.path_for(2, en), EP.parse_equipped_set('sets.exported={ main="サクパタソード", sub="プリュウェン", head="ファランクス帽" }'))
+lua_p = pp.to_lua()
+check('main="サクパタソード"' in lua_p and 'sub="プリュウェン"' in lua_p, "魔法のファランクスの剣と盾を出力する")
+check("phalanx_weapons" in lua_p, "唱えたあとに武器を戻す仕組みを出す")
+check("phalanx_weapons" not in lua_w, "魔法のファランクスが無ければ、その仕組みは出さない")
+if os.path.exists(LUAC):
+    d = tempfile.mkdtemp()
+    p = os.path.join(d, "PLD.lua")
+    with open(p, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(lua_p)
+    r = subprocess.run([LUAC, "-p", p], capture_output=True)
+    check(r.returncode == 0, "魔法のファランクスの PLD の Lua が luac を通る " + r.stderr.decode("utf-8", "replace"))
+    if os.path.exists(LUA51):
+        r = subprocess.run([LUA51, os.path.join(HERE, "phalanx_weapons_lua_test.lua"), p], capture_output=True)
+        sys.stdout.buffer.write(r.stdout + r.stderr)
+        check(r.returncode == 0, "模擬 GearSwap で、魔法のファランクスの武器の持ち替えと戻りが正しい")
+
+# サクパタソードを装備できるジョブ (res の jobs: 赤魔道士・ナイト・青魔道士) では、どれも剣・盾を出力して戻す
+for job in ("RDM", "PLD", "BLU"):
+    pj = Project(job)
+    pj.add_pair(RECEIVED_KIND, "IncreasedPhalanx", "被ファランクス")
+    pj.assign("sets.midcast.IncreasedPhalanx", EP.parse_equipped_set('sets.exported={ main="サクパタソード", sub="プリュウェン" }'))
+    pj.add_pair(2, "Phalanx", "ファランクス")
+    pj.assign(pj.path_for(2, "Phalanx"), EP.parse_equipped_set('sets.exported={ main="サクパタソード", sub="プリュウェン" }'))
+    lj = pj.to_lua()
+    check(lj.count('main="サクパタソード"') == 2 and "received_save" in lj and "phalanx_weapons" in lj,
+          "%s: 被ファランクスと魔法のファランクスで、剣・盾を出力して戻す" % job)
 
 if fails:
     sys.stdout.buffer.write(("FAILED %d 件\n" % len(fails)).encode("utf-8"))

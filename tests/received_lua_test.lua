@@ -15,7 +15,7 @@ local env = {
     state = {IdleMode = {options = function() end}},
     sets = {precast = {JA = {}}, midcast = {}, buff = {}, idle = {}, engaged = {}},
     windower = {
-        register_event = function(name, fn) if name == "action" then handler = fn end end,
+        raw_register_event = function(name, fn) if name == "action" then handler = fn end end,
         ffxi = {
             get_player = function() return {id = ME} end,
             get_mob_by_id = function(id) return {id = id, in_party = (id == PALLY)} end,
@@ -31,6 +31,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
+if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
 check(handler ~= nil, "action のイベントを登録する")
 
 local function cast_begin(actor, target, spell)
@@ -38,6 +39,18 @@ local function cast_begin(actor, target, spell)
 end
 local function land(actor) handler({actor_id = actor, category = 4, param = 0, targets = {}}) end
 local function last() return sent[#sent] end
+
+-- 近接・遠隔などは、get_player も呼ばずに先に捨てる (全員分の action が届くため)
+local calls = 0
+local orig_gp = env.windower.ffxi.get_player
+env.windower.ffxi.get_player = function() calls = calls + 1; return orig_gp() end
+for _, cat in ipairs{1, 2, 3, 5, 7, 11, 12, 13} do
+    handler({actor_id = STRANGER, category = cat, param = 0, targets = {}})
+end
+check(calls == 0 and #sent == 0, "見ないカテゴリは、get_player を呼ばずに捨てる")
+handler({actor_id = STRANGER, category = 8, param = 0, targets = {}})
+check(calls == 1, "見るカテゴリ (8) は、先へ進む")
+env.windower.ffxi.get_player = orig_gp
 
 -- ほかの人が自分にファランクス → 着る → 着弾で戻す
 cast_begin(PALLY, ME, 106)

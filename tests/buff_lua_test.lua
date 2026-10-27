@@ -26,6 +26,7 @@ local chunk = assert(loadfile(path))
 setfenv(chunk, env)
 chunk()
 env.init_gear_sets()
+if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
 check(type(env.sets.idle) == "table" and type(env.sets.engaged) == "table", "待機・戦闘中のセットが無くても、空のセットができる (Mote が customize_idle_set を呼べる)")
 
 local base = {head = "ふつうの頭", body = "ふつうの胴"}

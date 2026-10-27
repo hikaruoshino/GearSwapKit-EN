@@ -24,6 +24,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
+if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
 
 check(env.sets.precast.JA.Maneuver.main == "乾坤圏", "マニューバのセットに乾坤圏が入っている")
 local fire = {english = "Fire Maneuver", type = "JobAbility"}

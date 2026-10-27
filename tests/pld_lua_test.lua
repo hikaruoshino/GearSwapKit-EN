@@ -31,6 +31,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
+if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
 local sets = env.sets
 
 -- 敵対心: セットの無いアビリティは敵対心の装備・センチネルは敵対心 (最大) に重ねる

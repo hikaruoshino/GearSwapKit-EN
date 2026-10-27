@@ -76,6 +76,7 @@ All of these are opt-in (a checkbox or a mode), so they stay out of your way if 
 - Enmity, max-enmity, spell interruption and Cure sets. Abilities with no set of their own use your enmity gear.
 - **3-stage swap**: Fast Cast at precast, spell interruption while casting, then your Cure or enmity gear right before the spell lands. Timed from your Fast Cast; adjust with `//gs c landadjust 0.4`.
 - Magic-defense and status-resist sets you toggle with `//gs c toggle Magical` / `StatusResist`, including the sword and shield; turning them off puts your chosen weapons back.
+- Phalanx with Phalanx+ weapons (1.2.1): the Phalanx spell set and the Phalanx-received set keep the sword and shield from your export. Your weapons from before go back on when the spell lands, or when you finish casting it yourself. If you'd rather not lose TP, drop the weapons from the export or the Lua.
 
 **Puppetmaster**
 - Automaton tank and automaton Store TP modes for idle and engaged.
@@ -121,6 +122,12 @@ All of these are opt-in (a checkbox or a mode), so they stay out of your way if 
 - **Hachirin-no-Obi or Orpheus's Sash**, whichever is better for the weather (storms included), day, and distance to the target.
 - Immanence gear always wins while Immanence is up.
 - Stormsurge feet when casting storms.
+
+## Keeping your gear sets in a separate file (JOB_gear.lua)
+
+Since 1.2.1, the Lua the kit makes has the gear-swap logic ("SYSTEM") at the top and the gear sets (`init_gear_sets`) at the very bottom, between `-- ======== GEAR SETS BEGIN ========` and `-- ======== GEAR SETS END ========`.
+
+If you want to maintain the gear sets yourself, create `data/<character name>/<JOB>_gear.lua` and paste everything between those two marks into it. It works as is, and GearSwap will use the sets from that file (the same mechanism described below). Leave the system part in `<JOB>.lua`. Making the Lua again with the kit won't overwrite your `<JOB>_gear.lua`.
 
 ## If GearSwap ignores your sets
 

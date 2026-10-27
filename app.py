@@ -29,7 +29,7 @@ from i18n import L
 from project import Project, RECEIVED_KIND
 
 APP_NAME = "GearSwapKit"
-VERSION = "1.2.0"
+VERSION = "1.2.1"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")
@@ -459,6 +459,16 @@ class App:
             if not path:
                 return                   # 保存先を選ばなかったら、閉じずに戻る
         elif os.path.exists(path):
+            # すでに保存してあって (保存した直後・開いたまま変えていない)、中身が同じなら、聞かずにそのまま閉じる
+            text = self.project.to_json()
+            try:
+                with open(path, encoding="utf-8") as f:
+                    if f.read() == text:
+                        self.remember_file("last_project", path)
+                        self.root.destroy()
+                        return
+            except (OSError, UnicodeDecodeError):
+                pass                     # 読めなければ、今までどおり聞く
             if not messagebox.askyesno(APP_NAME, L("閉じる前に、作業を保存します。\n\n%s\n\nこのファイルはすでにあります。上書きして閉じますか?\n"
                                                    "(いいえを押すと、閉じずに画面に戻ります)",
                                                    "Your work will be saved before closing.\n\n%s\n\nThis file already exists. "
@@ -826,6 +836,8 @@ class App:
                 skipped = False     # ナイトの対魔法・状態異常耐性は、武器も着替える
             if slot == "main" and self.project.job == "PUP" and e["path"] in (G.PUP_WS_SET, "sets.precast.JA.Maneuver"):
                 skipped = False     # からくり士のオートマトンの WS は、メイン (シュコアトルなど) も持ち替える
+            if slot in ("main", "sub", "range") and (e["path"].startswith("sets.midcast.Increased") or e["path"] in ("sets.Sleep", G.PHALANX_SET)):
+                skipped = False     # 受ける強化 (剣・盾の被ファランクス+ など) と睡眠から起きる装備は、武器も持ち替える (generator.py の keep_for と同じ)
             lines.append("%s\t%s%s" % (slot_name(slot), self.item_name(it.name),
                                          L("   ← 武器は出力に含めません", "   ← weapons are left out of the Lua") if skipped else ""))
         text = "\n".join(lines) if lines else L("(まだ装備が割り当てられていません)", "(No gear assigned yet.)")
