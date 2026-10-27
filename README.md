@@ -127,7 +127,9 @@ All of these are opt-in (a checkbox or a mode), so they stay out of your way if 
 
 Since 1.2.1, the Lua the kit makes has the gear-swap logic ("SYSTEM") at the top and the gear sets (`init_gear_sets`) at the very bottom, between `-- ======== GEAR SETS BEGIN ========` and `-- ======== GEAR SETS END ========`.
 
-If you want to maintain the gear sets yourself, create `data/<character name>/<JOB>_gear.lua` and paste everything between those two marks into it. It works as is, and GearSwap will use the sets from that file (the same mechanism described below). Leave the system part in `<JOB>.lua`. Making the Lua again with the kit won't overwrite your `<JOB>_gear.lua`.
+If you want to maintain the gear sets yourself, create `data/<character name>/<JOB>_gear.lua` and paste everything between those two marks into it. It works as is, and GearSwap will use the sets from that file (the same mechanism described below). Leave the system part in `<JOB>.lua`.
+
+From then on, edit your sets in `<JOB>_gear.lua`. While that file exists, gear changes you make in the kit won't apply, even if you regenerate the Lua; the kit is still useful for updating the system part. You'll get a warning about the file when you make the Lua, and it's fine to go ahead.
 
 ## If GearSwap ignores your sets
 
