@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""「技ごとの追加」で、名前を打たずに選べるようにするための一覧を、Windower の res から作る。
+"""Builds pick lists for "Add per skill" from Windower's res, so actions can be chosen without typing names.
 
-魔法は習得レベルのあるジョブだけ・ペットの技は召喚士 / 獣使いに合わせて・ウェポンスキルは武器の種類、
-アビリティは種類で、グループ分けする。res は読むだけ。
+Spells are limited to jobs that learn them, pet moves follow SMN / BST, weapon skills are grouped by weapon type,
+and abilities by ability type. res is only read.
 """
 import os
 import re
@@ -18,7 +18,7 @@ _SKILL = re.compile(r'\bskill=(\d+)')
 _LEVELS = re.compile(r'\blevels=\{([^}]*)\}')
 _LEVEL = re.compile(r'\[(\d+)\]=(\d+)')
 
-# アビリティの種類の日本語名 (res の type)
+# Japanese names for ability types (res type)
 JA_TYPE_NAMES = {
     "JobAbility": "ジョブアビリティ", "Scholar": "学者の章・ストラタジェム", "Waltz": "ワルツ", "Samba": "サンバ",
     "Step": "ステップ", "Jig": "ジグ", "Rune": "ルーン", "Effusion": "ランの付与", "Ward": "ウォード",
@@ -28,7 +28,7 @@ PET_TYPE_NAMES = {
     "BloodPactRage": "契約の履行:幻術 (攻撃)", "BloodPactWard": "契約の履行:験術 (強化・弱体)",
     "Monster": "ほんきだせ・しじをさせろ の技", "PetCommand": "ペットへの指示",
 }
-# 英語のときのグループ名 (英語クライアントの呼び方)
+# Group names in English (as the English client calls them)
 JA_TYPE_NAMES_EN = {
     "JobAbility": "Job Abilities", "Scholar": "Stratagems", "Waltz": "Waltzes", "Samba": "Sambas",
     "Step": "Steps", "Jig": "Jigs", "Rune": "Runes", "Effusion": "Effusions", "Ward": "Wards",
@@ -46,9 +46,9 @@ def _lang_name(ja_map, en_map, key):
     return en_map.get(key, ja_map.get(key)) if is_en() else ja_map.get(key)
 
 
-# ジョブが使える武器の種類 (res/skills.lua の番号: 1 格闘・2 短剣・3 片手剣・4 両手剣・5 片手斧・6 両手斧・7 両手鎌・8 両手槍・
-# 9 片手刀・10 両手刀・11 片手棍・12 両手棍・25 弓術・26 射撃)。WS の候補をジョブで絞るために使う。
-# res にはジョブごとの WS の情報が無いので、武器の種類で絞るだけ (レリック・ミシックなどジョブ専用の WS の細かい制限は見ない)。
+# Weapon types each job can use (numbers from res/skills.lua: 1 Hand-to-Hand, 2 Dagger, 3 Sword, 4 Great Sword, 5 Axe, 6 Great Axe, 7 Scythe, 8 Polearm,
+# 9 Katana, 10 Great Katana, 11 Club, 12 Staff, 25 Archery, 26 Marksmanship). Used to narrow the WS list by job.
+# res has no per-job WS data, so this only filters by weapon type (job-specific limits on relic, mythic and similar WS aren't checked).
 JOB_WEAPON_SKILLS = {
     "WAR": [1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 25, 26],
     "MNK": [1, 11, 12],
@@ -74,7 +74,7 @@ JOB_WEAPON_SKILLS = {
     "RUN": [3, 4, 5, 6, 11],
 }
 
-# ペットの技のジョブ別の絞り込み (それ以外のジョブは、すべて出す)
+# Pet moves filtered by job (every other job gets all of them)
 PET_TYPES_BY_JOB = {"SMN": ["BloodPactRage", "BloodPactWard"], "BST": ["Monster", "PetCommand"]}
 
 
@@ -83,7 +83,7 @@ def _unescape(s):
 
 
 def _rows(res_dir, table):
-    """res/<table>.lua の各行から {id, en, ja, type, skill, levels} を取り出す。"""
+    """Pull {id, en, ja, type, skill, levels} out of each line of res/<table>.lua."""
     path = os.path.join(res_dir or "", table + ".lua")
     try:
         with open(path, "rb") as f:
@@ -112,7 +112,7 @@ def _rows(res_dir, table):
 def _skill_names(res_dir):
     col = "en" if is_en() else "ja"
     names = {r["id"]: r[col] for r in _rows(res_dir, "skills") if r["id"] is not None}
-    # 習得レベルのある魔法のうち、スキルが無いもの (フェイス・転送など) は、「その他」にまとめる
+    # Spells with learn levels but no skill (Trusts, teleports, etc.) are grouped under "Other"
     return {k: (_other() if v in ("(N/A)", "N/A", "") else v) for k, v in names.items()}
 
 
@@ -121,7 +121,7 @@ def _other():
 
 
 def groups_of(items):
-    """一覧の「グループ」の名前 (表示順・重複なし)。"""
+    """Group names in the list (display order, no duplicates)."""
     seen = []
     for it in items:
         if it["group"] not in seen:
@@ -130,8 +130,8 @@ def groups_of(items):
 
 
 def choices(resdb, kind, job):
-    """kind: "ws" / "ja" / "magic" / "pet"。戻り値: [{en, ja, group}] (グループ → 名前の順)。
-    resdb が使えないときは、空のリスト。"""
+    """kind: "ws" / "ja" / "magic" / "pet". Returns [{en, ja, group}] (ordered by group, then name).
+    Returns an empty list when resdb isn't available."""
     if kind != "received" and (resdb is None or not resdb.available()):
         return []
     res_dir = resdb.res_dir if resdb is not None else None
@@ -142,7 +142,7 @@ def choices(resdb, kind, job):
         for r in _rows(res_dir, "weapon_skills"):
             if allowed is not None and r["skill"] not in allowed:
                 continue
-            if job and not _WS.usable_by_job(r["en"], job):     # ジョブ専用の WS (例: レデンサリュートはコルセアだけ)
+            if job and not _WS.usable_by_job(r["en"], job):     # job-specific WS (e.g. Leaden Salute is COR only)
                 continue
             items.append(dict(en=r["en"], ja=r["ja"], group=skills.get(r["skill"], _other()), order=r["skill"] or 0))
     elif kind == "magic":
@@ -164,7 +164,7 @@ def choices(resdb, kind, job):
         for r in _rows(res_dir, "job_abilities"):
             if r["type"] in wanted:
                 items.append(dict(en=r["en"], ja=r["ja"], group=_lang_name(PET_TYPE_NAMES, PET_TYPE_NAMES_EN, r["type"]), order=wanted.index(r["type"]) * 100000 + (r["id"] or 0)))
-    # グループの並び: 出てきた順ではなく、order の小さい順
+    # Group order: by smallest order value, not order of appearance
     items.sort(key=lambda it: (it["order"], it["ja"]))
     seen, out = set(), []
     for it in items:

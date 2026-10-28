@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Project (作業内容)・conflicts (付属ファイルの警告) の確認。実行 (GearSwapKit/ で): python -I tests/test_project.py"""
+"""Tests for Project (the user's work) and conflicts (warnings about companion files). Run (from GearSwapKit/): python -I tests/test_project.py"""
 import os
 import shutil
 import sys
@@ -40,14 +40,14 @@ check(pr.is_assigned("sets.idle"), "割り当てると設定済みになる")
 pr.clear("sets.idle")
 check(not pr.is_assigned("sets.idle"), "外すと未設定に戻る")
 
-# res が無いときは、日本語名を受け付けない (英語名は、そのまま使える)
+# Without res, Japanese names are rejected (English names work as-is)
 check(pr.add_custom(3, "ボルトストライク") == ("notfound", None), "res が無いと、日本語名は断る")
 st, pe = pr.add_custom(3, "Volt Strike")
 check(st == "ok" and pe == "sets.midcast.Pet['Volt Strike']", "英語名は、そのまま使う (実際 %r %r)" % (st, pe))
 pr.remove_custom(pe)
 real_res = RDB.guess_res_dir(REAL_DATA)
 HAS_RES = bool(real_res)
-if HAS_RES:   # res が無い PC では、日本語名の確認を飛ばし、英語名で続ける
+if HAS_RES:   # on a PC without res, skip the Japanese-name checks and continue with English names
     check(real_res is not None, "data フォルダーから res を探せる")
     pr.set_resdb(RDB.ResDB(real_res))
     st, p1 = pr.add_custom(3, "ボルトストライク")
@@ -73,7 +73,7 @@ pr.include_weapons = True
 check('main="ニルヴァーナ"' in pr.to_lua(), "武器を含める指定で出力する")
 pr.include_weapons = False
 
-# 割り当ては、ジョブごとに別々 (SMN の内容が、ほかのジョブに出ない・戻すと元に戻る)
+# Assignments are kept per job (SMN's don't leak into other jobs, and switching back restores them)
 check(pr.is_assigned("sets.idle") and pr.has_work("SMN"), "SMN に割り当てがある")
 pr.set_job("COR")
 check(not pr.is_assigned("sets.idle"), "COR に変えると、待機は未設定")
@@ -89,13 +89,13 @@ pr.set_job("COR")
 pr.weapons.pop("main", None)
 pr.set_job("SMN")
 
-# 保存と読み込み
+# Save and load
 pr2 = Project.from_json(pr.to_json())
 check(pr2.job == "SMN" and pr2.is_assigned(p1), "保存した作業を読み戻せる")
 check(pr2.assignments["sets.idle"]["neck"].raw == SET["neck"].raw, "オーグメントの表記が保たれる")
 check(pr2.to_lua() == pr.to_lua(), "読み戻しても同じ Lua になる")
 
-# 出力 (バックアップ)
+# Writing the file (with backup)
 tmp = tempfile.mkdtemp()
 try:
     path, backup = pr.write_lua(tmp)
@@ -104,7 +104,7 @@ try:
     check(backup and os.path.exists(backup), "2 回目はバックアップを残す")
     check(open(path, encoding="utf-8").read() == pr.to_lua(), "出力の中身が一致する")
 
-    # 付属ファイルの警告
+    # Companion file warnings
     data = os.path.join(tmp, "data")
     os.makedirs(os.path.join(data, "MyChar"))
     os.makedirs(os.path.join(data, "common"))
@@ -121,7 +121,7 @@ try:
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
 
-# 全ジョブ・全セットに装備を入れて出力した Lua が、構文として正しいこと (luac が使えるときだけ)
+# Lua generated with gear in every set for every job must be syntactically valid (only when luac is available)
 import subprocess
 import set_catalog as CAT
 WEAPON_MAIN_A_EARLY = EP.parse_equipped_set('sets.exported={ main="ニルヴァーナ" }')["main"]
@@ -150,7 +150,7 @@ if os.path.exists(LUAC):
     pn.assign("sets.precast.FC.Utsusemi", SET)
     check("sets.precast.FC.Utsusemi = {" in pn.to_lua(), "NIN の空蝉の詠唱の開始のセットが出る")
 
-# 技ごとの追加の一覧 (res から・選択式)
+# The list of per-action additions (from res, pick-from-list)
 import choices as CH
 if real_res:
     rdc = RDB.ResDB(real_res)
@@ -168,7 +168,7 @@ if real_res:
     check(pc.add_pair(3, "Volt Strike", "ボルトストライク") == "ok" and pc.add_pair(3, "Volt Strike", "ボルトストライク") == "dup", "一覧から選んだ技を足せる (重複は断る)")
     check(any(c[2] == "sets.midcast.Pet['ボルトストライク']" for c in pc.custom), "一覧から足した技にも、日本語の別名がつく")
 
-# 装備できるジョブ (res の items・jobs)
+# Which jobs can equip an item (res items and jobs)
 if real_res:
     rd = RDB.ResDB(real_res)
     check(rd.usable_by("ニルヴァーナ", "SMN") is True, "ニルヴァーナは召喚士が使える")
@@ -178,7 +178,7 @@ if real_res:
     check(rd.usable_by("存在しない名前", "SMN") is None, "res に無い名前は、判断できない (None)")
     check(rd.usable_by("ニルヴァーナ", "XXX") is None, "ジョブの略称が違うときも、判断できない (None)")
 
-# 全ジョブぶんの保存と読み込み・古い形式 (1 ジョブ) の読み込み
+# Saving and loading all jobs, and loading the old single-job format
 pm = Project("SMN")
 pm.assign("sets.idle", SET)
 pm.set_job("COR")
@@ -192,7 +192,7 @@ old_json = '{"job": "BLU", "include_weapons": false, "custom": [], "assignments"
 po = Project.from_json(old_json)
 check(po.job == "BLU" and po.is_assigned("sets.idle"), "古い形式の保存も、そのジョブの内容として読める")
 
-# 武器の切り替え
+# Weapon switching
 WEAPON_MAIN_A = EP.parse_equipped_set('sets.exported={ main="ニルヴァーナ", head="X" }')["main"]
 WEAPON_MAIN_B = EP.parse_equipped_set('sets.exported={ main="ガンドリング" }')["main"]
 WEAPON_SUB = EP.parse_equipped_set('sets.exported={ sub={ name="ドゥバン", augments={\'HP+5\',} } }')["sub"]
@@ -222,7 +222,7 @@ try:
 finally:
     shutil.rmtree(tmpw, ignore_errors=True)
 
-# 武器の切り替えと「武器も含める」の両方: 切り替えのあるスロットはセットに入れない (Mote の cycle の後の着替えで上書きされるため)
+# Weapon switching plus "include weapons": slots with switching are left out of sets (they'd be overwritten by the swap after Mote's cycle)
 pb = Project("SMN")
 pb.include_weapons = True
 pb.assign("sets.idle", EP.parse_equipped_set('sets.exported={ main="ガンドリング", sub="エンキアストラップ", head="ＢＣホーン+1" }'))
@@ -232,7 +232,7 @@ idle_part = lua_b.split("sets.idle = {")[1].split("}")[0]
 check("main=" not in idle_part and "sub=" in idle_part and "head=" in idle_part,
       "武器の切り替えのあるメインは待機のセットに入れず、切り替えの無いサブは入れる")
 
-# ロックスタイル番号 (lockstyleset): ジョブごと・1〜200・保存して読み込める・武器のコマンドと 1 つの job_self_command にまとめる
+# Lockstyle number (lockstyleset): per job, 1-200, survives save/load, shares a single job_self_command with the weapon commands
 pl = Project("COR")
 check(pl.set_lockstyle("94") == 94 and pl.lockstyle == 94, "ロックスタイル番号を入れられる")
 check(pl.has_work("COR"), "ロックスタイル番号だけでも、作業ありになる")
@@ -262,7 +262,7 @@ try:
 finally:
     shutil.rmtree(tmpl, ignore_errors=True)
 
-# 一覧から外した項目 (古い作業の割り当て) は出力しない。作業のファイルには残す
+# Entries dropped from the list (assignments in old projects) aren't output, but stay in the project file
 po = Project("SMN")
 po.assignments["sets.midcast.Pet.BloodPactWard"] = EP.parse_equipped_set('sets.exported={ head="古い頭" }')
 po.assign("sets.idle.Avatar", EP.parse_equipped_set('sets.exported={ head="ＢＣホーン+1" }'))

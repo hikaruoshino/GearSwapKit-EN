@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""場面の一覧と説明の日英切り替えの確認。実行 (GearSwapKit/ で): python -I tests/test_i18n_catalog.py"""
+"""Tests for switching the set list and its descriptions between Japanese and English. Run (from GearSwapKit/): python -I tests/test_i18n_catalog.py"""
 import os
 import re
 import sys
@@ -23,7 +23,7 @@ def check(ok, msg):
 
 def make(job):
     pr = Project(job)
-    # 技ごとの追加 (res 無しでも足せる英語名・被強化・アビリティ強化の効果中・メリット)
+    # Per-action additions (English names that work without res, received buffs, ability gear while active, merits)
     pr.add_custom(0, "Leaden Salute")
     pr.add_pair(JA_KIND, "Manawell", "マナウェル")
     pr.add_pair(RECEIVED_KIND, "IncreasedPhalanx", "被ファランクス (受けるファランクスの強化)")

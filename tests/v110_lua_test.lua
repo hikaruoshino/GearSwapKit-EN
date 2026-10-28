@@ -1,5 +1,5 @@
--- 1.1.0 で足した仕組み (クリティカルの WS・トレジャーハンター・二刀流・モード・青魔法・風水士) を、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/v110_lua_test.lua <出力した Lua のパス> <ジョブ> <サポジョブ>
+-- Simulates GearSwap to check features added in 1.1.0 (critical WS, Treasure Hunter, dual wield, modes, blue magic, Geomancer).
+-- Run: lua5.1.exe tests/v110_lua_test.lua <path to generated Lua> <job> <subjob>
 local path, job, sub = arg[1], arg[2], arg[3]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. job .. ": " .. msg .. "\n") end end
@@ -26,22 +26,22 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 local S = env.sets
 
 local function has(list, v) for _, x in ipairs(list or {}) do if x == v then return true end end return false end
 
--- モード
+-- Modes
 check(has(env.state.OffenseMode.list, "Acc") and has(env.state.OffenseMode.list, "SubtleBlow"), "OffenseMode に Acc と SubtleBlow")
 if S.idle.Refresh then check(has(env.state.IdleMode.list, "Refresh"), "IdleMode に Refresh") end
 
--- クリティカルの WS
+-- Critical WS
 if env.job_get_spell_map and S.precast.WS.Critical then
     check(env.job_get_spell_map({type = "WeaponSkill", english = "Evisceration", skill = "Dagger"}, nil) == "Critical", "エヴィサレーションはクリティカル")
     check(env.job_get_spell_map({type = "WeaponSkill", english = "Savage Blade", skill = "Sword"}, nil) == nil, "サベッジブレードはクリティカルではない")
 end
 
--- トレジャーハンター (戦闘中だけ)
+-- Treasure Hunter (engaged only)
 check(env.state.TreasureHunter ~= nil, "TreasureHunter の切り替えがある")
 env.state.TreasureHunter.value = true
 local melee = env.customize_melee_set({head = "base"})
@@ -50,7 +50,7 @@ local idle = env.customize_idle_set({head = "base"})
 check(idle.head == "base", "TreasureHunter は待機には重ねない")
 env.state.TreasureHunter.value = false
 
--- 二刀流
+-- Dual wield
 if S.engaged.dual11 then
     melee = env.customize_melee_set({waist = "base"})
     if sub == "NIN" or sub == "忍" then check(melee.waist == "dual11腰", "サポ忍で dual11 を重ねる")
@@ -59,13 +59,13 @@ if S.engaged.dual11 then
     check(env.customize_idle_set({waist = "base"}).waist == "base", "二刀流は待機には重ねない")
 end
 
--- 青魔法
+-- Blue magic
 if job == "BLU" then
     check(env.job_get_spell_map({type = "BlueMagic", english = "Sinker Drill"}, nil) == "BluePhysical", "シンカードリルは物理")
     check(env.job_get_spell_map({type = "BlueMagic", english = "Tenebral Crush"}, nil) == "BlueMagical", "テネブラルクラッシュは魔法")
 end
 
--- 風水士
+-- Geomancer
 if job == "GEO" then
     check(S.idle.Pet == S.idle.Luopan, "羅盤がいるときの待機は sets.idle.Pet")
     env.buffactive["Entrust"] = true
@@ -74,7 +74,7 @@ if job == "GEO" then
     check(worn.head == "エントラスト帽", "エントラスト中のインデで、エントラストの装備")
 end
 
--- マジックバースト
+-- Magic burst
 if S.midcast["精霊魔法"] and S.midcast["精霊魔法"].MB then
     check(has(env.state.CastingMode.list, "MB"), "CastingMode に MB")
 end
@@ -82,7 +82,7 @@ if S.midcast["Elemental Magic"] and S.midcast["Elemental Magic"].MB then
     check(has(env.state.CastingMode.list, "MB"), "CastingMode に MB (英語)")
 end
 
--- 1.2.0: 睡眠 (スリップの装備に替えて、起きたら武器を戻す)
+-- 1.2.0: sleep (swap to the wake-up gear in gear.Slip, such as Frenzy Sallet, and restore weapons on waking)
 
 if S.Sleep then
     env.player.equipment = {main = "元の剣", sub = "元の盾", range = "empty"}
@@ -97,7 +97,7 @@ if S.Sleep then
     check(env.customize_idle_set({}).head == "フレンジーサリット", "睡眠中は待機にもスリップの装備を重ねる")
     env.buffactive["Sleep"] = nil
 end
--- 死の宣告 (被カーズナの装備を重ねる)・聖水
+-- Doom (layer Cursna-received gear) / Holy Water
 if S.midcast.IncreasedCursna then
     env.buffactive["Doom"] = true
     check(env.customize_idle_set({}).neck == "カーズナ首" and env.customize_melee_set({}).neck == "カーズナ首", "死の宣告中は被カーズナを重ねる")
@@ -107,14 +107,14 @@ if S.midcast.IncreasedCursna then
     env.job_post_precast({action_type = "Item", english = "Holy Water", name = "聖水", type = "Item"}, {}, nil, {})
     check(worn.neck == "カーズナ首", "聖水を使うとき被カーズナを着る")
 end
--- 神獣の加護 (待機だけ)
+-- Avatar's Favor (idle only)
 if S.idle.Avatar and S.idle.Avatar.Favor then
     env.buffactive["Avatar's Favor"] = true
     check(env.customize_idle_set({}).head == "加護帽", "神獣の加護中の待機")
     check(env.customize_melee_set({}).head == nil, "加護は戦闘中には重ねない")
     env.buffactive["Avatar's Favor"] = nil
 end
--- HP が少ないとき・ノックバック
+-- Low HP / knockback
 if S.LowHp then
     env.player.hpp = 20
     check(env.customize_idle_set({}).body == "LowHp胴", "HP 30% 以下で LowHp")
@@ -126,16 +126,16 @@ if S.KnockBack then
     check(env.customize_melee_set({}).back == "リパルスマント", "KnockBack をオンで戦闘中に重ねる")
     env.state.KnockBack.value = false
 end
--- 弱体の INT / MND
+-- Enfeebling INT / MND
 if S.midcast.EnfeeblingEffectInt then
     check(env.job_get_spell_map({english = "Sleep II", type = "WhiteMagic"}, nil) == "EnfeeblingEffectInt", "スリプルIIは INT 系")
     check(env.job_get_spell_map({english = "Silence", type = "WhiteMagic"}, nil) == "EnfeeblingEffectMnd", "サイレスは MND 系")
 end
--- 青魔法の魔命
+-- Blue magic accuracy
 if S.midcast.BlueMagicAcc then
     check(env.job_get_spell_map({english = "Sheep Song", type = "BlueMagic"}, nil) == "BlueMagicAcc", "シープソングは魔命")
 end
--- モードの選択肢
+-- Mode options
 if S.midcast.RA and S.midcast.RA.Critical then check(has(env.state.RangedMode.list, "Critical"), "RangedMode に Critical") end
 if S.engaged.Parry then check(has(env.state.OffenseMode.list, "Parry"), "OffenseMode に Parry") end
 if S.engaged.Enn then check(has(env.state.OffenseMode.list, "Enn"), "OffenseMode に Enn") end

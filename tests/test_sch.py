@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""学者のアビリティ強化の装備 (陣頭指揮の足 = いつも履いたまま・震天動地の章 = ＡＣブレーサー) の確認。
-実行 (GearSwapKit/ で): python -I tests/test_sch.py"""
+"""Tests for SCH ability-enhancing gear (Stormsurge feet = worn when casting storm spells, Immanence = Academic's Bracers).
+Run (from GearSwapKit/): python -I tests/test_sch.py"""
 import os
 import subprocess
 import sys
@@ -74,7 +74,7 @@ print("OK")
         r = subprocess.run([LUA51, t, p], capture_output=True)
         check(r.returncode == 0 and b"OK" in r.stdout, "模擬 GearSwap で、陣頭指揮の足を履いたままにする " + r.stderr.decode("utf-8", "replace"))
 
-# バ系の魔法: 強化魔法を使うジョブの一覧にあり、強化魔法の装備に重ねる
+# Bar-element spells: listed for jobs that use Enhancing Magic, layered on top of the Enhancing Magic set
 import set_catalog as C
 for job in ("WHM", "RDM", "SCH", "PLD", "RUN"):
     check("sets.midcast.BarElement" in [e["path"] for e in C.sets_for_job(job)], "%s に、バ系の魔法がある" % job)
@@ -84,7 +84,7 @@ pb.assign("sets.midcast['強化魔法']", EP.parse_equipped_set('sets.exported={
 pb.assign("sets.midcast.BarElement", EP.parse_equipped_set('sets.exported={ legs="シェダルサラウィル" }'))
 check("sets.midcast.BarElement = set_combine(sets.midcast['強化魔法'], {" in pb.to_lua(), "バ系の魔法は、強化魔法の装備に重ねる")
 
-# 属性帯・オルペウスサッシュの自動選択と、震天動地の章の最優先
+# Automatic choice of Hachirin-no-Obi vs. Orpheus's Sash, and Immanence taking top priority
 pw = Project("SCH")
 pw.assign("sets.midcast['精霊魔法']", EP.parse_equipped_set('sets.exported={ waist="セットの腰", head="精霊の頭" }'))
 pw.add_ability_gear(sch["Immanence"], EP.Item("hands", "ＡＣブレーサー+3", '"ＡＣブレーサー+3"'))

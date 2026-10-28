@@ -1,5 +1,5 @@
--- 出力した Lua の「マニューバのメインを元の武器に戻す」を、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/maneuver_lua_test.lua <出力した Lua のパス>
+-- Simulates GearSwap to check the generated Lua's "restore the original main weapon after a maneuver".
+-- Run: lua5.1.exe tests/maneuver_lua_test.lua <path to generated Lua>
 local path = arg[1]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -24,7 +24,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 
 check(env.sets.precast.JA.Maneuver.main == "乾坤圏", "マニューバのセットに乾坤圏が入っている")
 local fire = {english = "Fire Maneuver", type = "JobAbility"}
@@ -34,7 +34,7 @@ worn = {}
 env.job_post_aftercast(fire, {}, nil, {})
 check(worn.main == "オータス", "マニューバのあと、元の武器 (オータス) に戻す")
 
--- KeepManeuverWeapon がオンなら、戻さない
+-- With KeepManeuverWeapon on, don't swap back
 check(env.state.KeepManeuverWeapon and env.state.KeepManeuverWeapon.value == false, "KeepManeuverWeapon がある (初めはオフ)")
 env.state.KeepManeuverWeapon.value = true
 env.player.equipment.main = "オータス"
@@ -44,21 +44,21 @@ worn = {}
 env.job_post_aftercast(fire, {}, nil, {})
 check(worn.main == nil, "KeepManeuverWeapon がオンなら、乾坤圏のまま")
 
--- オートマトンの WS のためにシュコアトルを持っている最中にマニューバ → WS が終わる → マニューバが終わる: オータスに戻る
+-- Maneuver while holding Xiucoatl for an automaton WS -> WS ends -> maneuver ends: back to Ohtas
 env.state.KeepManeuverWeapon.value = false
 env.player.equipment.main = "オータス"
 env.job_pet_midcast({english = "Bone Crusher", skillchain_a = "Fragmentation"}, {}, nil, {handled = false})
 env.player.equipment.main = "シュコアトル"
-env.job_post_precast(fire, {}, nil, {})            -- マニューバの開始 (シュコアトルを持っている)
+env.job_post_precast(fire, {}, nil, {})            -- Maneuver starts (holding Xiucoatl)
 env.player.equipment.main = "乾坤圏"
 worn = {}
-env.job_pet_aftercast({english = "Bone Crusher"}, {}, nil, {})   -- WS が終わる
+env.job_pet_aftercast({english = "Bone Crusher"}, {}, nil, {})   -- WS ends
 check(worn.main == "オータス", "WS が終わったら、選んでいる武器 (オータス) に戻す")
 worn = {}
-env.job_post_aftercast(fire, {}, nil, {})         -- マニューバが終わる
+env.job_post_aftercast(fire, {}, nil, {})         -- Maneuver ends
 check(worn.main == "オータス", "マニューバのあとも、シュコアトルではなく選んでいる武器 (オータス) に戻す")
 
--- マニューバ以外のアビリティでは何もしない
+-- Abilities other than maneuvers do nothing
 env.state.KeepManeuverWeapon.value = false
 worn = {}
 env.job_post_precast({english = "Repair", type = "JobAbility"}, {}, nil, {})

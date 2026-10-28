@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""tests/ のテストを全部実行する。実行 (GearSwapKit/ で): python -I tests/run_all.py
-画面のテスト (test_gui.py) は tkinter が要る。外部のファイル (res・Lua 5.1 など) の場所は tests/_env.py を参照。
-無いものは、そのテストの中で確認を飛ばす。"""
+"""Runs every test in tests/. Run (from GearSwapKit/): python -I tests/run_all.py
+The GUI test (test_gui.py) needs tkinter. See tests/_env.py for where external files (res, Lua 5.1, etc.) are found.
+If something is missing, the test that needs it skips those checks."""
 import glob
 import os
 import subprocess

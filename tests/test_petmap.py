@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""召喚士の契約の履行・獣使いの技の分け方 (物理・魔法) の確認。
-実行 (GearSwapKit/ で): python -I tests/test_petmap.py"""
+"""Tests for classifying SMN Blood Pacts and BST pet moves (physical vs. magical).
+Run (from GearSwapKit/): python -I tests/test_petmap.py"""
 import json
 import os
 import subprocess
@@ -62,7 +62,7 @@ check("'Foot Kick'] = 'PhysicalDamage'" in bst.replace('"', "'"), "獣使い: �
 check("MagicDamage" in bst, "獣使い: 魔法・弱体の技は魔命のセット")
 check("pet_move_map" not in lua_for("WAR", ("sets.engaged",)), "ほかのジョブには出さない")
 
-# 模擬 GearSwap: job_get_spell_map がペットの技だけを分ける (同じ名前の魔法 = 自分のファイアII などは分けない)
+# Mock GearSwap: job_get_spell_map classifies only pet moves (same-named spells, e.g. your own Fire II, are left alone)
 if os.path.exists(LUA51):
     test = '''
 local env = setmetatable({include=function() end, set_language=function() end, send_command=function() end,

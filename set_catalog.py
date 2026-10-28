@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""セットの一覧 (どういう状況のセットか) とヘルプ文。
+"""The list of sets (what situation each set is for) and their help text.
 
-path は GearSwap (Mote-Include) の sets.* の名前。language='japanese' で動かす前提で、
-日本語のアビリティ名・スキル名をそのままキーにする。
-verified=False のものは、キットのゲーム内確認がまだのもの (画面に「未確認」と出す)。
+path is the GearSwap (Mote-Include) sets.* name. Since it assumes language='japanese',
+Japanese ability and skill names are used directly as keys.
+verified=False marks sets the kit hasn't been checked with in game yet (shown as "unverified" in the UI).
 """
 
-# 共通 (どのジョブでも使える)
+# Common (usable on any job)
 COMMON = [
     dict(path="sets.idle", title="待機", verified=True,
          help="戦闘していないとき (立っているだけ・移動中) に着る装備。HP・MP の回復、移動速度、被ダメージ軽減など、普段の装備を入れます。"),
@@ -41,7 +41,7 @@ MAGIC_SKILLS = [
 
 import ws_types as WS
 
-# ジョブ別の追加 (未対応ジョブ中心)
+# Per-job additions (mostly for jobs without dedicated support)
 JOB = {
     "SMN": [
         dict(path="sets.idle.Avatar", title="待機 (召喚獣がいるとき = 維持費)", verified=True,
@@ -147,13 +147,13 @@ JOB = {
     ],
 }
 
-# 魔法のジョブの、技能ごとの魔法 (未対応ジョブ以外でも使える)
+# Per-magic-skill sets for casting jobs (usable outside the jobs without dedicated support too)
 JOBS_WITH_SKILL_SETS = {"WHM", "RDM", "BLM", "SCH", "GEO", "PLD", "DRK", "RUN", "BRD", "SMN", "BLU", "NIN"}
 
 ALL_JOBS = ["WAR", "MNK", "WHM", "BLM", "RDM", "THF", "PLD", "DRK", "BST", "BRD", "RNG", "SAM", "NIN", "DRG",
             "SMN", "BLU", "COR", "PUP", "DNC", "SCH", "GEO", "RUN"]
 
-# 技ごとの追加 (自由に名前を足せる枠)
+# Per-skill additions (slots where any name can be added)
 CUSTOM_KINDS = [
     ("sets.precast.WS", "ウェポンスキル", "技の名前を入れます (例: レデンサリュート)。日本語で入れると、英語名を自動で調べます。その技を使う瞬間だけ、この装備にします。"),
     ("sets.precast.JA", "ジョブアビリティ", "アビリティの名前を入れます (例: マナシード)。それを使う瞬間だけ、この装備にします。"),
@@ -163,7 +163,7 @@ CUSTOM_KINDS = [
      "自分に向けて唱え始められたら着て、届いたら元の装備に戻します。"),
 ]
 
-# 被強化の装備 (技ごとの追加の「被強化の装備」で選ぶ)。セットの名前・日本語名・対象の魔法 (res の番号)・範囲の魔法
+# Received-buff gear (picked under "Received buffs" in the per-skill additions). Set name, Japanese name, target spells (res ids), area spells
 RECEIVED = [
     ("IncreasedPhalanx", "被ファランクス (受けるファランクスの強化)", [106, 107], []),
     ("IncreasedProtect", "被プロテス (受けるプロテスの強化)", [43, 44, 45, 46, 47], [125, 126, 127, 128, 129]),
@@ -175,7 +175,7 @@ RECEIVED_HELP = ("ほかの人 (や自分) から受ける魔法を強くする�
                  "パーティーの人が唱えたときに着ます。自分で自分に唱えるときは、詠唱中に着ます。")
 
 
-# 武器の切り替え (装備のセットとは別。//gs c cycle MainWeapons などで、武器を順番に持ち替える)
+# Weapon cycle (separate from the gear sets; cycles through weapons with //gs c cycle MainWeapons etc.)
 WEAPON_ENTRIES = [
     dict(path="weapons:main", weapon_slot="main", title="武器の切り替え (メイン)", verified=True,
          help="メインの武器を、順番に持ち替えられるようにします。ゲームでは「//gs c cycle MainWeapons」を押すたびに、次の武器に替わります。使いたい武器を 1 本ずつ装備して、//gs export で書き出し、ここへ「export から武器を足す」で追加してください。武器は、装備のセット (待機・戦闘中など) には入れません。持ち替えても、TP が消えるのは、武器を替えたときだけです。"),
@@ -186,7 +186,7 @@ WEAPON_ENTRIES = [
 ]
 
 
-# 矢弾の使い分け (狩人・コルセアだけ)。所持品の一覧 (//gs export all) から選ぶ
+# Ammo switching (RNG and COR only). Picked from the inventory list (//gs export all)
 AMMO_HELP_TAIL = ("「所持品の一覧から選ぶ…」で、//gs export all の一覧から選んでください (装備して //gs export したファイルを「export から矢弾を選ぶ…」で使うこともできます)。"
                   "矢弾を選ぶと、ほかのセットの export に入っている矢弾は使わず、ここで選んだ弾を場面に合わせて装備します。")
 AMMO_ENTRIES = [
@@ -228,7 +228,7 @@ WS_RANGE_ENTRY = dict(
          "レデンサリュートなど魔法属性の遠隔 WS は「ウェポンスキル (魔攻・属性物理)」を使います。")
 
 
-# 遠隔攻撃 (狩人・コルセア)。sets.RA_STP・sets.RA_ACC は、作者の COR_gear.lua と同じ名前 (generator が sets.midcast.RA に結ぶ)
+# Ranged attack (RNG, COR). sets.RA_STP and sets.RA_ACC use the same names as the author's COR_gear.lua (generator links them to sets.midcast.RA)
 RANGED_ENTRIES = [
     dict(path="sets.precast.RA", title="遠隔の構え (スナップショット)", verified=False,
          help="遠隔攻撃を構える瞬間の装備。スナップショット・ラピッドショットなど、構えを速くする装備を入れます。"),
@@ -238,7 +238,7 @@ RANGED_ENTRIES = [
          help="飛命を重視するときの遠隔攻撃の装備 (//gs c cycle RangedMode で Acc にしたとき。sets.midcast.RA.Acc)。"),
 ]
 
-# コルセアのロールとクイックドロー。名前は作者の COR_gear.lua と同じ
+# COR rolls and Quick Draw. Names match the author's COR_gear.lua
 COR_QD_MODES = [("sets.RA_QDSTP", "ソーティ", "StoreTP"), ("sets.RA_QDDPS", "通常", "Damage")]
 COR_ENTRIES = [
     dict(path="sets.CorsairRoll", title="ロール (共通)", verified=False,
@@ -256,7 +256,7 @@ COR_ENTRIES = [
 ]
 JOB["COR"] = COR_ENTRIES
 
-# 魔法の系統のセット (Mote-Include が魔法の系統名 = spellMap で自動で探すもの)。ジョブごとに、使える系統だけ出す
+# Spell family sets (looked up automatically by Mote-Include using the spell family name = spellMap). Each job only gets the families it can use
 SPELL_FAMILY_ENTRIES = {
     "sets.midcast.Cure": dict(title="ケアル", verified=False,
                               help="ケアル (I〜VI) を唱えている間の装備。ケアル回復量アップ・MND・回復魔法スキルなどを入れます。"
@@ -308,14 +308,14 @@ SPELL_FAMILY_JOBS = {
 for _path, _e in SPELL_FAMILY_ENTRIES.items():
     _e["path"] = _path
 
-# 神聖魔法・風水魔法 (技能で探すセット。ジョブを絞る)
+# Divine and Geomancy magic (sets looked up by skill; limited to certain jobs)
 JOB_SKILL_EXTRA = {"WHM": ["神聖魔法"], "PLD": ["神聖魔法"], "GEO": ["風水魔法"]}
 SKILL_EXTRA_HELP = {
     "神聖魔法": "バニシュ・ホーリーなどの神聖魔法を唱えている間の装備。MND・魔法攻撃力・神聖魔法スキルなどを入れます。",
     "風水魔法": "インデ・ジオ (風水魔法) を唱えている間の装備。風水魔法スキル・羅盤の効果アップなどを入れます。",
 }
 
-# 踊り子 (Mote-Include はアビリティの種類 = spell.type で探す: sets.precast.Waltz など)
+# DNC (Mote-Include looks these up by ability type = spell.type: sets.precast.Waltz, etc.)
 JOB["DNC"] = [
     dict(path="sets.precast.Waltz", title="ワルツ", verified=False,
          help="ケアルワルツなどワルツを使う瞬間の装備。ワルツ回復量アップ・CHR・ワルツの再使用短縮などを入れます。"),
@@ -330,10 +330,10 @@ JOB["DNC"] = [
 ]
 
 
-# --- 1.1.0 で足したセット (作者の *_gear.lua の見直し) ---
+# --- Sets added in 1.1.0 (from a review of the author's *_gear.lua) ---
 ALL = tuple(ALL_JOBS)
 DUAL_JOBS = ("WAR", "MNK", "RDM", "THF", "DRK", "BST", "BRD", "SAM", "NIN", "DRG", "BLU", "COR", "DNC", "RUN")
-# (ジョブ, 項目)。ジョブは ALL か、略称のタプル
+# (jobs, entry). jobs is ALL or a tuple of job abbreviations
 EXTRA_ENTRIES = [
     (ALL, dict(path="sets.TreasureHunter", title="トレジャーハンター (手動で切り替え)", verified=False,
                help="トレジャーハンターの装備。ゲームで「//gs c toggle TreasureHunter」を押すと、戦闘中の装備に重ねます (待機には重ねません)。"
@@ -375,12 +375,12 @@ SONG_FAMILIES = [
 EXTRA_ENTRIES += [(("BRD",), dict(path="sets.midcast.%s" % fam, title="歌 (%s)" % ja, verified=False,
                                   help="%sを歌っている間の装備。%s" % (ja, why)))
                   for fam, ja, why in SONG_FAMILIES]
-# 睡眠から起きるスリップの装備 (FF11 用語辞典 18733「スリップ」・38554「プライムウェポン」の第一段階)
+# Slip gear that wakes you from sleep (Japanese FF11 wiki: wiki.ffo.jp pages 18733 "Slip" and 38554 "Prime Weapon", stage one)
 SLIP_ITEMS = ["フレンジーサリット", "サクリフィストルク", "バーサーカートルク", "ヴィムトルク", "ヴィムトルク+1",
               "プライムフィスト", "プライムダガー", "プライムソード", "プライムブレード", "プライムピック", "プライムアクス",
               "プライムランス", "プライムサイズ", "原始短刀", "原始刀", "プライムモール", "プライムスタッフ", "プライムボウ",
               "プライムガン", "プライムホルン", "プライムシールド",
-              # 第二段階 (同じ名前の第三段階以降には、スリップは付かない)
+              # Stage two (the same weapons at stage three and beyond don't have slip)
               "ヴァルガプルニカワ", "ンプガンドリング", "カリブルヌス", "ヘルヘイム", "スパリリソス", "ラフリア", "ゲイブィード",
               "フォエナリア", "慟哭", "草薙剣", "ローグモル", "オパショーロ", "ピナカ", "アープ", "ラックナシェード", "ドゥバン"]
 EXTRA_ENTRIES += [
@@ -442,12 +442,12 @@ BAR_ELEMENT_ENTRY = dict(
 
 
 def sets_for_job(job):
-    """そのジョブで選べるセットの一覧 (表示順)。"""
+    """List of sets selectable for the job (in display order)."""
     out = []
     for e in COMMON:
         out.append(e)
         if e["path"] == "sets.precast.WS":
-            # 共通の WS のすぐ後に、魔攻の WS と (遠隔武器が主のジョブだけ) 遠隔の WS
+            # Right after the common WS: the magical WS and (only for jobs that mainly use ranged weapons) the ranged WS
             out.append(WS_MAGIC_ENTRY)
             out.append(WS_CRIT_ENTRY)
             if job in WS.RANGED_SET_JOBS:
@@ -476,7 +476,7 @@ def sets_for_job(job):
 
 
 # ---------------------------------------------------------------------------
-# 英語 (i18n.L で切り替え)。path は変えない。各 dict に title_en / help_en を足す
+# English (switched via i18n.L). Paths stay the same; title_en / help_en are added to each dict
 # ---------------------------------------------------------------------------
 from i18n import L, SKILL_EN  # noqa: E402
 
@@ -652,16 +652,16 @@ _attach_en()
 
 
 def title(e):
-    """場面の題名 (今の言語。英語が無ければ日本語)。"""
+    """Title of the entry (current language; falls back to Japanese if there's no English)."""
     return L(e["title"], e.get("title_en") or e["title"])
 
 
 def help_text(e):
-    """場面の説明 (今の言語。英語が無ければ日本語)。"""
+    """Help text of the entry (current language; falls back to Japanese if there's no English)."""
     return L(e["help"], e.get("help_en") or e["help"])
 
 
-# 技ごとの追加の種類 (CUSTOM_KINDS と同じ順) の英語
+# English for the per-skill addition kinds (same order as CUSTOM_KINDS)
 CUSTOM_KINDS_EN = [
     ("Weapon skill", "Enter a weapon skill name (e.g. Leaden Salute). This gear is worn only the moment you use it."),
     ("Job ability", "Enter an ability name (e.g. Manawell). This gear is worn only the moment you use it."),
@@ -673,7 +673,7 @@ CUSTOM_KINDS_EN = [
 
 
 def kind_label(i):
-    """技ごとの追加の種類の名前 (今の言語)。app.py のドロップダウン用。"""
+    """Name of a per-skill addition kind (current language). For the dropdown in app.py."""
     return L(CUSTOM_KINDS[i][1], CUSTOM_KINDS_EN[i][0])
 
 
@@ -693,7 +693,7 @@ RECEIVED_HELP_EN = ("Gear that strengthens spells cast on you by others (or your
 
 
 def received_label(name):
-    """被強化の装備の表示名 (name = IncreasedPhalanx など。今の言語)。"""
+    """Display name of received-buff gear (name = IncreasedPhalanx etc.; current language)."""
     for en, ja, _ids, _aoe in RECEIVED:
         if en == name:
             return L(ja, RECEIVED_EN.get(en, en))

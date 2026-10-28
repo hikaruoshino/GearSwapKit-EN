@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""1.1.0 で足したセットと仕組みを、全ジョブで確かめる (日本語・英語の両方)。
-実行 (GearSwapKit/ で): python -I tests/test_v110.py"""
+"""Checks the sets and features added in 1.1.0 across all jobs (in both Japanese and English).
+Run (from GearSwapKit/): python -I tests/test_v110.py"""
 import os
 import subprocess
 import sys
@@ -35,7 +35,7 @@ GEAR = {"sets.TreasureHunter": 'head="TH帽"', "sets.engaged.dual11": 'waist="du
         "sets.midcast.EnfeeblingEffectInt": 'head="INT帽"', "sets.midcast.EnfeeblingEffectMnd": 'head="MND帽"',
         "sets.midcast.BlueMagicAcc": 'head="青魔命帽"'}
 
-# 一覧に出るジョブ
+# Which jobs each entry shows up for
 def paths(job):
     return [e["path"] for e in C.sets_for_job(job)]
 

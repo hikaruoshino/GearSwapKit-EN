@@ -1,5 +1,5 @@
--- 出力した Lua の「矢弾の使い分け」を、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/ammo_lua_test.lua <出力した Lua のパス>   (test_ammo.py が作る COR の Lua)
+-- Simulates GearSwap to check the generated Lua's "ammo selection".
+-- Run: lua5.1.exe tests/ammo_lua_test.lua <path to generated Lua>   (the COR Lua built by test_ammo.py)
 local path = arg[1]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -23,7 +23,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 
 local function act(spell)
     worn = {}

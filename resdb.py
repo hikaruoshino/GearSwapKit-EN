@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Windower の res フォルダー (spells.lua など) から、技・魔法の日本語名と英語名の対応を引く。
+"""Look up Japanese and English names of abilities and spells from Windower's res folder (spells.lua etc.).
 
-標準の GearSwap (Mote-Include) は、技の名前でセットを探すときに英語名 (spell.english) を使う。
-日本語の名前を入れてもらい、英語名に直して書くために使う。res は読むだけで、書き換えない。
+Stock GearSwap (Mote-Include) uses the English name (spell.english) when looking sets up by skill name.
+This lets users enter Japanese names and have them written out as English names. res is only read, never modified.
 """
 import os
 import re
 
-# 種類ごとに引く表 (sets.precast.WS など、セットの置き場ごとに、技の出どころが違う)
+# Tables to look up for each kind (where skills come from depends on where the set goes, e.g. sets.precast.WS)
 TABLES = {
     "ws": ["weapon_skills"],
     "ja": ["job_abilities"],
@@ -21,7 +21,7 @@ _JA = re.compile(r'\bja\s*=\s*"((?:[^"\\]|\\.)*)"')
 
 
 def guess_res_dir(data_dir):
-    """GearSwap の data フォルダー (…/Windower4/addons/gearswap/data) から、res フォルダーを探す。"""
+    """Find the res folder starting from GearSwap's data folder (.../Windower4/addons/gearswap/data)."""
     if not data_dir:
         return None
     d = os.path.abspath(data_dir)
@@ -40,7 +40,7 @@ def _unescape(s):
 class ResDB:
     def __init__(self, res_dir):
         self.res_dir = res_dir
-        self._cache = {}     # 表の名前 -> [(en, ja), ...]
+        self._cache = {}     # table name -> [(en, ja), ...]
 
     def available(self):
         return bool(self.res_dir) and os.path.isfile(os.path.join(self.res_dir, "spells.lua"))
@@ -69,7 +69,7 @@ class ResDB:
         return rows
 
     def names(self, kind, name):
-        """入力した名前 (日本語・英語どちらでも) から、[(英語名, 日本語名)] を返す (重複なし・見つかった順)。"""
+        """From an entered name (Japanese or English), return [(English name, Japanese name)] (no duplicates, in the order found)."""
         key = (name or "").strip()
         if not key:
             return []
@@ -84,7 +84,7 @@ class ResDB:
         return found
 
 
-# --- 装備できるジョブ (res/items.lua の jobs・ジョブの印の足し合わせ) ---
+# --- Jobs that can equip an item (jobs in res/items.lua: a sum of job bits) ---
 _JOBS_MASK = re.compile(r'\bjobs=(\d+)')
 _JOB_ROW = re.compile(r'\bid=(\d+).*?\bens="([A-Z]+)"')
 
@@ -98,7 +98,7 @@ def _read_text(path):
 
 
 def _job_ids(self):
-    """ジョブの略称 (SMN など) -> ジョブ番号 (res/jobs.lua)。"""
+    """Job abbreviation (SMN etc.) -> job id (res/jobs.lua)."""
     if getattr(self, "_job_ids_cache", None) is None:
         ids = {}
         for line in _read_text(os.path.join(self.res_dir or "", "jobs.lua")).splitlines():
@@ -110,7 +110,7 @@ def _job_ids(self):
 
 
 def _item_masks(self):
-    """装備の名前 (日本語・英語の小文字) -> 使えるジョブの印の足し合わせ。同じ名前の別の版は、足し合わせる。"""
+    """Item name (Japanese, or lowercase English) -> sum of the job bits that can use it. Different versions with the same name are combined."""
     if getattr(self, "_item_masks_cache", None) is None:
         masks = {}
         for line in _read_text(os.path.join(self.res_dir or "", "items.lua")).splitlines():
@@ -128,7 +128,7 @@ def _item_masks(self):
 
 
 def usable_by(self, item_name, job):
-    """その装備を、そのジョブ (SMN など) が使えるか。使える True・使えない False・res に無い名前は None。"""
+    """Whether the job (SMN etc.) can use the item. True if usable, False if not, None for names not in res."""
     if not self.available():
         return None
     key = (item_name or "").strip()
@@ -149,7 +149,7 @@ _SLOTS = re.compile(r'\bslots=(\d+)')
 
 
 def item_slots(self, item_name):
-    """その装備を着られる部位の印 (res の slots。メイン = 1・サブ = 2 …。同じ名前の別の版は足し合わせる)。res に無い名前は None。"""
+    """Bits for the slots the item can go in (res slots: main = 1, sub = 2, ...; versions with the same name are combined). None for names not in res."""
     if not self.available():
         return None
     if getattr(self, "_item_slots_cache", None) is None:
@@ -175,7 +175,7 @@ ResDB._job_ids_map = _job_ids
 
 
 def _item_names(self):
-    """装備の名前 (日本語) -> 英語名。同じ日本語名が複数あるときは、最初のもの。"""
+    """Item name (Japanese) -> English name. When several items share a Japanese name, the first one wins."""
     if getattr(self, "_item_names_cache", None) is None:
         names = {}
         for line in _read_text(os.path.join(self.res_dir or "", "items.lua")).splitlines():
@@ -188,7 +188,7 @@ def _item_names(self):
 
 
 def item_en(self, ja_name):
-    """装備の日本語名から英語名を引く。見つからなければ None。"""
+    """Look up an item's English name from its Japanese name. None if not found."""
     if not self.available():
         return None
     return _item_names(self).get((ja_name or "").strip())
@@ -197,12 +197,12 @@ def item_en(self, ja_name):
 ResDB.item_en = item_en
 
 
-# --- アビリティの種類 (res/job_abilities.lua の type) ---
+# --- Ability types (type in res/job_abilities.lua) ---
 _TYPE = re.compile(r'\btype="([A-Za-z0-9]+)"')
 
 
 def ability_type(self, en_name):
-    """アビリティの英語名から、res の type (JobAbility・CorsairRoll・Waltz など) を返す。無ければ None。"""
+    """From an ability's English name, return its res type (JobAbility, CorsairRoll, Waltz, etc.). None if not found."""
     if not self.available():
         return None
     if getattr(self, "_ability_types_cache", None) is None:

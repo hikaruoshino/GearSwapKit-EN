@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""WS の魔攻 (sets.precast.WS.Magic)・遠隔 (sets.precast.WS.Range)・技ごとの WS の重ね方の確認。
-実行 (GearSwapKit/ で): python -I tests/test_ws.py"""
+"""Tests for magical WS (sets.precast.WS.Magic), ranged WS (sets.precast.WS.Range), and how per-WS sets are layered.
+Run (from GearSwapKit/): python -I tests/test_ws.py"""
 import os
 import re
 import subprocess
@@ -28,7 +28,7 @@ def check(cond, msg):
         sys.stdout.buffer.write(("NG: %s\n" % msg).encode("utf-8"))
 
 
-# --- 名前を res と突き合わせる ---
+# --- Cross-check names against res ---
 if os.path.isfile(os.path.join(RES, "weapon_skills.lua")):
     with open(os.path.join(RES, "weapon_skills.lua"), "rb") as f:
         txt = f.read().decode("utf-8", errors="replace")
@@ -45,7 +45,7 @@ if os.path.isfile(os.path.join(RES, "weapon_skills.lua")):
     check(ranged == set(WS.RANGED_WS), "遠隔の WS の一覧が、res の弓術・射撃と一致 (差: %s)" % sorted(ranged ^ set(WS.RANGED_WS)))
 check(len(WS.MAGIC_WS) == len(set(WS.MAGIC_WS)), "魔法属性の WS に重複が無い")
 
-# ジョブ専用の WS (ミシック・エルゴン): 名前が res にあり、ほかのジョブのドロップダウンには出ない
+# Job-exclusive WS (Mythic, Ergon): the names exist in res and don't appear in other jobs' dropdowns
 if os.path.isfile(os.path.join(RES, "weapon_skills.lua")):
     for n in WS.JOB_ONLY_WS:
         check(n in all_ws, "ジョブ専用の WS の名前が res にある: %s" % n)
@@ -62,7 +62,7 @@ if os.path.isfile(os.path.join(RES, "weapon_skills.lua")):
 check(WS.kind_of("Leaden Salute") == "RangeMagic" and WS.kind_of("Aeolian Edge") == "Magic" and WS.kind_of("Jishnu's Radiance") == "Range" and WS.kind_of("Savage Blade") is None,
       "分け方: レデンサリュート = 魔攻・ジシュヌの光輝 = 遠隔・サベッジブレード = ふつう")
 
-# --- 一覧: 魔攻の WS は全ジョブ・遠隔の WS は狩人とコルセアだけ ---
+# --- List: magical WS for every job; ranged WS for RNG and COR only ---
 for job in C.ALL_JOBS:
     paths = [e["path"] for e in C.sets_for_job(job)]
     check("sets.precast.WS.Magic" in paths, "%s に魔攻の WS がある" % job)
@@ -71,7 +71,7 @@ for job in C.ALL_JOBS:
     if "sets.precast.WS.Magic" in paths:
         check(paths.index("sets.precast.WS.Magic") == paths.index("sets.precast.WS") + 1, "%s: 魔攻の WS は、共通の WS のすぐ後" % job)
 
-# --- 出力 ---
+# --- Output ---
 H = EP.parse_equipped_set
 pr = Project("COR")
 pr.assign("sets.precast.WS", H('sets.exported={ head="ＮＹヘルム+1", body="ＮＹメイル+1" }'))
@@ -98,7 +98,7 @@ p3 = Project("WAR")
 p3.assign("sets.precast.WS.Magic", H('sets.exported={ head="ピクシードヘアピン+1" }'))
 check("return 'Range'" not in p3.to_lua() and "return 'Magic'" in p3.to_lua(), "遠隔のセットが無ければ、遠隔の分け方は出さない")
 
-# 遠隔魔攻のセットがあれば、遠隔の魔法属性 WS はそちら・近接の魔法属性 WS は魔攻のまま
+# With a ranged magical set, ranged elemental WS use it, while melee elemental WS stay on the magical set
 p4 = Project("COR")
 p4.assign("sets.precast.WS", H('sets.exported={ head="ＮＹヘルム+1" }'))
 p4.assign("sets.precast.WS.Magic", H('sets.exported={ head="ニャメヘルム" }'))

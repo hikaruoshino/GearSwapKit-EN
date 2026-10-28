@@ -1,5 +1,5 @@
--- 出力した Lua の「武器の切り替え」の動きを、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/weapons_lua_test.lua <出力した Lua のパス>
+-- Simulates GearSwap to check the generated Lua's "weapon switching".
+-- Run: lua5.1.exe tests/weapons_lua_test.lua <path to generated Lua>
 local path = arg[1]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -10,7 +10,7 @@ local env = {
     equip = function(t) equipped[#equipped + 1] = t end,
     send_command = function(c) sent[#sent + 1] = c end,
     include = function() end, set_language = function() end,
-    M = function(t)   -- Mote の M{} の代わり: 選択肢と、いまの選択
+    M = function(t)   -- Stand-in for Mote's M{}: the options and the current choice
         local m = {description = t.description, current = t[1], options = {}}
         for i = 1, #t do m.options[i] = t[i] end
         return m
@@ -31,7 +31,7 @@ check(env.state.SubWeapons ~= nil, "SubWeapons がある")
 check(env.state.RangeWeapons == nil, "遠隔は足していないので、RangeWeapons は作らない")
 check(sent[#sent] == "wait 3; gs c weapons", "読み込んだあとに武器を装備する命令を送る")
 
--- cycle したときに Mote が呼ぶ job_state_change
+-- job_state_change, which Mote calls on cycle
 env.job_state_change("MainWeapons", "ガンドリング", "ニルヴァーナ")
 check(equipped[#equipped] and equipped[#equipped].main == "ガンドリング", "ガンドリングをメインに装備する")
 equipped = {}

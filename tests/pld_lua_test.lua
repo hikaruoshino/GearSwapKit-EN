@@ -1,5 +1,5 @@
--- 出力した Lua の「ナイトの仕組み」を、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/pld_lua_test.lua <出力した Lua のパス> <3 段階 = 1 / 0>
+-- Simulates GearSwap to check the generated Lua's "Paladin features".
+-- Run: lua5.1.exe tests/pld_lua_test.lua <path to generated Lua> <three-stage = 1 / 0>
 local path, three = arg[1], arg[2] == "1"
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -31,10 +31,10 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 local sets = env.sets
 
--- 敵対心: セットの無いアビリティは敵対心の装備・センチネルは敵対心 (最大) に重ねる
+-- Enmity: abilities without a set use the enmity gear; Sentinel is layered on enmity (max)
 check(sets.precast.JA.head == "ＳＶシャレル+1", "セットの無いアビリティは、敵対心の装備 (sets.precast.JA に入っている)")
 check(sets.precast.JA["Sentinel"] and sets.precast.JA["Sentinel"].body == "最大の胴" and sets.precast.JA["Sentinel"].feet == "ＣＢレギンス+3",
       "センチネルは、敵対心 (最大) に重ねる")
@@ -53,7 +53,7 @@ worn = {}
 env.job_post_midcast({english = "Majesty", action_type = "Ability", type = "JobAbility"}, {}, nil, {})
 check(worn.head == nil, "アビリティの midcast では、詠唱中断の装備を着ない")
 
--- 手動の対魔法・状態異常耐性
+-- Manual magic defense / status resistance
 check(env.state.Magical and env.state.Magical.value == false and env.state.StatusResist, "対魔法・状態異常耐性の切り替えがある (初めはオフ)")
 local idle = env.customize_idle_set({head = "待機の頭", neck = "待機の首"})
 check(idle.head == "待機の頭", "オフのときは、待機の装備のまま")
@@ -64,25 +64,25 @@ env.state.StatusResist.value = true
 local melee = env.customize_melee_set({head = "戦闘の頭"})
 check(melee.head == "耐性の頭", "両方オンなら、状態異常耐性が上")
 
--- 3 段階の着替え
+-- Three-stage swaps
 if three then
     worn, sent, busy = {}, {}, true
     local cure = {english = "Cure IV", action_type = "Magic", cast_time = 2.5}
     env.job_post_midcast(cure, {}, "Cure", {})
     check(worn.head == "ＣＶアーメット+3", "詠唱中は、詠唱中断の装備")
     check(sent[#sent] and sent[#sent]:find("gs c land", 1, true), "着弾の直前に替える命令を送る")
-    -- 2.5 秒 × (1 - 0.40) - 0.30 = 1.20 秒
+    -- 2.5 s x (1 - 0.40) - 0.30 = 1.20 s
     check(sent[#sent]:find("wait 1.20", 1, true), "待ち時間は、ファストキャスト 40% で 1.20 秒 (" .. tostring(sent[#sent]) .. ")")
     worn = {}
     env.job_self_command({"land"}, {})
     check(worn.head == "ＳＶシャレル+1" and worn.legs == "ケアルの脚", "着弾の直前に、ケアルの装備に替える")
-    -- 詠唱が終わったあと (中断など) に命令が届いても、着替えない
+    -- If the command arrives after the cast is over (interrupted, etc.), don't swap
     env.job_post_midcast(cure, {}, "Cure", {})
     env.job_post_aftercast(cure, {}, "Cure", {})
     busy, worn = false, {}
     env.job_self_command({"land"}, {})
     check(worn.head == nil, "詠唱が終わったあとは、着弾の装備に替えない")
-    -- サポ赤なら、特性を足す
+    -- With /RDM, add the trait
     env.player.sub_job, busy, sent = "RDM", true, {}
     env.job_post_midcast(cure, {}, "Cure", {})
     check(sent[#sent]:find("wait 0.82", 1, true), "サポ赤は 15% 足す: 2.5 × 0.45 - 0.30 = 0.82 秒 (" .. tostring(sent[#sent]) .. ")")

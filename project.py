@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""キットの作業内容 (どのセットに、どの export を割り当てたか)。画面から独立していて、テストできる。
+"""The kit's work state (which export is assigned to which set). Independent of the UI, so it can be tested.
 
-割り当て・技ごとの追加・武器の切り替えは、**ジョブごとに別々**に持つ (SMN で登録したものが COR に出ることはない)。
+Assignments, per-skill additions and weapon cycles are stored **separately for each job** (nothing registered on SMN shows up on COR).
 """
 import datetime
 import json
@@ -15,10 +15,10 @@ import generator as G
 import resdb as R
 import set_catalog as C
 
-# 「技ごとの追加」の種類 (C.CUSTOM_KINDS と同じ順) と、引く res の表
+# Kinds of per-skill additions (same order as C.CUSTOM_KINDS) and the res table each one looks up
 KIND_KEYS = ["ws", "ja", "magic", "pet", "received"]
-RECEIVED_KIND = 4                 # 被強化の装備 (sets.midcast.IncreasedPhalanx など。[ ] ではなく . で付く)
-JA_KIND = 1                       # KIND_KEYS / C.CUSTOM_KINDS の中の「ジョブアビリティ」の位置
+RECEIVED_KIND = 4                 # received-buff gear (sets.midcast.IncreasedPhalanx etc.; attached with . rather than [ ])
+JA_KIND = 1                       # Position of "Job ability" in KIND_KEYS / C.CUSTOM_KINDS
 BUFF_BASE = "sets.buff"
 BUFF_HELP = ("アビリティの強化が付いている間、着たままにする装備です。強化が付くと待機と戦闘中の装備に重ねて着て、"
              "切れると元に戻ります (アビリティ強化の装備から追加したものです)。")
@@ -30,12 +30,12 @@ BUFF_HELP_EN = ("Gear kept on while the ability's effect is active. It's layered
 MERIT_HELP_EN = ("Gear that enhances a merit trait (Optimization, Fine-Tuning, etc.). It does nothing unless you've put merits "
                  "into that trait, so it starts off. If you have, use //gs c cycle MeritGear in game to turn it On and it's "
                  "layered over your idle and engaged sets (for PUP and DRG, only while your pet is out).")
-# 一覧に無い、まとめのセット (ability_gear.json の set_path) の英語の表示名
+# English display names for grouped sets that aren't in the list (set_path in ability_gear.json)
 SPECIAL_SET_TITLES_EN = {"sets.Stormsurge": "Stormsurge feet (when casting storm spells)"}
 
 
 def _key_name(path):
-    """sets.x['Name'] の Name (無ければ空)。"""
+    """Name from sets.x['Name'] (empty string if there is none)."""
     if path.endswith("']") and "['" in path:
         return path[path.index("['") + 2:-2].replace("\\'", "'").replace("\\\\", "\\")
     return ""
@@ -45,7 +45,7 @@ _SET_ABILITY_EN = None
 
 
 def _ability_en_for_set(path):
-    """ability_gear.json で set_path がこの path のアビリティの英語名 (無ければ None)。"""
+    """English name of the ability whose set_path in ability_gear.json is this path (None if there is none)."""
     global _SET_ABILITY_EN
     if _SET_ABILITY_EN is None:
         import ability_gear as AG
@@ -63,31 +63,31 @@ def _split_camel(s):
 
 
 class JobData:
-    """1 つのジョブの作業内容。"""
+    """Work state for a single job."""
 
     def __init__(self):
         self.assignments = {}      # path -> {slot: Item}
-        self.custom = []           # [(path, 表示名, 日本語名の別名のパス または None)]  技ごとの追加
-        self.weapons = {}          # スロット (main/sub/range) -> [Item, ...]  武器の切り替え
-        self.buffs = {}            # sets.buff のパス -> (バフ番号, 英語名, 日本語名)  効果中ずっと着る装備
-        self.lockstyle = None      # ロックスタイル番号 (ゲームの装備セットの番号)。None なら使わない
-        self.received_manual = set()   # 被強化の装備のうち、自動で着替えないもの (例: {"IncreasedPhalanx"})
-        self.ammo = {}             # 矢弾の役目 (physical/magical/quickdraw) -> Item  (狩人・コルセア)
-        self.ws_ammo = {}          # WS の英語名 -> Item  特殊弾 (その WS だけで使う弾)
-        self.three_stage = False   # ナイト: 3 段階の着替え (ファストキャスト → 詠唱中断 → 着弾の装備) を使うか
-        self.fast_cast = 0         # ナイト: 3 段階の着替えの計算に使う、装備のファストキャスト (%)
-        self.pup_auto = False      # からくり士: オートマトンの技の装備を先に着る (自動の事前着替え) を入れるか
-        self.auto_waist = False    # 精霊魔法で、属性帯 (八輪の帯) とオルペウスサッシュを自動で選ぶか
+        self.custom = []           # [(path, display name, path of the Japanese-name alias or None)]  per-skill additions
+        self.weapons = {}          # slot (main/sub/range) -> [Item, ...]  weapon cycle
+        self.buffs = {}            # sets.buff path -> (buff id, English name, Japanese name)  gear kept on while the buff is active
+        self.lockstyle = None      # lockstyle number (the in-game equipment set number). None means lockstyle isn't used
+        self.received_manual = set()   # received-buff gear that isn't swapped in automatically (e.g. {"IncreasedPhalanx"})
+        self.ammo = {}             # ammo role (physical/magical/quickdraw) -> Item  (RNG, COR)
+        self.ws_ammo = {}          # WS English name -> Item  special ammo (used only for that WS)
+        self.three_stage = False   # PLD: use the three-stage swap (Fast Cast -> spell interruption -> landing gear)
+        self.fast_cast = 0         # PLD: gear Fast Cast (%) used for the three-stage swap timing
+        self.pup_auto = False      # PUP: equip automaton weapon skill gear ahead of time (automatic pre-swap)
+        self.auto_waist = False    # elemental magic: automatically pick the elemental obi (Hachirin-no-Obi) or Orpheus's Sash
 
 
 class Project:
     def __init__(self, job="SMN"):
         self.job = job
         self.include_weapons = False
-        self.resdb = None          # 日本語名 → 英語名を引くための res (無くても動く)
-        self._jobs = {}            # ジョブの略称 -> JobData
+        self.resdb = None          # res used to look up English names from Japanese ones (works without it)
+        self._jobs = {}            # job abbreviation -> JobData
 
-    # --- ジョブ ---
+    # --- Jobs ---
     def _cur(self):
         return self._jobs.setdefault(self.job, JobData())
 
@@ -112,7 +112,7 @@ class Project:
         return self._cur().lockstyle
 
     def set_lockstyle(self, value):
-        """ロックスタイル番号を決める。1〜200 の整数 (文字でもよい)。空・範囲外は使わない (None)。戻り値: 決まった番号か None。"""
+        """Set the lockstyle number: an integer from 1 to 200 (a string is fine). Empty or out of range means none (None). Returns the number set, or None."""
         try:
             n = int(str(value).strip())
         except (TypeError, ValueError):
@@ -123,7 +123,7 @@ class Project:
         return n
 
     def set_received_auto(self, name, auto):
-        """被強化の装備 (name = IncreasedPhalanx など) を、魔法に反応して自動で着替えるか。"""
+        """Whether received-buff gear (name = IncreasedPhalanx etc.) is swapped in automatically in response to spells."""
         if auto:
             self._cur().received_manual.discard(name)
         else:
@@ -133,11 +133,11 @@ class Project:
         return name not in self._cur().received_manual
 
     def set_job(self, job):
-        """ジョブを変える。割り当ては、ジョブごとに別々に持つので、ほかのジョブの内容は出ない (戻すと、元に戻る)。"""
+        """Switch jobs. Assignments are kept per job, so other jobs' contents don't show up (switching back restores them)."""
         self.job = job
 
     def has_work(self, job):
-        """そのジョブに、何か割り当て・追加・武器があるか。"""
+        """Whether the job has any assignments, additions or weapons."""
         d = self._jobs.get(job)
         return bool(d and (any(d.assignments.values()) or d.custom or any(d.weapons.values()) or d.lockstyle
                            or d.ammo or d.ws_ammo))
@@ -145,9 +145,9 @@ class Project:
     def set_resdb(self, resdb):
         self.resdb = resdb
 
-    # --- 一覧 ---
+    # --- Set list ---
     def entries(self):
-        """画面に出すセットの一覧 [{path, title, help, verified, custom}]"""
+        """List of sets to show in the UI [{path, title, help, verified, custom}]"""
         rows = []
         for e in C.sets_for_job(self.job):
             rows.append(dict(path=e["path"], title=C.title(e), help=C.help_text(e),
@@ -160,7 +160,7 @@ class Project:
         return rows
 
     def _custom_title_en(self, path):
-        """技ごとの追加の英語の表示名を、path から作る (保存してある表示名は日本語のため)。"""
+        """Build the English display name of a per-skill addition from its path (the saved display name is Japanese)."""
         name = _key_name(path)
         if path.startswith(BUFF_BASE + "["):
             b = self._cur().buffs.get(path)
@@ -196,15 +196,15 @@ class Project:
             if path.startswith(base + "["):
                 return C.kind_help(i)
         if path.startswith("sets.precast.") and path.endswith("]"):
-            # 種類のセットの中の技 (sets.precast.CorsairRoll['…'] など) は、アビリティの説明
+            # A skill inside a type set (sets.precast.CorsairRoll['...'] etc.) gets the ability help text
             return C.kind_help(JA_KIND)
         return L("技ごとの追加のセットです。", "A set added per skill.")
 
-    # --- 割り当て ---
+    # --- Assignments ---
     def assign(self, path, items):
-        """items: {slot: Item}。空なら割り当てを外す。"""
+        """items: {slot: Item}. Empty removes the assignment."""
         if path.startswith(("weapons:", "ammo:")):
-            return     # 武器の切り替えは add_weapon・矢弾は set_ammo / set_ws_ammo で足す
+            return     # weapons are added with add_weapon, ammo with set_ammo / set_ws_ammo
         if items:
             self.assignments[path] = dict(items)
         else:
@@ -232,19 +232,19 @@ class Project:
         return bool(self.assignments.get(path))
 
     def _base_for(self, kind_index, en):
-        """セットの置き場。アビリティのうち、res の種類が JobAbility 以外 (コルセアのロール・踊り子のワルツなど) は、
-        Mote-Include が sets.precast.<種類> の中で探す (種類のセットがあると sets.precast.JA を見ない) ので、そこに置く。"""
+        """Where the set goes. For abilities whose res type isn't JobAbility (COR rolls, DNC waltzes, etc.), Mote-Include
+        looks inside sets.precast.<type> (and ignores sets.precast.JA once that type set exists), so the set goes there."""
         base = C.CUSTOM_KINDS[kind_index][0]
         if kind_index == JA_KIND and self.resdb is not None and self.resdb.available():
             t = self.resdb.ability_type(en)
-            # PetCommand (獣使いのほんきだせ・しじをさせろ など) は、一覧に元から sets.precast.JA['Sic'] などがあるので JA のまま
-            # (sets.precast.PetCommand を作らなければ、Mote は JA を見る)
+            # PetCommand (BST Sic, Ready, etc.) stays under JA, since the list already has sets.precast.JA['Sic'] and the like
+            # (as long as sets.precast.PetCommand isn't created, Mote looks at JA)
             if t and t not in ("JobAbility", "WeaponSkill", "PetCommand"):
                 base = "sets.precast.%s" % t
         return base
 
     def resolve(self, kind_index, name):
-        """入れた名前 (日本語・英語) を、(状態, 英語名, 日本語名) にする。状態: "ok" / "empty" / "notfound"。追加はしない。"""
+        """Turn an entered name (Japanese or English) into (status, English name, Japanese name). Status: "ok" / "empty" / "notfound". Adds nothing."""
         name = (name or "").strip()
         if not name:
             return "empty", None, None
@@ -263,15 +263,15 @@ class Project:
         return "ok", name, None
 
     def path_for(self, kind_index, en):
-        """技ごとの追加のセットのパス (種類のセットに置くものも含む)。"""
+        """Path of a per-skill addition set (including ones placed in a type set)."""
         if kind_index == RECEIVED_KIND:
             return "sets.midcast.%s" % en
         return G.make_key(self._base_for(kind_index, en), en)
 
     def add_custom(self, kind_index, name):
-        """技ごとの追加。戻り値: (状態, path)。状態: "ok" / "empty" / "dup" / "notfound"。
-        日本語名を入れたときは、res から英語名を引き、英語名のセットと、日本語名の別名の両方を作る
-        (標準の Mote-Include は英語名で探す)。res で見つからない日本語名は "notfound"。英語名は、そのまま使う。"""
+        """Add a per-skill set. Returns (status, path). Status: "ok" / "empty" / "dup" / "notfound".
+        For a Japanese name, the English name is looked up in res and both the English-named set and a Japanese-name alias
+        are created (stock Mote-Include looks sets up by English name). A Japanese name not found in res is "notfound". English names are used as is."""
         name = (name or "").strip()
         if not name:
             return "empty", None
@@ -296,7 +296,7 @@ class Project:
         return "ok", path
 
     def add_pair(self, kind_index, en, ja):
-        """一覧から選んだ技を足す (英語名と日本語名が、すでに分かっているとき)。戻り値: "ok" / "dup"。"""
+        """Add a skill picked from the list (when both the English and Japanese names are already known). Returns "ok" / "dup"."""
         _b, label, _ = C.CUSTOM_KINDS[kind_index]
         if kind_index == RECEIVED_KIND:
             path = self.path_for(kind_index, en)
@@ -320,22 +320,22 @@ class Project:
         if path.startswith("sets.midcast.Increased"):
             self._cur().received_manual.discard(path[len("sets.midcast."):])
 
-    # --- アビリティ強化の装備 ---
+    # --- Ability gear ---
     def add_ability_gear(self, entry, item):
-        """アビリティ強化の装備 (ability_gear.json のエントリ) の 1 つを、そのアビリティのセットの、その部位に割り当てる。
-        使う瞬間だけ着るもの (use) は sets.precast.JA['英語名'] (+ 日本語名の別名)・効果中ずっと着るもの (while_active) は
-        sets.buff['英語名']。すでに同じ部位があれば、置き換える。戻り値: セットのパス。"""
+        """Assign one ability gear entry (from ability_gear.json) to that slot of the ability's set.
+        Gear worn only at the moment of use (use) goes in sets.precast.JA['English name'] (plus a Japanese-name alias); gear kept
+        on while the effect is active (while_active) goes in sets.buff['English name']. An existing item in the same slot is replaced. Returns the set path."""
         en, ja = entry["ability_en"], entry["ability_ja"]
         if entry.get("set_path"):
-            # 複数の技を 1 つのセットでまとめて扱うもの (例: マニューバ 8 種 = sets.precast.JA.Maneuver)。一覧に元からある場面へ入れる
+            # One set shared by several skills (e.g. all eight maneuvers = sets.precast.JA.Maneuver). Goes into the entry already in the list
             path = entry["set_path"]
             known = {e["path"] for e in C.sets_for_job(self.job)}
             if path not in known and not any(p == path for p, _l, _a in self.custom):
-                # 一覧に無いセット (sets.merit.* など) は、技ごとの追加として一覧に出す (割り当てを外す・削除ができるように)
+                # Sets not in the list (sets.merit.* etc.) are shown as per-skill additions (so they can be unassigned and removed)
                 self.custom.append((path, entry.get("set_label") or ("メリット特性の装備: %s" % ja), None))
         elif entry.get("timing") in ("while_active", "cast") and entry.get("buff"):
             buff = entry["buff"]
-            # 効果中ずっと (待機・戦闘中に重ねる) は "idle"・魔法を唱えるとき (学者の章など) は "precast" / "midcast"
+            # "idle" while the effect is active (layered over idle/engaged); "precast" / "midcast" when casting a spell (SCH Arts, etc.)
             phase = entry.get("cast_phase", "midcast") if entry["timing"] == "cast" else "idle"
             path = G.make_key(BUFF_BASE, buff["en"])
             if not any(p == path for p, _l, _a in self.custom):
@@ -343,25 +343,25 @@ class Project:
                 act = {"WeaponSkill": "ウェポンスキル", "Ranged Attack": "遠隔攻撃"}.get(entry.get("cast_on"), "魔法")
                 label = "効果中の装備" if phase == "idle" else "効果中に%sをするときの装備" % act
                 self.custom.append((path, "%s: %s" % (label, shown), None))
-            kind = entry.get("cast_on", "Magic")     # 効果中に着る行動: Magic / WeaponSkill / Ranged Attack
+            kind = entry.get("cast_on", "Magic")     # action the gear is worn for while active: Magic / WeaponSkill / Ranged Attack
             self._cur().buffs[path] = (int(buff["id"]), buff["en"], buff["ja"], phase, kind)
         else:
-            self.add_pair(JA_KIND, en, ja)       # すでにあれば、何もしない
+            self.add_pair(JA_KIND, en, ja)       # does nothing if it's already there
             path = G.make_key(self._base_for(JA_KIND, en), en)
         slots = self.assignments.setdefault(path, {})
         slots[item.slot] = item
         return path
 
-    # --- 武器の切り替え ---
+    # --- Weapon cycle ---
     def add_weapon(self, slot, item):
-        """武器を足す。同じ装備 (名前もオーグメントも同じ) がすでにあれば、足さずに False。"""
+        """Add a weapon. If the same item (same name and augments) is already there, it isn't added and False is returned."""
         lst = self.weapons.setdefault(slot, [])
         if any(it.raw == item.raw for it in lst):
             return False
         lst.append(item)
         return True
 
-    # --- 矢弾 (狩人・コルセア) ---
+    # --- Ammo (RNG, COR) ---
     @property
     def ammo(self):
         return self._cur().ammo
@@ -371,17 +371,17 @@ class Project:
         return self._cur().ws_ammo
 
     def set_ammo(self, role, item):
-        """矢弾の役目 (physical/magical/quickdraw) に、1 つ決める (置き換え)。"""
+        """Set the single ammo for a role (physical/magical/quickdraw), replacing any previous one."""
         self._cur().ammo[role] = EP.Item("ammo", item.name, item.raw)
 
     def set_ws_ammo(self, ws_en, item):
-        """特殊弾: その WS だけで使う弾を決める。item が None なら外す。"""
+        """Special ammo: set the ammo used only for that WS. item=None removes it."""
         if item is None:
             self._cur().ws_ammo.pop(ws_en, None)
         else:
             self._cur().ws_ammo[ws_en] = EP.Item("ammo", item.name, item.raw)
 
-    # --- 属性帯・オルペウスサッシュの自動選択 ---
+    # --- Automatic elemental obi / Orpheus's Sash selection ---
     @property
     def auto_waist(self):
         return self._cur().auto_waist
@@ -389,7 +389,7 @@ class Project:
     def set_auto_waist(self, on):
         self._cur().auto_waist = bool(on)
 
-    # --- からくり士の自動の事前着替え ---
+    # --- PUP automatic pre-swap ---
     @property
     def pup_auto(self):
         return self._cur().pup_auto
@@ -397,7 +397,7 @@ class Project:
     def set_pup_auto(self, on):
         self._cur().pup_auto = bool(on)
 
-    # --- ナイトの 3 段階の着替え ---
+    # --- PLD three-stage swap ---
     @property
     def three_stage(self):
         return self._cur().three_stage
@@ -410,18 +410,18 @@ class Project:
         return self._cur().fast_cast
 
     def set_fast_cast(self, value):
-        """装備のファストキャスト (%)。0〜100 の整数 (文字でもよい)。読めなければ 0。戻り値: 決まった値。"""
+        """Gear Fast Cast (%): an integer from 0 to 100 (a string is fine). 0 if it can't be parsed. Returns the value set."""
         try:
             n = int(str(value).strip())
         except (TypeError, ValueError):
             n = 0
-        self._cur().fast_cast = max(0, min(100, n))     # 上限 (80%) 超えも残す (無駄の知らせに使う。出力では 80 で切る)
+        self._cur().fast_cast = max(0, min(100, n))     # values above the 80% cap are kept (used to warn about waste; the output clamps to 80)
         return self._cur().fast_cast
 
-    # --- 出力 ---
+    # --- Output ---
     def _relocate_custom(self):
-        """古い作業 (種類のセットに置く前に保存したもの) の sets.precast.JA['…'] を、正しい置き場所へ移す。
-        例: sets.precast.JA['Tactician\\'s Roll'] → sets.precast.CorsairRoll['Tactician\\'s Roll']。割り当てと別名も移す。"""
+        """Move sets.precast.JA['...'] entries from older work files (saved before type sets were used) to where they belong.
+        e.g. sets.precast.JA['Tactician\\'s Roll'] -> sets.precast.CorsairRoll['Tactician\\'s Roll']. Assignments and aliases move too."""
         if self.resdb is None or not self.resdb.available():
             return
         ja_base = C.CUSTOM_KINDS[JA_KIND][0]
@@ -444,14 +444,14 @@ class Project:
         self.custom = [c for _old, c in moved]
 
     def to_lua(self):
-        """今のジョブの内容だけを出力する。"""
+        """Output only the current job's contents."""
         self._relocate_custom()
         order = [e["path"] for e in self.entries()]
         ordered = {}
         for p in order:
             if p in self.assignments:
                 ordered[p] = self.assignments[p]
-        # 一覧に無いセット (キットの更新で外した項目に、前に割り当てたもの) は出力しない。作業のファイルには残す
+        # Sets no longer in the list (items removed in a kit update that were assigned earlier) aren't output, but stay in the work file
         self.orphans = [p for p in self.assignments if p not in ordered and self.assignments[p]]
         aliases = {alias: path for path, _l, alias in self.custom if alias}
         for e in self.entries():
@@ -467,7 +467,7 @@ class Project:
                            pup_auto=self._cur().pup_auto, auto_waist=self._cur().auto_waist)
 
     def write_lua(self, data_dir):
-        """data_dir/<ジョブ>.lua に書く。既にあれば、同じ場所にバックアップを取ってから。(path, backup または None) を返す。"""
+        """Write data_dir/<job>.lua, backing up any existing file in the same folder first. Returns (path, backup or None)."""
         path = os.path.join(data_dir, "%s.lua" % self.job)
         backup = None
         if os.path.exists(path):
@@ -478,7 +478,7 @@ class Project:
             f.write(self.to_lua())
         return path, backup
 
-    # --- 保存 / 読み込み (作業のやり直し用・全ジョブぶん) ---
+    # --- Save / load (for resuming work; all jobs) ---
     @staticmethod
     def _job_to_dict(d):
         return dict(custom=d.custom, buffs={p: list(b) for p, b in d.buffs.items()},
@@ -497,7 +497,7 @@ class Project:
         return json.dumps(data, ensure_ascii=False, indent=1)
 
     def _load_job(self, job, jd):
-        """1 ジョブぶんの辞書を、そのジョブの内容として読み込む。"""
+        """Load one job's dict as that job's contents."""
         keep = self.job
         self.job = job
         try:
@@ -545,6 +545,6 @@ class Project:
             for job, jd in data["jobs"].items():
                 pr._load_job(job, jd)
         else:
-            # 古い形式 (1 つのジョブだけ): そのジョブの内容として読む
+            # Old format (a single job only): read it as that job's contents
             pr._load_job(pr.job, data)
         return pr

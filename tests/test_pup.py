@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""からくり士のオートマトンの技の装備 (WS・敵対心・自動の事前着替え) の確認。
-実行 (GearSwapKit/ で): python -I tests/test_pup.py"""
+"""Tests for gear for PUP automaton actions (WS, enmity, automatic pre-swap).
+Run (from GearSwapKit/): python -I tests/test_pup.py"""
 import os
 import subprocess
 import sys

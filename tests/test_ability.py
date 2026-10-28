@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""アビリティ強化の装備 (ability_gear.json・ability_gear.py・Project.add_ability_gear) の確認。
-実行 (GearSwapKit/ で): python -I tests/test_ability.py"""
+"""Tests for ability-enhancing gear (ability_gear.json, ability_gear.py, Project.add_ability_gear).
+Run (from GearSwapKit/): python -I tests/test_ability.py"""
 import os
 import re
 import subprocess
@@ -37,7 +37,7 @@ table = AG.load()
 check(bool(table), "対応表が読める")
 check("SMN" in table and len(table["SMN"]) == 4, "SMN に 4 つ (アストラルフロウ・神獣の加護・マナシード・エレメントサイフォン)")
 
-# --- 対応表の中身の整合 ---
+# --- Consistency of the mapping table ---
 VALID_SLOTS = set(EP.SLOTS)
 for job, entries in table.items():
     for e in entries:
@@ -50,7 +50,7 @@ for job, entries in table.items():
         if e["timing"] == "while_active":
             check(bool(e.get("buff")) and e["buff"].get("id"), tag + ": 効果中ずっと着るものは、バフの情報がある")
 
-# --- res との突き合わせ (res がある環境だけ) ---
+# --- Cross-check against res (only when res is available) ---
 if os.path.isfile(os.path.join(RES, "items.lua")):
     def read(name):
         with open(os.path.join(RES, name), "rb") as f:
@@ -59,13 +59,13 @@ if os.path.isfile(os.path.join(RES, "items.lua")):
     ja_items = set(re.findall(r'\bja="([^"]*)"', items_txt))
     abil_txt = read("job_abilities.lua")
     abilities = set(re.findall(r'\ben="([^"]*)",ja="([^"]*)"', abil_txt))
-    abilities |= set(re.findall(r'\ben="([^"]*)",ja="([^"]*)"', read("spells.lua")))   # 学者の虚誘掩殺の策など、魔法の強化
+    abilities |= set(re.findall(r'\ben="([^"]*)",ja="([^"]*)"', read("spells.lua")))   # spell enhancements too, e.g. SCH Klimaform
     buffs_txt = read("buffs.lua")
     buffs = {int(m[0]): (m[1], m[2]) for m in re.findall(r'\bid=(\d+),en="([^"]*)",ja="([^"]*)"', buffs_txt)}
     for job, entries in table.items():
         for e in entries:
             tag = "%s/%s" % (job, e["ability_en"])
-            if not e.get("set_path"):      # set_path のもの (マニューバなど) は、まとめのセットなので名前の照合はしない
+            if not e.get("set_path"):      # set_path entries (Maneuvers, etc.) are shared sets, so skip the name check
                 check((e["ability_en"], e["ability_ja"]) in abilities, tag + ": アビリティ名が res の job_abilities と一致")
             for i in e["items"]:
                 check(i["ja"] in ja_items, tag + ": 装備名 %s が res の items にある" % i["ja"])
@@ -75,7 +75,7 @@ if os.path.isfile(os.path.join(RES, "items.lua")):
 else:
     out("(res が無いので、res との突き合わせは省略)")
 
-# --- 所持品との照合 ---
+# --- Matching against the inventory ---
 INV = EP.parse_inventory('''sets.exported={
  head="ＧＬホーン+1", head={ name="ＢＣホーン+2", augments={'Path: A',}}, head="ベコナーホーン", head="アストラルホーン",
  hands="ＢＣブレーサー+1", hands="ＢＣブレーサー+3",
@@ -101,7 +101,7 @@ if os.path.isfile(os.path.join(RES, "items.lua")):
     f = AG.owned(by["Astral Flow"], inv_en, rdb)
     check([i.name for _g, _s, i in f] == ["Glyphic Horn +1"], "英語名の所持品 (Glyphic Horn +1) も、アストラルフロウの候補になる")
 
-# --- Project に追加して Lua を作る ---
+# --- Add to a Project and generate Lua ---
 pr = Project("SMN")
 p_af = pr.add_ability_gear(by["Astral Flow"], AG.best_owned(by["Astral Flow"], INV)[2])
 check(p_af == "sets.precast.JA['Astral Flow']", "使う瞬間だけ着るものは sets.precast.JA['英語名'] (実際 %s)" % p_af)
@@ -118,27 +118,27 @@ check("hads" not in lua, "hads の綴りの間違いが無い")
 check("sets.buff['Avatar\\'s Favor'] = {" in lua, "神獣の加護は sets.buff に出る")
 check("sets.precast.JA['Avatar\\'s Favor']" not in lua, "神獣の加護は precast には出ない")
 check("function customize_idle_set(idleSet)" in lua and "function customize_melee_set(meleeSet)" in lua, "待機・戦闘中に重ねる処理が出る")
-# 念のための用意: Mote は sets.idle / sets.engaged を空で作るが、無い環境でも customize_idle_set が呼ばれるよう、無ければ空のセットを用意する
+# Safety net: Mote creates empty sets.idle / sets.engaged, but in case they're missing, create empty ones so customize_idle_set still gets called
 check("sets.idle" not in "".join(k for k in pr.assignments) and "sets.idle = sets.idle or {}" in lua
       and "sets.engaged = sets.engaged or {}" in lua, "待機・戦闘中のセットが無くても、空のセットを用意する")
 check("buff_gear[#buff_gear + 1] = {431, \"Avatar's Favor\", \"神獣の加護\", sets.buff['Avatar\\'s Favor']}" in lua, "バフの登録が出る")
-# 同じ部位を置き換える
+# Replacing gear in the same slot
 pr.add_ability_gear(by["Mana Cede"], AG.owned(by["Mana Cede"], INV)[0][2])
 check(len(pr.assignments["sets.precast.JA['Mana Cede']"]) == 1 and
       pr.assignments["sets.precast.JA['Mana Cede']"]["hands"].name == "ＢＣブレーサー+1", "同じ部位は置き換える")
-# 保存と読み込み
+# Save and reload
 pr2 = Project.from_json(pr.to_json())
 check(pr2.to_lua() == pr.to_lua(), "保存して読み込み直しても、同じ Lua になる")
-# 削除
+# Removal
 pr2.remove_custom(p_fav)
 lua2 = pr2.to_lua()
 check("buff_gear" not in lua2 and "sets.buff[" not in lua2, "効果中の追加を削除すると、重ねる処理も消える")
-# 一覧に出る
+# Shows up in the list
 rows = {r["path"]: r for r in pr.entries()}
 check(p_fav in rows and "効果中" in rows[p_fav]["help"] or "着たまま" in rows[p_fav]["help"], "一覧に効果中の装備が出て、説明がある")
 check(not Project("COR").has_work("COR"), "ほかのジョブには出ない")
 
-# まとめのセット (set_path): PUP のマニューバの胴は sets.precast.JA.Maneuver に入る
+# Shared set (set_path): PUP's Maneuver body piece goes into sets.precast.JA.Maneuver
 man = [e for e in table["PUP"] if e.get("set_path") == "sets.precast.JA.Maneuver"][0]
 pp = Project("PUP")
 inv_pup = EP.parse_inventory('sets.exported={ body="ＫＧファルセト+2", body="ＣＣファルセット+1" }')
@@ -149,7 +149,7 @@ check(p_man == "sets.precast.JA.Maneuver", "マニューバは sets.precast.JA.M
 check(not pp.custom, "一覧に元からある場面なので、技ごとの追加は増えない")
 check("sets.precast.JA.Maneuver = {" in pp.to_lua() and 'body="ＫＧファルセト+2"' in pp.to_lua(), "Lua に出る")
 
-# 魔法を唱えるとき (学者の章): 電光石火の章の足は詠唱を始めるとき・令狸執鼠の章の手は詠唱中
+# Gear for spellcasting (SCH Stratagems): Celerity feet at the start of the cast, Perpetuance hands during the cast
 cel = [e for e in table["SCH"] if e["ability_en"] == "Celerity"][0]
 per = [e for e in table["SCH"] if e["ability_en"] == "Perpetuance"][0]
 sub = [e for e in table["SCH"] if e["ability_en"] == "Sublimation"][0]
@@ -180,7 +180,7 @@ if os.path.exists(LUA51):
     sys.stdout.buffer.write(r.stdout + r.stderr)
     check(r.returncode == 0, "模擬 GearSwap で、詠唱を始めるとき・詠唱中の装備が正しく替わる")
 
-# 効果中に WS・遠隔攻撃をするとき (踊り子の C.フラリッシュ・狩人のダブルショット) と、青魔道士のブルーチェーン (魔法)
+# Gear for a WS or ranged attack while a buff is up (DNC Climactic Flourish, RNG Double Shot), plus BLU Chain Affinity (magic)
 clf = [e for e in table["DNC"] if e["ability_en"] == "Climactic Flourish"][0]
 dbs = [e for e in table["RNG"] if e["ability_en"] == "Double Shot"][0]
 cha = [e for e in table["BLU"] if e["ability_en"] == "Chain Affinity"][0]
@@ -209,7 +209,7 @@ if os.path.exists(LUA51):
         sys.stdout.buffer.write(r.stdout + r.stderr)
         check(r.returncode == 0, "模擬 GearSwap で、%s のときだけ着る" % kind)
 
-# メリット特性 (最適化・微調整): 専用のセット・MeritGear で On のときだけ重ねる
+# Merit traits (Optimization, Fine-Tuning): dedicated sets, layered on only when MeritGear is On
 opt = [e for e in table["PUP"] if e["ability_en"] == "Optimization"][0]
 fin = [e for e in table["PUP"] if e["ability_en"] == "Fine-Tuning"][0]
 inv_m = EP.parse_inventory('sets.exported={ head="ＰＩタージ+3", hands="ＰＩダスタナ+1", hands="ピトルダスタナ" }')
@@ -221,13 +221,13 @@ check("sets.merit.FineTuning = {" in lua_m and 'hands="ＰＩダスタナ+1"' in
 check("state.MeritGear = M{['description']='MeritGear', 'Off', 'On'}" in lua_m, "MeritGear の切り替え (既定は Off)")
 check(lua_m.count("function customize_idle_set") == 1, "customize_idle_set は 1 つだけ")
 check("state.MeritGear.value == 'On' and pet and pet.isvalid" in lua_m, "からくり士は、ペットがいる間だけ重ねる")
-# ペットのいないジョブ (コルセアのウィニングストリーク) は、On の間いつでも重ねる (ペットを条件にしない)
+# Jobs without a pet (COR Winning Streak) layer it on whenever it's On (no pet condition)
 win = [e for e in table["COR"] if e.get("set_path") == "sets.merit.WinningStreak"][0]
 pc = Project("COR")
 pc.add_ability_gear(win, EP.parse_equipped_set('sets.exported={ head="ＬＡトリコルヌ+3" }')["head"])
 lua_c = pc.to_lua()
 check("state.MeritGear.value == 'On' then" in lua_c and "pet.isvalid" not in lua_c, "ペットのいないジョブは、ペットを条件にしない")
-# 種類が JobAbility 以外の技 (コルセアのロール・踊り子のフラリッシュなど) は、Mote が sets.precast.<種類> の中で探すので、そこに置く
+# Abilities whose type isn't JobAbility (COR rolls, DNC flourishes, etc.) go under sets.precast.<type>, since that's where Mote looks for them
 if os.path.isfile(os.path.join(RES, "job_abilities.lua")):
     rdb2 = RDB.ResDB(RES)
     check(rdb2.ability_type("Blitzer's Roll") == "CorsairRoll" and rdb2.ability_type("Mana Cede") == "JobAbility", "res から技の種類を引ける")
@@ -240,7 +240,7 @@ if os.path.isfile(os.path.join(RES, "job_abilities.lua")):
     check("sets.precast.CorsairRoll = sets.precast.CorsairRoll or {}" in lua_b, "種類のセットが無ければ、空のセットを先に用意する")
     check("sets.precast.CorsairRoll['ブリッツァロール'] = sets.precast.CorsairRoll['Blitzer\\'s Roll']" in lua_b, "日本語名の別名も同じ種類のセットの中")
     check("sets.precast.JA = sets.precast.JA or {}" not in lua_b, "Mote が作る入れ物は用意しない")
-    # まとめのセット (ファントムロール全般) と一緒でも、両方が同じ種類のセットに入る
+    # Even alongside the shared set (all Phantom Rolls), both end up in the same type set
     roll = [e for e in table["COR"] if e.get("set_path") == "sets.precast.CorsairRoll"][0]
     pr_c.add_ability_gear(roll, EP.parse_equipped_set('sets.exported={ hands="ＣＳガントリー+3" }')["hands"])
     lua_b2 = pr_c.to_lua()
@@ -249,10 +249,10 @@ if os.path.isfile(os.path.join(RES, "job_abilities.lua")):
           and "sets.precast.CorsairRoll = sets.precast.CorsairRoll or {}" not in lua_b2,
           "まとめのセットが先に出て、個別の技はまとめのセットに重ねる (Mote は個別のセットだけを着るため・ゲーム内で発覚)")
     check("sets.precast.CorsairRoll['Blitzer\\'s Roll'] = {" in lua_b, "まとめのセットが無ければ、重ねずに普通に書く")
-    # 古い作業 (修正前に保存したもの・sets.precast.JA['Tactician\'s Roll']) を開いても、Lua を作るときに正しい置き場所へ移す
+    # Opening an old project (saved before the fix, with sets.precast.JA['Tactician\'s Roll']) still moves it to the right place when generating Lua
     old = Project("COR")
     tac = [e for e in table["COR"] if e["ability_en"] == "Tactician's Roll"][0]
-    old.add_ability_gear(tac, EP.parse_equipped_set('sets.exported={ body="ＣＳフラック+3" }')["body"])   # res 無し → JA に入る
+    old.add_ability_gear(tac, EP.parse_equipped_set('sets.exported={ body="ＣＳフラック+3" }')["body"])   # no res -> goes into JA
     old.add_ability_gear(roll, EP.parse_equipped_set('sets.exported={ hands="ＣＳガントリー+3" }')["hands"])
     check("sets.precast.JA['Tactician\\'s Roll']" in old.assignments, "res 無しのときは JA に入る (古い作業の再現)")
     reopened = Project.from_json(old.to_json())
@@ -283,7 +283,7 @@ if os.path.exists(LUA51):
     sys.stdout.buffer.write(r.stdout + r.stderr)
     check(r.returncode == 0, "模擬 GearSwap で、MeritGear の On/Off とペットの有無で重ね方が変わる")
 
-# --- luac で構文確認と、模擬 GearSwap での動作確認 ---
+# --- Syntax check with luac, and behavior check in the mock GearSwap ---
 if os.path.exists(LUAC):
     d = tempfile.mkdtemp()
     path = os.path.join(d, "SMN.lua")

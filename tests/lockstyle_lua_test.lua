@@ -1,5 +1,5 @@
--- 出力した Lua の「ロックスタイル」の動きを、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/lockstyle_lua_test.lua <出力した Lua のパス>   (ロックスタイル番号 94・武器の切り替えありの Lua)
+-- Simulates GearSwap to check the generated Lua's "lockstyle" behavior.
+-- Run: lua5.1.exe tests/lockstyle_lua_test.lua <path to generated Lua>   (a Lua with lockstyle set 94 and weapon switching)
 local path = arg[1]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -20,7 +20,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 
 local found = false
 for _, c in ipairs(sent) do if c == "wait 5; gs c lockstyleset" then found = true end end

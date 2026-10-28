@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""選んだセットから、GearSwap (Mote-Include) のジョブ用 Lua を作る。
+"""Build a GearSwap (Mote-Include) job Lua file from the selected sets.
 
-出力は GearSwap 標準の関数 (get_sets / user_setup / init_gear_sets) だけで組む。
-他の作者のコードは使わない。装備の中身 (名前・オーグメント) は export の表記をそのまま使う。
+The output uses only GearSwap's standard functions (get_sets / user_setup / init_gear_sets).
+No code from other authors is used. Gear contents (names, augments) are taken verbatim from the export.
 """
 import datetime
 import json
@@ -20,10 +20,10 @@ HEADER_JA = """-- {title}
 -- 装備の名前は日本語です (set_language('japanese'))。装備を変えたいときは、一番下の init_gear_sets の中の名前を書き換えます。
 -- 武器 ({weapon_slots}) は、{weapons}
 """
-HEADER = HEADER_JA      # 互換のため (日本語の見出し)
+HEADER = HEADER_JA      # For backward compatibility (Japanese header)
 
 
-# ファイルの分け方の説明と、装備のセットの前後の印 (ジョブ_gear.lua に写すとき、印のあいだをそのまま写せばよいように)
+# Notes on how the files are split, plus markers before and after the gear sets (so everything between the markers can be copied into JOB_gear.lua as-is)
 def SYSTEM_SECTION_NOTE(job):
     return [
         "",
@@ -63,26 +63,26 @@ HEADER_EN = """-- {title}
 
 
 def _en_skill_keys(text):
-    """英語クライアント用: セットのキーの日本語のスキル名 (['回復魔法']) を英語 (['Healing Magic']) にする。"""
+    """For the English client: convert Japanese skill names in set keys (e.g. Healing Magic in Japanese) to English (['Healing Magic'])."""
     for ja, en in SKILL_EN.items():
         text = text.replace("['%s']" % ja, "['%s']" % en)
     return text
 
 
 def make_key(base, name):
-    """sets.precast.WS + レデンサリュート → sets.precast.WS['レデンサリュート']"""
+    """sets.precast.WS + Leaden Salute -> sets.precast.WS['Leaden Salute']"""
     safe = name.replace('\\', '\\\\').replace("'", "\\'")
     return "%s['%s']" % (base, safe)
 
 
-# Mote-Include が init で作る入れ物 (Mote-Include.lua 112〜124 行。自分で作らなくてよい)。sets.merit はキットが作る
+# Containers Mote-Include creates in init (Mote-Include.lua lines 112-124; no need to create them yourself). The kit creates sets.merit
 MOTE_TABLES = {"sets", "sets.precast", "sets.precast.FC", "sets.precast.JA", "sets.precast.WS", "sets.precast.RA",
                "sets.midcast", "sets.midcast.RA", "sets.midcast.Pet", "sets.idle", "sets.resting", "sets.engaged",
                "sets.defense", "sets.buff", "sets.merit"}
 
 
 def _parent(path):
-    """sets.precast.CorsairRoll['X'] → sets.precast.CorsairRoll・sets.precast.JA.Maneuver → sets.precast.JA"""
+    """sets.precast.CorsairRoll['X'] -> sets.precast.CorsairRoll, sets.precast.JA.Maneuver -> sets.precast.JA"""
     if path.endswith("]") and "[" in path:
         return path[:path.rindex("[")]
     if "." in path:
@@ -94,16 +94,16 @@ def _depth(path):
     return path.count('.') + path.count('[')
 
 
-# 矢弾を、武器ではなく普通の装備としてセットに入れるジョブ (ストンチタスラム+1 など、着替えに意味があるもの)。
-# 遠隔のジョブ (狩人・コルセア) は、矢弾の使い分けの仕組みで替えるので除く
+# Jobs that put ammo in sets as regular gear rather than as a weapon (e.g. Staunch Tathlum +1, where swapping it actually matters).
+# Ranged jobs (Ranger, Corsair) are excluded because they swap ammo through the ammo-selection logic
 def ammo_as_gear(job):
     return job not in WS.RANGED_JOBS
 
 
 def set_lines(path, items, include_weapons, base=None, cycle_slots=(), keep_slots=()):
-    """1 つのセットを Lua の行にする。items は {スロット: Item}。
-    base があれば、そのセットに重ねる (set_combine)。Mote-Include は個別の技のセット (sets.precast.CorsairRoll['…'] など) を
-    見つけるとそれだけを着て、まとめのセット (ロール全般の頭・手など) を引き継がないため。"""
+    """Turn one set into Lua lines. items is {slot: Item}.
+    If base is given, layer on that set (set_combine). When Mote-Include finds an individual move's set (sets.precast.CorsairRoll['...'] etc.),
+    it equips only that set and doesn't inherit the umbrella set (head, hands, etc. for all rolls)."""
     lines = []
     for slot in EP.SLOTS:
         it = items.get(slot)
@@ -124,12 +124,12 @@ WEAPON_LABEL_EN = {"main": "Main", "sub": "Sub", "range": "Ranged"}
 
 
 def _lua_str(text):
-    """Lua の文字列 ("…") にする。"""
+    """Make a Lua string literal ("...")."""
     return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
 def weapon_names(items):
-    """武器の表示名 (切り替えの選択肢の名前)。同じ名前が複数あるときは「 (2)」「 (3)」を付ける。"""
+    """Display name for a weapon (the option name in the cycle). Duplicate names get " (2)", " (3)" appended."""
     names, seen = [], {}
     for it in items:
         base = it.name or L("武器", "Weapon")
@@ -139,7 +139,7 @@ def weapon_names(items):
 
 
 def weapon_blocks(weapons):
-    """武器の切り替えの Lua。戻り値: (ファイルの先頭に置く行, user_setup の中に置く行)。武器が無ければ空。"""
+    """Lua for weapon cycling. Returns (lines for the top of the file, lines inside user_setup). Empty if there are no weapons."""
     active = [(slot, field, label) for slot, field, label in WEAPON_STATES if weapons and weapons.get(slot)]
     if not active:
         return [], [], []
@@ -200,33 +200,33 @@ def weapon_blocks(weapons):
 MERIT_BASE = "sets.merit"
 
 
-# メリット特性の装備を「ペットがいる間だけ」重ねるジョブ (オートマトン・飛竜の性能を上げる特性)。ほかのジョブは On の間いつでも重ねる
+# Jobs that layer merit-trait gear only while a pet is out (traits that boost the automaton or wyvern). Other jobs layer it whenever it's On
 MERIT_NEEDS_PET = ("PUP", "DRG")
 
 
-# 二刀流のセット: (パス, サポジョブの英語略称, 日本語略称)。作者の user-globals.lua の customize_melee_set と同じ
+# Dual Wield sets: (path, English subjob abbreviation, Japanese subjob abbreviation). Same as customize_melee_set in the author's user-globals.lua
 DUAL_SETS = [("sets.engaged.dual11", "NIN", "忍"), ("sets.engaged.dual21", "DNC", "踊")]
 
 
 def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=(), status=(), low_hp=False, sleep=False, weapon_cycle=False):
-    """待機・戦闘中の装備に重ねる仕組みの Lua。
-    - 効果中ずっと着る装備 (sets.buff): buffs = [(セットのパス, バフ番号, 英語名, 日本語名)]。その強化が付いている間だけ重ねる。
-    - メリットポイントで覚える特性の装備 (sets.merit.*): //gs c cycle MeritGear を On にしたときだけ、ペットがいる間に重ねる
-      (振っていない人は、ほかの装備で対応しているので、既定は Off)。
-    戻り値: (ファイルの先頭に置く行, user_setup の中に置く行, init_gear_sets の最後に置く行)。重ねるものが無ければ空。
-    Mote-Include は sets.buff などを自動では使わないので、customize_idle_set / customize_melee_set で重ねる。"""
-    # buffs の 1 行: (パス, バフ番号, 英語名, 日本語名[, 着る時 = idle / precast / midcast / both[, 行動 = Magic / WeaponSkill / Ranged Attack]])
+    """Lua for layering gear over idle and engaged sets.
+    - Gear worn for a buff's whole duration (sets.buff): buffs = [(set path, buff ID, English name, Japanese name)]. Layered only while that buff is active.
+    - Gear for merit-point traits (sets.merit.*): layered while a pet is out, only when //gs c cycle MeritGear is On
+      (Off by default, since players who haven't put merits into the trait cover it with other gear).
+    Returns (lines for the top of the file, lines inside user_setup, lines at the end of init_gear_sets). Empty if there's nothing to layer.
+    Mote-Include doesn't use sets.buff and the like automatically, so they're layered in customize_idle_set / customize_melee_set."""
+    # One buffs entry: (path, buff ID, English name, Japanese name[, when = idle / precast / midcast / both[, action = Magic / WeaponSkill / Ranged Attack]])
     rows = []
     for b in (buffs or []):
         if b[0] in emitted:
             b = tuple(b)
             rows.append(b[:4] + ((b[4] if len(b) > 4 else "idle"), (b[5] if len(b) > 5 else "Magic")))
     active = [b[:4] for b in rows if b[4] == "idle"]
-    # "both" は、行動を始めるときと行動中の両方 (詠唱時間と再詠唱時間の両方に効くもの・学者の電光石火の章など)
+    # "both" means both at the start of the action and during it (for effects on both cast time and recast, e.g. Scholar's Celerity)
     casts = {ph: [b[:4] + (b[5],) for b in rows if b[4] in (ph, "both")] for ph in ("precast", "midcast")}
     merits = [p for p in sorted(emitted) if p.startswith(MERIT_BASE + ".")]
     toggles = list(toggles or [])
-    # toggles の 1 行: (state の名前, 説明, セットのパス[, "melee" = 戦闘中だけ重ねる])
+    # One toggles entry: (state name, description, set path[, "melee" = layer only while engaged])
     dual = [d for d in DUAL_SETS if d[0] in emitted] if dual else []
     status = list(status or [])
     if not active and not merits and not any(casts.values()) and not toggles and not dual and not status and not low_hp and not sleep:
@@ -282,7 +282,7 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=(), status=(), low
     for tg in toggles:
         field, desc, path = tg[:3]
         cond = " and melee" if len(tg) > 3 and tg[3] == "melee" else ""
-        if field is None:     # いつも重ねる装備 (学者の陣頭指揮の足など)
+        if field is None:     # gear that's always layered (e.g. Scholar's Stormsurge feet)
             top += ["    base = set_combine(base, %s)" % path + ("" if is_en() else "   -- %s" % desc)]
         else:
             top += ["    if state.%s and state.%s.value%s then base = set_combine(base, %s) end" % (field, field, cond, path)]
@@ -355,8 +355,8 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=(), status=(), low
                  "    state.MeritGear = M{['description']='MeritGear', 'Off', 'On'}"]
     reg = []
     if active or merits or toggles or dual or status or low_hp or sleep:
-        # 念のため: Mote-Include は sets.idle / sets.engaged を空で作るが、無いと customize_idle_set などが呼ばれないので、
-        # 無ければ空のセットを用意する (標準の Mote-Include では何も変わらない)
+        # Just in case: Mote-Include creates sets.idle / sets.engaged as empty tables, but without them customize_idle_set and friends never get called,
+        # so create an empty set if one is missing (no change with stock Mote-Include)
         reg.append(L("    -- 待機・戦闘中の装備のセットが無いときのための用意 (普段は何もしません)",
                      "    -- Fallback in case idle / engaged sets are missing (normally does nothing)"))
         reg.append("    sets.idle = sets.idle or {}")
@@ -364,7 +364,7 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=(), status=(), low
     if active:
         reg.append(L("    -- 効果中ずっと着る装備の登録", "    -- Register buff gear"))
         for path, bid, en, ja in active:
-            # 英語クライアントでは日本語名は使わないので、英語名を 2 つ並べる
+            # The English client never uses Japanese names, so list the English name twice
             reg.append("    buff_gear[#buff_gear + 1] = {%d, %s, %s, %s}" % (bid, _lua_str(en), _lua_str(en if is_en() else ja), path))
     if merits:
         reg.append(L("    -- メリットポイントで覚える特性の装備の登録", "    -- Register merit trait gear"))
@@ -376,7 +376,7 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=(), status=(), low
 
 
 def _cast_reg(casts):
-    """魔法を唱えるときの装備の登録の行。"""
+    """Lines that register gear for casting a spell."""
     reg = []
     for ph in ("precast", "midcast"):
         if casts.get(ph):
@@ -390,13 +390,13 @@ import set_catalog as _SC
 
 
 def received_blocks(emitted, manual=(), weapons=False):
-    """被強化の装備 (sets.midcast.IncreasedPhalanx / IncreasedProtect / IncreasedShell) の Lua。
-    戻り値: (ファイルの先頭の行, init_gear_sets の最後の行, job_post_midcast の中の行,
-            job_self_command の中の行, job_post_aftercast の中の行)。セットが無ければ空。
-    ほかの人が自分に唱え始めたら (action パケットの詠唱開始) 着て、着弾・中断 (または 8 秒) で gs c update を送って戻す。
-    weapons: 受ける強化のセットに武器 (main / sub / range) が入っている (ナイトの剣・盾など)。着る前の武器を覚えて、戻すときに着直す
-    (待機・戦闘中のセットには武器を入れていないので、gs c update だけでは武器が戻らないため)。"""
-    # manual (自動で着替えない) のものは、セットだけを出して、反応の仕組みには登録しない
+    """Lua for received-buff gear (sets.midcast.IncreasedPhalanx / IncreasedProtect / IncreasedShell).
+    Returns (top-of-file lines, end-of-init_gear_sets lines, lines in job_post_midcast,
+            lines in job_self_command, lines in job_post_aftercast). Empty if there are no sets.
+    Equips when someone else starts casting on you (cast-start action packet), then sends gs c update to revert when the spell lands or is interrupted (or after 8 seconds).
+    weapons: the received-buff set includes weapons (main / sub / range) (e.g. Paladin sword/shield). The weapons from before the swap are remembered and re-equipped on revert
+    (idle and engaged sets contain no weapons, so gs c update alone won't bring them back)."""
+    # manual entries (no automatic swap) only get their set written out; they aren't registered with the trigger logic
     use = [(name, ids, aoe) for name, _ja, ids, aoe in _SC.RECEIVED
            if "sets.midcast.%s" % name in emitted and name not in manual]
     if not use:
@@ -488,7 +488,7 @@ def received_blocks(emitted, manual=(), weapons=False):
             "    end"]
     cmds, after = [], []
     if weapons:
-        # received_weapons は job_self_command (このファイルの上のほう) からも使うので、local にしない
+        # received_weapons is also used from job_self_command (higher up in this file), so it isn't local
         cmds = [L("    -- //gs c received_save / received_restore: 受ける強化の装備で持ち替える前の武器を覚える・着直す",
                   "    -- //gs c received_save / received_restore: remember / re-equip the weapons from before the received-buff gear"),
                 "    if cmdParams[1] == 'received_save' then",
@@ -513,7 +513,7 @@ def received_blocks(emitted, manual=(), weapons=False):
 
 
 def lockstyle_blocks(lockstyle):
-    """ロックスタイル番号 (lockstyleset) の Lua。戻り値: (user_setup の中の行, init_gear_sets の最初の行, job_self_command の中の行)。"""
+    """Lua for the lockstyle number (lockstyleset). Returns (lines in user_setup, first lines of init_gear_sets, lines in job_self_command)."""
     if not lockstyle:
         return [], [], []
     setup = [L("    -- 読み込んだあと (武器を装備したあと)、少し待ってから、ロックスタイルをかけます",
@@ -532,23 +532,23 @@ def lockstyle_blocks(lockstyle):
     return setup, init, cmds
 
 
-# 矢弾の使い分け (狩人・コルセア)。役目: 物理 (遠隔攻撃・物理の WS)・魔攻 (魔法属性の遠隔 WS)・クイックドロー (コルセア)
+# Ammo selection (Ranger, Corsair). Roles: physical (ranged attacks and physical WS), magic attack (magical ranged WS), Quick Draw (Corsair)
 AMMO_ROLES = [("physical", "物理"), ("magical", "魔攻"), ("quickdraw", "クイックドロー")]
-# 魔法属性の遠隔 WS (魔攻の弾を使う)
+# Magical ranged WS (these use the magic attack ammo)
 RANGED_MAGIC_WS = [n for n in WS.MAGIC_WS if n in WS.RANGED_WS]
 
 
 def _RANGED_SKILL():
-    """弓術・射撃の WS かの判定 (英語クライアントは英語名だけ)。"""
+    """Whether a WS is Archery/Marksmanship (English names only on the English client)."""
     if is_en():
         return "spell.skill == 'Archery' or spell.skill == 'Marksmanship'"
     return "spell.skill == 'Archery' or spell.skill == 'Marksmanship' or spell.skill == '弓術' or spell.skill == '射撃'"
 
 
 def ammo_blocks(ammo, ws_ammo):
-    """矢弾の使い分けの Lua。ammo: {役目: Item}・ws_ammo: {WS の英語名: Item} (特殊弾)。
-    戻り値: (先頭, job_post_precast の中, job_post_aftercast の中, user_setup の中, job_self_command の中)。何も無ければ全部空。
-    特殊弾とクイックドローの弾は、使ったあとに外して、遠隔攻撃で撃ってしまわないようにする (誤射防止)。"""
+    """Lua for ammo selection. ammo: {role: Item}, ws_ammo: {English WS name: Item} (special ammo).
+    Returns (top, in job_post_precast, in job_post_aftercast, in user_setup, in job_self_command). All empty if there's nothing.
+    Special ammo and Quick Draw ammo are removed after use so a ranged attack doesn't fire them by mistake."""
     ammo = {k: v for k, v in (ammo or {}).items() if v}
     ws_ammo = {k: v for k, v in (ws_ammo or {}).items() if v}
     if not (ammo or ws_ammo):
@@ -619,8 +619,8 @@ def ammo_blocks(ammo, ws_ammo):
     return top, pre, after, setup, cmds
 
 
-# ペットの技の分け方 (召喚士の契約の履行・獣使いの技)。分類は pet_moves.json (FF11 用語辞典で確かめたもの)
-# ジョブ -> [(分類, セットの名前 = sets.midcast.Pet の後ろ)]
+# How pet moves are grouped (Summoner Blood Pacts, Beastmaster Ready moves). Categories come from pet_moves.json (checked against the Japanese FF11 wiki, wiki.ffo.jp)
+# job -> [(category, set name = the part after sets.midcast.Pet)]
 PET_MAPS = {
     "SMN": [("physical", "AvatarPhysicalPacts"), ("magical", "AvatarMagicalPacts"),
             ("buff", "AvatarBuffWard"), ("debuff", "AvatarDeBuffWard")],
@@ -640,11 +640,11 @@ def _pet_moves():
 
 
 def pet_map_rows(job, emitted):
-    """{技の英語名: セットの名前} (そのセットが出るものだけ)。"""
+    """{English move name: set name} (only for sets that get written)."""
     rows = {}
     want = {kind: name for kind, name in PET_MAPS.get(job, [])
             if "sets.midcast.Pet.%s" % name in emitted
-            # 強化の履行は、セットが無くても召喚魔法スキルの装備 (sets.SmnSkill) を使う
+            # Ward pacts use Summoning Magic skill gear (sets.SmnSkill) even when there's no dedicated set
             or (name == "AvatarBuffWard" and "sets.SmnSkill" in emitted)}
     if not want:
         return rows
@@ -659,7 +659,7 @@ BLU_SETS = ("BluePhysical", "BlueMagical", "BlueBuff", "BlueHealing")
 
 
 def blu_map_rows(job, emitted):
-    """青魔法の分類 {英語名: 'BluePhysical' など}。そのセットを出すときだけ (blu_spells.json = 作者の Mote-Mappings.lua の分類)。"""
+    """Blue Magic categories {English name: 'BluePhysical' etc.}. Only when that set is written (blu_spells.json = the categories from the author's Mote-Mappings.lua)."""
     if job != "BLU":
         return enfeeble_map_rows(job, emitted)
     have = {c for c in BLU_SETS if "sets.midcast.%s" % c in emitted}
@@ -674,12 +674,12 @@ def blu_map_rows(job, emitted):
     return {en: c for en, c in data.items() if c in have}
 
 
-# 弱体の青魔法 (魔命が大事なもの)。sets.midcast.BlueMagicAcc があるときだけ、これらをそちらに分ける
+# Enfeebling Blue Magic (where magic accuracy matters). These are split out only when sets.midcast.BlueMagicAcc exists
 BLU_ACC_SPELLS = ["Sheep Song", "Soporific", "Dream Flower", "Yawn", "Blank Gaze", "Geist Wall", "Sound Blast", "Chaotic Eye",
                   "Frightful Roar", "Jettatura", "Feather Tickle", "Reaving Wind", "Mortal Ray", "Absolute Terror", "Cruel Joke",
                   "Infrasonics", "Filamented Hold", "Lowing", "Auroral Drape", "Venom Shell", "Stinking Gas", "Awful Eye",
                   "Actinic Burst", "Cold Wave", "Light of Penance", "Blistering Roar"]
-# 弱体魔法の INT 系・MND 系 (作者の RDM.lua の分け方を広げたもの)
+# INT-based and MND-based Enfeebling Magic (an extended version of the grouping in the author's RDM.lua)
 ENFEEBLE_INT = ["Sleep", "Sleep II", "Sleepga", "Sleepga II", "Break", "Breakga", "Bind", "Blind", "Blind II",
                 "Gravity", "Gravity II", "Poison", "Poison II", "Poisonga", "Dispel"]
 ENFEEBLE_MND = ["Silence", "Paralyze", "Paralyze II", "Slow", "Slow II", "Addle", "Addle II", "Distract", "Distract II",
@@ -687,7 +687,7 @@ ENFEEBLE_MND = ["Silence", "Paralyze", "Paralyze II", "Slow", "Slow II", "Addle"
 
 
 def enfeeble_map_rows(job, emitted):
-    """弱体魔法の INT 系・MND 系 {英語名: 'EnfeeblingEffectInt' など}。そのセットを出すときだけ。"""
+    """INT-based / MND-based Enfeebling Magic {English name: 'EnfeeblingEffectInt' etc.}. Only when that set is written."""
     out = {}
     if "sets.midcast.EnfeeblingEffectInt" in emitted:
         out.update({n: "EnfeeblingEffectInt" for n in ENFEEBLE_INT})
@@ -697,8 +697,8 @@ def enfeeble_map_rows(job, emitted):
 
 
 def ws_blocks(emitted, job=None):
-    """WS の分け方 (job_get_spell_map) の Lua。sets.precast.WS.Magic / .Range が出るときだけ。
-    標準の Mote-Include は spellMap の名前でもセットを探すので、魔法属性の WS は 'Magic'・遠隔の WS は 'Range' と分ける。"""
+    """Lua for WS grouping (job_get_spell_map). Only when sets.precast.WS.Magic / .Range are written.
+    Stock Mote-Include also looks up sets by spellMap name, so magical WS map to 'Magic' and ranged WS to 'Range'."""
     has_magic = "sets.precast.WS.Magic" in emitted
     has_range = "sets.precast.WS.Range" in emitted
     has_rmagic = "sets.precast.WS.RangeMagic" in emitted
@@ -777,34 +777,34 @@ def ws_blocks(emitted, job=None):
     return top
 
 
-# --- ナイト (PLD) ---
-# 敵対心 (最大) を土台にするアビリティ (詠唱の無い、敵対心を稼ぐアビリティ)
+# --- Paladin (PLD) ---
+# Abilities that use Enmity (max) as their base (enmity-generating abilities with no cast time)
 PLD_ENMITY_MAX_JA = ("Sentinel", "Rampart", "Majesty", "Vallation", "Valiance", "Palisade")
-# 敵対心を土台にする魔法 (技ごとに足したとき)
+# Spells that use Enmity as their base (when a per-spell set is added)
 PLD_ENMITY_SPELLS = ("Flash", "Foil", "Reprisal", "Crusade", "Banish", "Banishga", "Banish II", "Holy", "Enlight",
                      "Jettatura", "Geist Wall", "Sheep Song", "Blank Gaze", "Soporific", "Stinking Gas", "Poisonga")
-# 手動で重ねる装備: (state の名前, 説明, セットのパス)。後ろのものが上に重なる
+# Manually layered gear: (state name, description, set path). Later entries layer on top
 PLD_TOGGLES = [("Magical", "対魔法", "sets.idle.Magical"), ("StatusResist", "状態異常耐性", "sets.StatusResist")]
 TOGGLE_EN = {"Magical": "magic defense", "StatusResist": "status resistance", "TreasureHunter": "Treasure Hunter"}
-# トレジャーハンター: //gs c toggle TreasureHunter で、戦闘中の装備に重ねる (全ジョブ)
+# Treasure Hunter: //gs c toggle TreasureHunter layers it over engaged gear (all jobs)
 TH_TOGGLE = ("TreasureHunter", "トレジャーハンター", "sets.TreasureHunter", "melee")
-# ノックバック防止: //gs c toggle KnockBack で、戦闘中の装備に重ねる (ナイト・魔導剣士)
+# Knockback prevention: //gs c toggle KnockBack layers it over engaged gear (Paladin, Rune Fencer)
 KB_TOGGLE = ("KnockBack", "ノックバック防止", "sets.KnockBack", "melee")
 TOGGLE_EN["KnockBack"] = "knockback guard"
-# 死の宣告・神獣の加護: (英語名, 日本語名, セット, idle = 待機だけ / both)
+# Doom / Avatar's Favor: (English name, Japanese name, set, idle = idle only / both)
 STATUS_OVERLAYS = [("Doom", "死の宣告", "sets.midcast.IncreasedCursna", "both"),
                    ("Avatar's Favor", "神獣の加護", "sets.idle.Avatar.Favor", "idle")]
-# メインとサブも着替えるセット (対魔法の武器・盾)。オフにしたら、武器の切り替えで選んでいる武器に戻す
+# Sets that also swap main and sub (anti-magic weapon and shield). When toggled off, revert to the weapon selected in the weapon cycle
 PLD_WEAPON_SETS = ("sets.idle.Magical", "sets.StatusResist")
-PHALANX_SET = "sets.midcast['Phalanx']"     # 魔法のファランクス (剣・盾のファランクス+ も持ち替える)
-# ファランクス・ファランクスII (赤魔道士) のセット。どちらも剣・盾を持ち替え、唱えたあとに戻す
+PHALANX_SET = "sets.midcast['Phalanx']"     # Phalanx spell (also swaps to a sword/shield with Phalanx+)
+# Sets for Phalanx and Phalanx II (Red Mage). Both swap sword and shield, then swap back after casting
 PHALANX_SETS = (PHALANX_SET, "sets.midcast['Phalanx II']")
-PLD_LAND_ADJUST = 0.30     # 着弾の何秒前に着弾の装備へ替えるか (作者の PLD.lua の実測: 0.30 秒で 10/10)
-PLD_SUB_RDM_FC = 15        # サポ赤のファストキャストの特性 (%)
+PLD_LAND_ADJUST = 0.30     # How many seconds before the spell lands to switch to landing gear (measured in the author's PLD.lua: 0.30 s, 10/10)
+PLD_SUB_RDM_FC = 15        # Fast Cast trait from /RDM (%)
 
 
 def pld_base(path, emitted):
-    """ナイトの技ごとのセットを重ねる元。アビリティ → 敵対心 (最大)・敵対心の魔法 → 敵対心。"""
+    """Base set that Paladin per-move sets layer on. Abilities -> Enmity (max), Enmity spells -> Enmity."""
     for prefix, names, chain in (("sets.precast.JA['", None, ("sets.Enmity",)),
                                  ("sets.midcast['", PLD_ENMITY_SPELLS, ("sets.Enmity",))):
         if path.startswith(prefix) and path.endswith("']"):
@@ -823,10 +823,10 @@ def pld_base(path, emitted):
 
 
 def pld_blocks(emitted, three_stage=False, fast_cast=0):
-    """ナイトの仕組みの Lua。戻り値: dict(top, post_midcast, aftercast, cmds, setup, init_tail, toggles)。
-    - 敵対心: セットの無いアビリティは sets.precast.JA (Mote が最後に見る場所) に、敵対心の装備を入れておく
-    - 詠唱中断: セットの無い魔法は sets.midcast (同じく最後に見る場所) に、詠唱中断の装備を入れておく
-    - 3 段階の着替え (three_stage): 詠唱中は詠唱中断の装備、着弾の直前に、その魔法の装備 (ケアルなど) へ替える"""
+    """Lua for the Paladin logic. Returns dict(top, post_midcast, aftercast, cmds, setup, init_tail, toggles).
+    - Enmity: abilities without a set get Enmity gear placed in sets.precast.JA (the last place Mote looks)
+    - Spell interruption: spells without a set get Spell Interruption gear placed in sets.midcast (likewise the last place it looks)
+    - Three-stage swap (three_stage): Spell Interruption gear while casting, then the spell's own gear (Cure etc.) just before it lands"""
     out = dict(top=[], post_midcast=[], aftercast=[], cmds=[], setup=[], init_tail=[], toggles=[])
     init = []
     if "sets.Enmity" in emitted:
@@ -837,7 +837,7 @@ def pld_blocks(emitted, three_stage=False, fast_cast=0):
                  "        if type(slot) == 'string' and sets.precast.JA[slot] == nil then sets.precast.JA[slot] = item end",
                  "    end"]
     if "sets.midcast.interruption" in emitted:
-        # sets.midcast (Mote が最後に見る場所) に入れると、アビリティの midcast でも着てしまうので、魔法のときだけ着る
+        # Putting it in sets.midcast (the last place Mote looks) would make abilities wear it at midcast too, so wear it for spells only
         out["post_midcast"] = [
             L("    -- セットを作っていない魔法は、詠唱中ずっと詠唱中断の装備です (アビリティ・WS では着ない)",
               "    -- Spells without their own set use the spell interruption set in midcast (not for JAs / WS)"),
@@ -860,7 +860,7 @@ def pld_blocks(emitted, three_stage=False, fast_cast=0):
               "local land_adjust = %.2f     -- seconds before landing to swap (too short and it misses; change with //gs c landadjust 0.4)" % PLD_LAND_ADJUST),
             "local land_set = nil",
             ""]
-        out["post_midcast"] = [     # 3 段階は、セットの有無にかかわらず詠唱中断を着るので、上の行と入れ替える
+        out["post_midcast"] = [     # Three-stage mode always wears Spell Interruption gear whether or not a set exists, so replace the line above
             L("    -- 3 段階の着替え: いまの装備 (その魔法の装備) を覚えて、詠唱中断の装備に替え、着弾の直前に戻す",
               "    -- 3-stage swap: remember the spell's set, switch to interruption gear, swap back just before landing"),
             "    if spell.action_type == 'Magic' then",
@@ -895,15 +895,15 @@ def pld_blocks(emitted, three_stage=False, fast_cast=0):
     return out
 
 
-# --- からくり士 (PUP) ---
+# --- Puppetmaster (PUP) ---
 PUP_WS_SET = "sets.midcast.Pet.WeaponSkill"
 PUP_ENMITY_SET = "sets.midcast.Pet.Enmity"
 
 
 def maneuver_blocks(emitted):
-    """からくり士のマニューバのメイン (乾坤圏など) を、マニューバのあと選んでいる武器に戻す Lua。
-    //gs c toggle KeepManeuverWeapon でオンにすると戻さない (TP を消したくないとき)。
-    戻り値: dict(top, post_precast, aftercast, setup)。マニューバのセットが無ければ空。"""
+    """Lua that returns Puppetmaster's maneuver main weapon (Kenkonken etc.) to the selected weapon after a maneuver.
+    Turning on //gs c toggle KeepManeuverWeapon skips the revert (for when you don't want to lose TP).
+    Returns dict(top, post_precast, aftercast, setup). Empty if there's no maneuver set."""
     out = dict(top=[], post_precast=[], aftercast=[], setup=[])
     if "sets.precast.JA.Maneuver" not in emitted:
         return out
@@ -950,11 +950,11 @@ def maneuver_blocks(emitted):
 
 
 def pup_blocks(emitted, auto=False):
-    """からくり士のオートマトンの技の装備の Lua。戻り値: dict(top, setup, cmds)。
-    - 反応する着替え: オートマトンの技が出たとき (job_pet_midcast)、WS (連携属性のある技) はペットの WS の装備、
-      ストロボ・フラッシュバルブはペットの敵対心の装備を着る
-    - 自動の事前着替え (auto): 1 秒ごとに、オートマトンの TP が 930 以上なら WS の装備、ストロボ (火のマニューバ中)・
-      フラッシュバルブ (光のマニューバ中) の再使用まで残り 2 秒なら敵対心の装備を、先に着ておく (技が出てからでは間に合わないため)"""
+    """Lua for Puppetmaster automaton move gear. Returns dict(top, setup, cmds).
+    - Reactive swap: when an automaton move goes off (job_pet_midcast), WS (moves with skillchain properties) use pet WS gear,
+      and Strobe / Flashbulb use pet Enmity gear
+    - Automatic pre-swap (auto): every second, put on WS gear if the automaton has 930+ TP, or Enmity gear if Strobe (during Fire maneuvers) /
+      Flashbulb (during Light maneuvers) is 2 seconds from being ready, ahead of time (swapping after the move fires is too late)"""
     has_ws, has_en = PUP_WS_SET in emitted, PUP_ENMITY_SET in emitted
     out = dict(top=[], setup=[], cmds=[])
     if not (has_ws or has_en):
@@ -1125,15 +1125,15 @@ def pup_blocks(emitted, auto=False):
     return out
 
 
-# --- 属性帯 (八輪の帯) とオルペウスサッシュの自動選択 (精霊魔法) ---
-# 効果量: 天候 ±10% (強天候 ±25%)・曜日 ±10% (FF11用語辞典 html/2218)。オルペウスサッシュは対象との距離で +15〜+1%
-# (1.93 ヤルム以内で +15、13 以上で +1、あいだは直線。作者が使ってきた値・BG-Wiki)。効果の大きいほうを着る。
+# --- Auto-selecting elemental obis (Hachirin-no-Obi) and Orpheus's Sash (Elemental Magic) ---
+# Bonus: weather +/-10% (double weather +/-25%), day +/-10% (Japanese FF11 wiki: wiki.ffo.jp/html/2218.html). Orpheus's Sash gives +15 to +1% depending on distance to the target
+# (+15 within 1.93 yalms, +1 at 13 or more, linear in between; the values the author has used, per BG-Wiki). Wear whichever gives the bigger bonus.
 IMMANENCE_SET = "sets.buff['Immanence']"
 
 
 def waist_blocks(emitted, enabled):
-    """戻り値: dict(top, post_midcast)。enabled でなければ空。震天動地の章が効いている間は腰を替えず、
-    震天動地の章の装備 (sets.buff['Immanence']) を最後に着直す (最優先)。"""
+    """Returns dict(top, post_midcast). Empty unless enabled. While Immanence is active the waist isn't swapped,
+    and the Immanence gear (sets.buff['Immanence']) is re-equipped last (highest priority)."""
     out = dict(top=[], post_midcast=[])
     has_imm = IMMANENCE_SET in emitted
     imm = ([L("    -- 震天動地の章の装備を最優先 (ほかの装備の上から、最後に着る)",
@@ -1154,7 +1154,7 @@ def waist_blocks(emitted, enabled):
         "local function ja_element(e) return EN_JA[e] or e end",
         "",
         "-- 帯を着たときの効果 (%)。属性の無いものは nil"]
-    # 英語クライアント: 名前・属性は英語だけ (res/items.lua・res/elements.lua の en)。関数名 ja_element は下の行と共通にするため残す
+    # English client: names and elements are English only (en in res/items.lua and res/elements.lua). The function name ja_element is kept to match the line below
     head_en = [
         "-- Hachirin-no-Obi vs. Orpheus's Sash: in midcast, wear whichever waist gives more elemental magic damage.",
         "-- Weather (incl. SCH storms) +/-10% (double weather +/-25%), day +/-10%. Orpheus's Sash: +15% up close down to +1%.",
@@ -1217,24 +1217,24 @@ def waist_blocks(emitted, enabled):
     return out
 
 
-# --- 狩人・コルセアの遠隔攻撃、コルセアのロールとクイックドロー ---
-# 名前は作者の COR_gear.lua と同じ (sets.RA_STP など)。出したら、Mote-Include が探す名前に結ぶ
+# --- Ranger/Corsair ranged attacks, Corsair rolls and Quick Draw ---
+# Names match the author's COR_gear.lua (sets.RA_STP etc.). Once written, they're linked to the names Mote-Include looks for
 COR_QD_SETS = [("sets.RA_QDSTP", "ソーティ", "StoreTP"), ("sets.RA_QDDPS", "通常", "Damage")]
 COR_QD_ACC_SHOTS = [("Light Shot", "ライトショット"), ("Dark Shot", "ダークショット")]
 
 
 def ranged_links(emitted):
-    """{出したセット: [結ぶ先のパス]}。結ぶ先は、出した直後に `先 = セット` の行で作る (ロールごとのセットなどを、その上に重ねるため)。"""
+    """{written set: [link target paths]}. Link targets are created with a `target = set` line right after the set is written (so per-roll sets etc. can layer on top)."""
     links = {"sets.RA_STP": ["sets.midcast.RA"], "sets.RA_ACC": ["sets.midcast.RA.Acc"],
              "sets.CorsairRoll": ["sets.precast.CorsairRoll"]}
     qd = [p for p, _ja, _en in COR_QD_SETS if p in emitted]
     if qd:
-        links[qd[0]] = ["sets.precast.CorsairShot"]      # 既定のクイックドローは STP (無ければ威力)
+        links[qd[0]] = ["sets.precast.CorsairShot"]      # default Quick Draw set is STP (falls back to damage)
     return {k: v for k, v in links.items() if k in emitted}
 
 
 def cor_blocks(emitted):
-    """遠隔攻撃のモードと、コルセアのクイックドローの切り替えの Lua。戻り値: dict(setup, post_precast, init_tail)。"""
+    """Lua for ranged attack modes and Corsair Quick Draw cycling. Returns dict(setup, post_precast, init_tail)."""
     out = dict(setup=[], post_precast=[], init_tail=[])
     qd = [(p, L(ja, en)) for p, ja, en in COR_QD_SETS if p in emitted]
     if len(qd) == 2:
@@ -1259,7 +1259,7 @@ def cor_blocks(emitted):
                              "    sets.precast.CorsairShot = sets.precast.CorsairShot or {}"]
         for en, ja in COR_QD_ACC_SHOTS:
             out["init_tail"].append("    %s = sets.RA_QDACC" % make_key("sets.precast.CorsairShot", en))
-            if not is_en():     # 日本語名で探す改造版の Mote-Include 用
+            if not is_en():     # for modified Mote-Include builds that look up Japanese names
                 out["init_tail"].append("    %s = sets.RA_QDACC" % make_key("sets.precast.CorsairShot", ja))
     if out["init_tail"]:
         out["init_tail"].append("")
@@ -1267,13 +1267,13 @@ def cor_blocks(emitted):
 
 
 def ws_base(path, emitted):
-    """技ごとの WS (sets.precast.WS['英語名']) を重ねる元のセット。魔法属性 → WS.Magic・遠隔 → WS.Range・ほか → WS (共通)。"""
+    """Base set that per-move WS sets (sets.precast.WS['English name']) layer on. Magical -> WS.Magic, ranged -> WS.Range, others -> WS (generic)."""
     prefix = "sets.precast.WS['"
     if not (path.startswith(prefix) and path.endswith("']")):
         return None
     en = path[len(prefix):-2].replace("\\'", "'")
     kind = WS.kind_of(en)
-    # 遠隔魔攻のセットが無ければ魔攻のセット、それも無ければ共通の WS に重ねる
+    # If there's no ranged magic attack set, layer on the magic attack set; failing that, on the generic WS
     chain = {"RangeMagic": ["RangeMagic", "Magic"]}.get(kind, [kind] if kind else [])
     for cand in ["sets.precast.WS.%s" % k for k in chain] + ["sets.precast.WS"]:
         if cand and cand in emitted:
@@ -1284,13 +1284,13 @@ def ws_base(path, emitted):
 def build_lua(job, assignments, include_weapons=False, title=None, aliases=None, weapons=None, buffs=None, lockstyle=None,
               received_manual=(), ammo=None, ws_ammo=None, pld_three_stage=False, pld_fast_cast=0, pup_auto=False,
               auto_waist=False):
-    """assignments: {path: {slot: Item}}。空のセットは出さない。
-    aliases: {別名のパス: 元のパス}。元のセットが出力されるときだけ、`別名 = 元` の行を足す
-    (標準の Mote-Include は技の名前を英語で探し、日本語名に改造したものは日本語で探す。両方で動くようにする)。
-    weapons: {main/sub/range: [Item, ...]}。あれば、//gs c cycle MainWeapons などで持ち替える仕組みを足す。
-    buffs: [(sets.buff のセットのパス, バフ番号, 英語名, 日本語名)]。あれば、効果中ずっと着る装備を重ねる仕組みを足す。"""
+    """assignments: {path: {slot: Item}}. Empty sets aren't written.
+    aliases: {alias path: source path}. Adds an `alias = source` line only when the source set is written
+    (stock Mote-Include looks up move names in English, while builds modified for Japanese names look them up in Japanese; this makes both work).
+    weapons: {main/sub/range: [Item, ...]}. If present, adds weapon cycling via //gs c cycle MainWeapons etc.
+    buffs: [(sets.buff set path, buff ID, English name, Japanese name)]. If present, adds logic that layers gear worn for a buff's whole duration."""
     used = {p: s for p, s in assignments.items() if s}
-    # バ系の魔法は強化魔法の装備に重ねるので、その後に出す
+    # Bar-spells layer on Enhancing Magic gear, so write them after it
     order = sorted(used, key=lambda p: (_depth(p) + (1 if p == "sets.midcast.BarElement" else 0), p.endswith("]"),
                                         list(assignments).index(p)))
     out = []
@@ -1313,42 +1313,42 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
         out.extend(weapon_top)
     lock_setup, lock_init, lock_cmds = lockstyle_blocks(lockstyle)
     ammo_top, ammo_pre, ammo_after, ammo_setup, ammo_cmds = ammo_blocks(ammo, ws_ammo)
-    out.extend(ammo_top)       # job_self_command より前に (local の ammo を使うため)
-    # 武器の切り替えがあるスロットは、セットに入れない (Mote は cycle の後に装備を作り直すので、セットの武器で上書きされる)
+    out.extend(ammo_top)       # before job_self_command (it uses the local ammo)
+    # Slots covered by weapon cycling are left out of sets (Mote rebuilds gear after a cycle, so the set's weapon would overwrite the choice)
     cycle_slots = {slot for slot, items in (weapons or {}).items() if items}
     if ammo_top:
-        cycle_slots.add("ammo")     # 矢弾は使い分けの仕組みで替えるので、セットには入れない
+        cycle_slots.add("ammo")     # ammo is swapped by the ammo-selection logic, so keep it out of sets
     keep_slots = ("ammo",) if ammo_as_gear(job) and "ammo" not in cycle_slots else ()
 
     def keep_for(path):
-        # ナイトの対魔法・状態異常耐性は、メインとサブ (マリグナスソード・イージスなど) も着替える
+        # Paladin anti-magic / status resistance sets also swap main and sub (Malignance Sword, Aegis, etc.)
         if job == "PLD" and path in PLD_WEAPON_SETS:
             return tuple(keep_slots) + ("main", "sub")
-        # からくり士のオートマトンの WS は、メイン (シュコアトルなど) も持ち替える (乾坤圏のときは Lua の側で替えない)
+        # Puppetmaster automaton WS also swaps main (Xiucoatl etc.) (not swapped on the Lua side while using Kenkonken)
         if job == "PUP" and path == PUP_WS_SET:
             return tuple(keep_slots) + ("main",)
-        # からくり士のマニューバは、メイン (乾坤圏など、マニューバを強化する武器) も持ち替える
+        # Puppetmaster maneuvers also swap main (Kenkonken and other weapons that enhance maneuvers)
         if job == "PUP" and path == "sets.precast.JA.Maneuver":
             return tuple(keep_slots) + ("main",)
-        # 受ける強化の装備と魔法のファランクスは、武器も持ち替える (ナイトの剣・盾のファランクス+ など。TP を減らしたくなければ、export か Lua から外す)
+        # Received-buff gear and the Phalanx spell also swap weapons (Paladin sword/shield with Phalanx+ etc.; if you don't want to lose TP, remove them from the export or the Lua)
         if path.startswith("sets.midcast.Increased") or path in PHALANX_SETS:
             return tuple(keep_slots) + ("main", "sub", "range")
-        # 睡眠から起きる装備は、プライムウェポン (武器) も持ち替える
+        # Sleep wake-up gear also swaps the Prime Weapon
         if path == "sets.Sleep":
             return tuple(keep_slots) + ("main", "sub", "range")
         return keep_slots
     emitted_paths = {p for p in used if set_lines(p, used[p], include_weapons, cycle_slots=cycle_slots, keep_slots=keep_for(p))}
     pld = pld_blocks(emitted_paths, pld_three_stage, pld_fast_cast) if job == "PLD" else pld_blocks(set())
-    out.extend(pld["top"])     # job_self_command より前に (local の land_set を使うため)
+    out.extend(pld["top"])     # before job_self_command (it uses the local land_set)
     pup = pup_blocks(emitted_paths, pup_auto) if job == "PUP" else pup_blocks(set())
-    out.extend(pup["top"])     # job_self_command より前に (local の pet_auto_gear を使うため)
+    out.extend(pup["top"])     # before job_self_command (it uses the local pet_auto_gear)
     man = maneuver_blocks(emitted_paths) if job == "PUP" else maneuver_blocks(set())
     out.extend(man["top"])
     waist = waist_blocks(emitted_paths, auto_waist)
     out.extend(waist["top"])
     cor = cor_blocks(emitted_paths)
     links = ranged_links(emitted_paths)
-    # 受ける強化: job_self_command に武器を覚える・着直すコマンドを入れるので、先に作る
+    # Received buffs: build this first, since it adds commands to job_self_command that remember and re-equip weapons
     recv_weapons = any(p.startswith("sets.midcast.Increased") and set(used[p]) & {"main", "sub", "range"}
                        for p in emitted_paths)
     recv_top, recv_reg, recv_mid, recv_cmds, recv_after = received_blocks(emitted_paths, received_manual, recv_weapons)
@@ -1358,13 +1358,13 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
         out.extend(cmds)
         out.append("end")
         out.append("")
-    # 学者: 陣頭指揮の足は、陣の魔法の詠唱の開始と詠唱中に履く (マクロの部位着替えと同じ。ファストキャストの装備の上から)
-    # 魔法のファランクス: 剣・盾を持ち替えるときは、唱える前の武器を覚えて、唱えたあとに戻す
-    # (待機・戦闘中のセットには武器を入れていないので、行動の後の着替えだけでは武器が戻らないため)
+    # Scholar: Stormsurge feet are worn at cast start and during casting of storm spells (like a single-slot macro swap; layered over Fast Cast gear)
+    # Phalanx spell: when swapping sword and shield, remember the weapons from before the cast and restore them afterwards
+    # (idle and engaged sets contain no weapons, so the post-action swap alone won't bring them back)
     phalanx_weapons = any(p in emitted_paths and set(used[p]) & {"main", "sub", "range"} for p in PHALANX_SETS)
     phalanx_mid = ([L("    -- 魔法のファランクスで剣・盾を持ち替えるので、持ち替える前の武器を覚える",
                       "    -- Phalanx swaps sword / shield, so remember the weapons from before"),
-                    "    if spell.english == 'Phalanx' or spell.english == 'Phalanx II' then",   # Mote はファランクスII もファランクスのセットで唱える
+                    "    if spell.english == 'Phalanx' or spell.english == 'Phalanx II' then",   # Mote casts Phalanx II with the Phalanx set too
                     "        phalanx_weapons = phalanx_weapons or {main = player.equipment.main, sub = player.equipment.sub, range = player.equipment.range}",
                     "    end"] if phalanx_weapons else [])
     phalanx_after = ([L("    -- 魔法のファランクスを唱えたあとは、持ち替える前の武器に戻す",
@@ -1387,7 +1387,7 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.extend(ws_blocks(emitted_paths, job))
     out.extend(recv_top)
     has_cast = "local function equip_cast_gear(phase, spell)" in "\n".join(buff_top)
-    # クイックドローの装備は、矢弾 (ammo_pre) より先に着る (弾は使い分けの仕組みで替える)
+    # Quick Draw gear goes on before the ammo (ammo_pre) (the ammo itself is swapped by the ammo-selection logic)
     post_pre = ((["    equip_cast_gear('precast', spell)"] if has_cast else []) + cor["post_precast"] + ammo_pre + man["post_precast"]
                 + storm_lines)
     holy = ([L("    -- 聖水を使うときは、被カーズナ (聖水の効果アップ) の装備を着る",
@@ -1421,13 +1421,13 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     after = ammo_after + pld["aftercast"] + man["aftercast"] + recv_after + phalanx_after
     if after:
         out += ["function job_post_aftercast(spell, action, spellMap, eventArgs)"] + after + ["end", ""]
-    # 装備のセットを作ったあとに行う登録 (after_gear_sets) は、中身が決まってから、ここに差し込む
+    # Registrations that run after the gear sets are built (after_gear_sets) are inserted here once their contents are known
     after_at = len(out)
     out.append("function get_sets()")
     out.append("    mote_include_version = 2")
     out.append(L("    include('Mote-Include.lua')   -- この中で ジョブ_gear.lua (あれば) を読み、init_gear_sets を呼びます",
                  "    include('Mote-Include.lua')   -- loads JOB_gear.lua (if any) and calls init_gear_sets"))
-    if not is_en():     # 英語クライアントは既定 (英語) のまま
+    if not is_en():     # English client keeps the default (English)
         out.append("    set_language('japanese')")
     call_at = len(out)
     out.append("end")
@@ -1436,7 +1436,7 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.append("end")
     out.append("")
     out.append("function user_setup()")
-    # モードの切り替え: セットがあるモードだけを選択肢にする
+    # Mode cycling: only offer modes that have a set
     for field, base, modes in (("IdleMode", "sets.idle", ("DT", "Refresh", "Tate")),
                                ("OffenseMode", "sets.engaged", ("Acc", "SubtleBlow", "Parry", "Enn", "Tate", "PetSTP")),
                                ("HybridMode", "sets.engaged", ("DT",)),
@@ -1466,8 +1466,8 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     if any(p.startswith(MERIT_BASE + ".") for p in emitted_paths):
         out.append("    %s = {}" % MERIT_BASE)
         out.append("")
-    # 入れ物の用意: 種類のセットの中の技 (sets.precast.CorsairRoll['…'] など) は、種類のセットが無いと書けないので、
-    # 無ければ空のセットを作る (Mote-Include が作る sets.precast.JA・sets.buff などは除く)
+    # Containers: a move inside a category set (sets.precast.CorsairRoll['...'] etc.) can't be written unless the category set exists,
+    # so create an empty one if missing (except sets.precast.JA, sets.buff, etc., which Mote-Include creates)
     parents = []
     for p in sorted(emitted_paths, key=_depth):
         par = _parent(p)
@@ -1484,34 +1484,34 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
         base = base or ws_base(p, emitted)
         if not base and p == "sets.midcast.BarElement" and "sets.midcast['強化魔法']" in emitted:
             base = "sets.midcast['強化魔法']"
-        # ケアルの詠唱の開始は、ファストキャストに重ねる (ケアル詠唱時間短縮の部位だけ替えればよいように)
+        # Cure cast start layers on Fast Cast (so only the Cure casting time pieces need to change)
         if not base and p == "sets.precast.FC.Cure" and "sets.precast.FC" in emitted:
             base = "sets.precast.FC"
-        # マジックバースト・魔命重視は、精霊魔法の装備に重ねる。遠隔攻撃 (クリティカル) は遠隔攻撃に重ねる
+        # Magic Burst and magic-accuracy modes layer on Elemental Magic gear. Ranged attack (critical) layers on ranged attack
         if not base and p in ("sets.midcast['精霊魔法'].MB", "sets.midcast['精霊魔法'].Acc") and "sets.midcast['精霊魔法']" in emitted:
             base = "sets.midcast['精霊魔法']"
         if not base and p == "sets.midcast.RA.Critical" and "sets.midcast.RA" in emitted:
             base = "sets.midcast.RA"
-        # ほかの人への強化は、強化魔法の装備に重ねる
+        # Buffs on others layer on Enhancing Magic gear
         if not base and p == "sets.midcast['強化魔法'].Other" and "sets.midcast['強化魔法']" in emitted:
             base = "sets.midcast['強化魔法']"
         if job == "PLD":
             base = base or pld_base(p, emitted)
-        # 結ぶ先と同じ名前のセット (アビリティ強化の装備の sets.precast.CorsairRoll など) は、結んだ元に重ねる
+        # Sets with the same name as a link target (e.g. sets.precast.CorsairRoll from ability-enhancing gear) layer on the linked source
         src = next((s for s, ts in links.items() if p in ts), None)
         if not base and src in emitted:
             base = src
         lines = set_lines(p, used[p], include_weapons, base, cycle_slots, keep_for(p))
         if lines:
             emitted.add(p)
-            # Mote-Include が探す名前に結ぶ (sets.midcast.RA = sets.RA_STP など)。ロールごとのセットは、結んだ先に重ねる
+            # Link to the names Mote-Include looks for (sets.midcast.RA = sets.RA_STP etc.). Per-roll sets layer on the link target
             for target in links.get(p, []):
                 lines = lines[:-1] + ["    %s = %s" % (target, p), ""]
                 emitted.add(target)
         out.extend(lines)
-    # 英語クライアント用の出力には、日本語名の別名を出さない
+    # Output for the English client doesn't include Japanese-name aliases
     alias_lines = [] if is_en() else ["    %s = %s" % (a, target) for a, target in (aliases or {}).items() if target in emitted]
-    # 召喚士: 作っていないセットを、ほかのセットで代わりにする (作者の SMN_gear.lua と同じ組み方)
+    # Summoner: fill in sets that weren't made using other sets (same approach as the author's SMN_gear.lua)
     if job == "SMN":
         for target, source, why, why_en in (
                 ("sets.precast.BloodPactRage", "sets.precast.BloodPactWard", "幻術の履行も、履行の短縮の装備で使う",
@@ -1522,10 +1522,10 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
                  "idle with an avatar out (Mote looks for sets.idle.Pet)")):
             if source in emitted and target not in emitted:
                 alias_lines.append("    %s = %s   -- %s" % (target, source, L(why, why_en)))
-    # 風水士: 羅盤がいるときの待機 (Mote は、ペットがいると sets.idle.Pet を見る)
+    # Geomancer: idle with a luopan out (Mote checks sets.idle.Pet when a pet is present)
     if job == "GEO" and "sets.idle.Luopan" in emitted and "sets.idle.Pet" not in emitted:
         alias_lines.append("    sets.idle.Pet = sets.idle.Luopan   -- %s" % L("羅盤がいるときの待機", "idle with a luopan out"))
-    # アスピル: 日本語名で探す改造版の Mote はドレインと同じ系統 (Drain)、標準の Mote は Aspir で探す
+    # Aspir: the modified Mote that uses Japanese names puts it in the same family as Drain (Drain); stock Mote looks it up as Aspir
     if "sets.midcast.Drain" in emitted and "sets.midcast.Aspir" not in emitted:
         alias_lines.append("    sets.midcast.Aspir = sets.midcast.Drain   -- %s" % L("アスピルも、ドレインの装備で唱える",
                                                                                 "Aspir uses the Drain gear"))
@@ -1534,8 +1534,8 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.append("end")
     out.extend(GEAR_SECTION_END())
     out.append("")
-    # 装備のセットを作ったあとに行う登録。init_gear_sets には入れない
-    # (init_gear_sets を ジョブ_gear.lua に写したとき、このファイルの local (buff_gear など) が見えずに止まるため)
+    # Registrations that run after the gear sets are built. Not placed in init_gear_sets
+    # (if init_gear_sets is copied into JOB_gear.lua, it can't see this file's locals (buff_gear etc.) and errors out)
     post = []
     if alias_lines:
         post.append(L("    -- 日本語名の別名 (標準の Mote-Include は英語名で、日本語名で探す改造版は日本語名で、セットを探します)",
@@ -1553,5 +1553,5 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
             "function after_gear_sets()"] + post + ["end", ""]
     out[1:1] = SYSTEM_SECTION_NOTE(job)
     text = "\n".join(out)
-    # 英語クライアント: キーのスキル名を英語に (中で比べている sets.midcast['強化魔法'] などを壊さないよう、最後に置き換える)
+    # English client: convert skill names in keys to English (done last so internal comparisons against the Japanese skill keys, such as the Japanese key for Enhancing Magic, don't break)
     return _en_skill_keys(text) if is_en() else text

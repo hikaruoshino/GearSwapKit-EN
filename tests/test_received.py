@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""被強化の装備 (被ファランクス・被プロテス・被シェル) の確認。実行 (GearSwapKit/ で): python -I tests/test_received.py"""
+"""Tests for received-buff gear (Phalanx, Protect, and Shell received from others). Run (from GearSwapKit/): python -I tests/test_received.py"""
 import os
 import re
 import subprocess
@@ -28,7 +28,7 @@ def check(cond, msg):
         sys.stdout.buffer.write(("NG: %s\n" % msg).encode("utf-8"))
 
 
-# --- 魔法の番号を res と突き合わせる ---
+# --- Cross-check spell IDs against res ---
 if os.path.isfile(os.path.join(RES, "spells.lua")):
     with open(os.path.join(RES, "spells.lua"), "rb") as f:
         txt = f.read().decode("utf-8", errors="replace")
@@ -40,7 +40,7 @@ if os.path.isfile(os.path.join(RES, "spells.lua")):
         for i in aoe:
             check(names.get(i, "").startswith(expect[name] + "ra"), "%s の範囲の番号 %d は %sra 系 (実際 %s)" % (name, i, expect[name], names.get(i)))
 
-# --- 選択式: 最初から左の一覧には出さない・技ごとの追加の「被強化の装備」で選ぶ ---
+# --- Pick-from-list: not in the left-hand list by default; chosen via the "received buff gear" kind of per-action addition ---
 for job in C.ALL_JOBS:
     check(not any(e["path"].startswith("sets.midcast.Increased") and e["path"] != "sets.midcast.IncreasedCursna" for e in C.sets_for_job(job)), "%s: 最初から左の一覧には出さない (被カーズナ・死の宣告だけは出す)" % job)
 items = CH.choices(None, "received", "SAM")
@@ -65,7 +65,7 @@ check("received_sets[48]" not in lua, "割り当てていない被シェルは�
 check(lua.count("function job_post_midcast") == 1, "job_post_midcast は 1 つ")
 check(Project.from_json(pr.to_json()).to_lua() == lua, "保存と読み込みで同じ")
 
-# 被ファランクスの「自動で着替える」を外したとき: セットは出すが、ファランクスには反応しない (被プロテスはそのまま反応する)
+# With "swap automatically" turned off for received Phalanx: the set is still output, but it doesn't react to Phalanx (received Protect still reacts)
 pm = Project.from_json(pr.to_json())
 pm.set_job("SAM")
 check(pm.received_auto("IncreasedPhalanx"), "初めは自動で着替える")
@@ -87,7 +87,7 @@ check("register_event" not in lua_o and "job_post_midcast" not in lua_o, "自動
 p_only.remove_custom("sets.midcast.IncreasedPhalanx")
 check(p_only.received_auto("IncreasedPhalanx"), "被ファランクスを消すと、「自動で着替えない」の設定も消える (足し直したら初めの状態)")
 
-# 学者の章 (行動のときの装備) と一緒でも、job_post_midcast は 1 つにまとまる
+# Even combined with SCH Stratagems (gear for actions), there is still only one job_post_midcast
 p2 = Project("SCH")
 per = [e for e in AG.load()["SCH"] if e["ability_en"] == "Perpetuance"][0]
 p2.add_ability_gear(per, EP.parse_equipped_set('sets.exported={ hands="ＡＢブレーサー+2" }')["hands"])
@@ -110,7 +110,7 @@ if os.path.exists(LUAC):
             sys.stdout.buffer.write(r.stdout + r.stderr)
             check(r.returncode == 0, "模擬 GearSwap で、受けるときの着替えと戻りが正しい")
 
-# ナイトの被ファランクス: 剣・盾 (被ファランクス+) も出力し、届いたら元の武器に戻す (武器を外したい人は export か Lua から消す)
+# PLD received Phalanx: the sword and shield (Phalanx received+) are output too, and the original weapons come back once it lands (to drop the weapons, remove them from the export or the Lua)
 pw = Project("PLD")
 pw.add_pair(RECEIVED_KIND, "IncreasedPhalanx", "被ファランクス")
 pw.assign("sets.midcast.IncreasedPhalanx",
@@ -131,9 +131,9 @@ if os.path.exists(LUAC):
         sys.stdout.buffer.write(r.stdout + r.stderr)
         check(r.returncode == 0, "模擬 GearSwap で、武器入りの被ファランクスの着替えと武器の戻りが正しい")
 
-# 魔法のファランクス (自分で唱える): 剣・盾も出力し、唱えたあとに元の武器に戻す
+# Phalanx as a spell (self-cast): the sword and shield are output too, and the original weapons come back after casting
 pp = Project("PLD")
-st, en, _ja = pp.resolve(2, "Phalanx")   # テストでは res を読まないので、英語名で選ぶ
+st, en, _ja = pp.resolve(2, "Phalanx")   # the test doesn't load res, so pick by English name
 check(st == "ok" and en == "Phalanx", "技ごとの追加の「魔法」でファランクスを選べる")
 pp.add_pair(2, en, "ファランクス")
 pp.assign(pp.path_for(2, en), EP.parse_equipped_set('sets.exported={ main="サクパタソード", sub="プリュウェン", head="ファランクス帽" }'))
@@ -153,18 +153,18 @@ if os.path.exists(LUAC):
         sys.stdout.buffer.write(r.stdout + r.stderr)
         check(r.returncode == 0, "模擬 GearSwap で、魔法のファランクスの武器の持ち替えと戻りが正しい")
 
-# 赤魔道士がファランクスII だけのセットを足したときも、剣・盾を出力して、唱えたあとに戻す
+# Same when RDM adds a set for Phalanx II only: output the sword/shield and switch back after casting
 p2p = Project("RDM")
 p2p.add_pair(2, "Phalanx II", "ファランクスII")
-# プリュウェン (盾) はナイト専用なので、赤魔道士は剣だけ
+# Priwen (shield) is PLD-only, so RDM gets just the sword
 p2p.assign(p2p.path_for(2, "Phalanx II"), EP.parse_equipped_set('sets.exported={ main="サクパタソード", head="ファランクス帽" }'))
 lua_p2 = p2p.to_lua()
 check(p2p.path_for(2, "Phalanx II") == "sets.midcast['Phalanx II']", "ファランクスII のセットの名前")
 check('main="サクパタソード"' in lua_p2, "ファランクスII だけのセットでも、剣を出力する")
 check("phalanx_weapons" in lua_p2, "ファランクスII だけのセットでも、唱えたあとに武器を戻す仕組みを出す")
 
-# サクパタソードを装備できるジョブ (res の jobs: 赤魔道士・ナイト・青魔道士) では、どれも武器を出力して戻す
-# (盾のプリュウェンはナイト専用なので、ナイトだけ盾も入れる)
+# Every job that can equip Sakpata's Sword (res jobs: RDM, PLD, BLU) outputs the weapon and switches back
+# (the Priwen shield is PLD-only, so only PLD includes the shield)
 for job in ("RDM", "PLD", "BLU"):
     gear = 'main="サクパタソード", sub="プリュウェン"' if job == "PLD" else 'main="サクパタソード"'
     pj = Project(job)

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""テストで使う外部のファイルの場所 (Windower の res・Lua 5.1・所持品の一覧など)。
+"""Locations of external files the tests use (Windower's res, Lua 5.1, the inventory export, etc.).
 
-環境変数か、tests/local_paths.json (公開しない・各自の PC の場所を書く) から読む。
-どちらにも無いものは空文字にする。テストは、空や存在しない場所のときは、その確認を飛ばす。
+Read from environment variables, or from tests/local_paths.json (not published; each user fills in the paths on their own PC).
+Anything found in neither is set to an empty string. When a path is empty or doesn't exist, the tests skip the checks that need it.
 
-local_paths.json の例:
+Example local_paths.json:
 {
  "res": "C:/Windower4/res",
  "luac": "C:/lua51/luac5.1.exe",
@@ -29,9 +29,9 @@ def _path(key, env):
     return os.environ.get(env) or _LOCAL.get(key) or ""
 
 
-RES = _path("res", "GSK_RES")                       # Windower の res フォルダー
-LUAC = _path("luac", "GSK_LUAC")                    # Lua 5.1 の luac (構文の確認)
-LUA51 = _path("lua51", "GSK_LUA51")                 # Lua 5.1 (模擬 GearSwap の実行)
-GS_DATA = _path("gearswap_data", "GSK_GS_DATA")     # GearSwap の data フォルダー (res を探す起点)
-EXPORT_ALL = _path("export_all", "GSK_EXPORT_ALL")  # //gs export all の所持品の一覧
-TEST_DATA = _path("test_data", "GSK_TEST_DATA")     # 画面のテストで使う data フォルダー
+RES = _path("res", "GSK_RES")                       # Windower's res folder
+LUAC = _path("luac", "GSK_LUAC")                    # Lua 5.1 luac (syntax check)
+LUA51 = _path("lua51", "GSK_LUA51")                 # Lua 5.1 (runs the mock GearSwap)
+GS_DATA = _path("gearswap_data", "GSK_GS_DATA")     # GearSwap data folder (starting point when looking for res)
+EXPORT_ALL = _path("export_all", "GSK_EXPORT_ALL")  # inventory list from //gs export all
+TEST_DATA = _path("test_data", "GSK_TEST_DATA")     # data folder used by the GUI tests

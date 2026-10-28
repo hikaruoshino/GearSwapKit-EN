@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""遠隔攻撃 (狩人・コルセア)・コルセアのロールとクイックドローの確認。
-実行 (GearSwapKit/ で): python -I tests/test_cor.py"""
+"""Tests for ranged attacks (Ranger, Corsair) and Corsair rolls and Quick Draw.
+Run (from GearSwapKit/): python -I tests/test_cor.py"""
 import os
 import subprocess
 import sys
@@ -27,7 +27,7 @@ def check(cond, msg):
 
 H = EP.parse_equipped_set
 
-# 一覧: 遠隔攻撃は狩人とコルセア・ロールとクイックドローはコルセアだけ
+# List: ranged attack entries for RNG and COR; rolls and Quick Draw are COR only
 for job in C.ALL_JOBS:
     paths = [e["path"] for e in C.sets_for_job(job)]
     ranged = job in ("RNG", "COR", "SAM")
@@ -43,7 +43,7 @@ pr.assign("sets.RA_ACC", H('sets.exported={ head="飛命帽" }'))
 pr.assign("sets.CorsairRoll", H('sets.exported={ head="ロール帽", body="ロール胴" }'))
 pr.custom.append(("sets.precast.CorsairRoll", "ロール (アビリティ強化)", None))
 pr.custom.append(("sets.precast.CorsairRoll['Allies\\' Roll']", "アライズロール", None))
-pr.assign("sets.precast.CorsairRoll", H('sets.exported={ legs="ロール脚" }'))   # アビリティ強化の装備 (ロール全般)
+pr.assign("sets.precast.CorsairRoll", H('sets.exported={ legs="ロール脚" }'))   # ability-enhancing gear (all rolls)
 pr.assign("sets.precast.CorsairRoll['Allies\\' Roll']", H('sets.exported={ head="ＣＳトリコルヌ+3" }'))
 pr.assign("sets.RA_QDSTP", H('sets.exported={ head="QDSTP帽" }'))
 pr.assign("sets.RA_QDDPS", H('sets.exported={ head="QD威力帽" }'))
@@ -57,7 +57,7 @@ check("sets.precast.CorsairShot['ライトショット'] = sets.RA_QDACC" in lua
 check(lua.index("sets.precast.CorsairRoll = sets.CorsairRoll") < lua.index("sets.precast.CorsairRoll['Allies\\' Roll'] = set_combine("),
       "ロールごとのセットより先に、ロール (共通) を結ぶ")
 
-# 威力だけなら、モードを出さずにそれを既定にする
+# With only a damage set, skip the mode and make it the default
 p2 = Project("COR")
 p2.assign("sets.RA_QDDPS", H('sets.exported={ head="QD威力帽" }'))
 l2 = p2.to_lua()

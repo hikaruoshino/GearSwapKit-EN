@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""画面 (tkinter) を、表示せずに動かして確認する。実行 (GearSwapKit/ で): python -I tests/test_gui.py (tkinter が使える Python で)"""
+"""Drives the GUI (tkinter) without showing it. Run (from GearSwapKit/): python -I tests/test_gui.py (with a Python that has tkinter)"""
 import os
 import sys
 import tkinter as tk
@@ -12,7 +12,7 @@ import _env as ENV
 import app as A
 import export_parser as EP
 import tempfile as _tf
-# 本物の設定ファイル (gearswapkit_settings.json) を汚さないよう、テストの間は一時フォルダーに向ける
+# Point settings at a temp folder during the test so the real settings file (gearswapkit_settings.json) isn't touched
 A.SETTINGS = os.path.join(_tf.mkdtemp(), "gearswapkit_settings.json")
 
 fails = []
@@ -36,7 +36,7 @@ check(first is not None and first["path"] == "sets.idle", "最初は待機が選
 check("待機" in gui.title_lbl.cget("text"), "詳細にタイトルが出る")
 check(gui.help_lbl.cget("text") != "", "ヘルプ文が出る")
 
-# 装備を割り当てる (ファイル選択の代わりに、直接割り当てる)
+# Assign gear (directly, instead of going through the file picker)
 text = '''sets.exported={
     head="ＢＣホーン+1",
     neck="シビルスカーフ",
@@ -54,11 +54,11 @@ check("武器は出力に含めません" not in gui.gear_txt.get("1.0", "end"),
 gui.weapons_var.set(False)
 gui.on_weapons()
 
-# 技ごとの追加
-gui.data_dir.set(ENV.GS_DATA)   # res を探せる場所
+# Per-action additions
+gui.data_dir.set(ENV.GS_DATA)   # somewhere res can be found from
 gui.update_resdb()
 if gui.project.resdb is None or not gui.project.resdb.available():
-    # res が無い PC では、ここから先 (技のドロップダウン以降) は確かめられない (tests/_env.py を参照)
+    # Without res on this PC, nothing from here on (the action dropdown onward) can be checked (see tests/_env.py)
     root.destroy()
     sys.stdout.buffer.write((("OK GearSwapKit 画面: 失敗 0 件 (res が無いので、技のドロップダウン以降は飛ばした)"
                               if not fails else "FAILED %d" % len(fails)) + "\n").encode("utf-8"))
@@ -66,20 +66,20 @@ if gui.project.resdb is None or not gui.project.resdb.available():
 gui.kind_var.set("ペットの技")
 check(any("ボルトストライク" in v for v in gui.name_cb.cget("values")), "ペットの技のドロップダウンに、ボルトストライクがある (SMN)")
 n_before = len(gui._rows)
-# export を選ぶ画面の代わり: 1 回目は「やめる」(None) → 一覧は増えない
+# Stand-in for the export picker: the first time it's cancelled (None), so the list doesn't grow
 gui.ask_equipped_set = lambda *a, **k: None
 gui.name_var.set([v for v in gui.name_cb.cget("values") if "ボルトストライク" in v][0])
 gui.add_with_export()
 root.update()
 check(len(gui._rows) == n_before, "export を選ばずにやめたら、左の一覧は増えない")
-# 2 回目は装備を返す → 一覧に増えて、割り当て済み
+# The second time it returns gear, so the row is added and marked assigned
 gui.ask_equipped_set = lambda *a, **k: EP.parse_equipped_set('sets.exported={ head="ＡＰクラウン+1" }')
 gui.add_with_export()
 root.update()
 cur = gui.current()
 check(cur and cur["custom"] and "ボルトストライク" in cur["title"] and "Volt Strike" in cur["title"], "追加した技が選ばれ、英語名も出る")
 check(gui.tree.set(gui.tree.selection()[0], "state") == A.STATE_ON, "export を割り当てて追加したので、割り当て済み")
-# WS のドロップダウンは、ジョブの武器の種類で絞る (召喚士は片手棍・両手棍・短剣 → ガルーダの…ではなく、例: レトリビューションは出て、ジシュヌの光輝は出ない)
+# The WS dropdown is filtered by the job's weapon types (SMN: club, staff, dagger -> e.g. Retribution is listed, Jishnu's Radiance is not)
 gui.kind_var.set("ウェポンスキル")
 ws_vals = gui.name_cb.cget("values")
 check(any("Retribution" in v for v in ws_vals) and not any("Jishnu" in v for v in ws_vals), "SMN の WS に両手棍は出て、弓術は出ない")
@@ -114,7 +114,7 @@ check("ペット" in gui.kind_help.cget("text") or gui.kind_help.cget("text") !=
 gui.remove_custom()
 check(all(not r["custom"] for r in gui._rows.values()), "追加を削除できる")
 
-# ジョブを変える
+# Change job
 gui.job_var.set("BLU")
 gui.on_job()
 root.update()
@@ -122,7 +122,7 @@ paths = [r["path"] for r in gui._rows.values()]
 check("sets.midcast['青魔法']" in paths, "BLU に変えると青魔法のセットが出る")
 check("sets.precast.BloodPactRage" not in paths, "BLU には契約の履行が出ない")
 
-# 武器の切り替え (ファイル選択の代わりに、直接足す)
+# Weapon switching (added directly, instead of through the file picker)
 gui.job_var.set("SMN")
 gui.on_job()
 root.update()
@@ -143,7 +143,7 @@ check(gui.tree.set(gui.tree.selection()[0], "state") == A.STATE_ON, "武器を�
 gui.clear_assignment()
 check(not gui.project.weapons.get("main"), "「割り当てを外す」で、武器を外せる")
 
-# 技ごとの追加を、一覧から選ぶ画面
+# The dialog for picking per-action additions from a list
 import choices as CH2
 import resdb as RDB0
 res0 = RDB0.guess_res_dir(ENV.GS_DATA)
@@ -162,7 +162,7 @@ if res0:
     npk.ok()
     check(len(npk.result) == 1 and npk.result[0]["en"].startswith("Cure"), "選んだ魔法が結果に入る")
 
-# ジョブごとに別々 (SMN の武器・割り当てが、COR に出ない)
+# Kept separate per job (SMN's weapons and assignments don't show up for COR)
 gui.job_var.set("SMN")
 gui.on_job()
 gui.project.add_weapon("main", EP.parse_equipped_set('sets.exported={ main="ニルヴァーナ" }')["main"])
@@ -185,7 +185,7 @@ check(gui.tree.set(rows_smn["weapons:main"], "state") == A.STATE_ON, "SMN に戻
 gui.project.weapons.clear()
 gui.project.assignments.clear()
 
-# 武器を選ぶ画面 (所持品の一覧から・ジョブで絞る)。wait_window は、表示せずに動かすため、何もしない関数にする
+# The weapon picker (from the inventory list, filtered by job). wait_window is stubbed out so it runs without showing
 import resdb as RDB
 real_inv = ENV.EXPORT_ALL
 res_dir = RDB.guess_res_dir(ENV.GS_DATA)
@@ -210,7 +210,7 @@ if os.path.exists(real_inv) and res_dir:
     pk.on_select()
     pk.ok()
     check(len(pk.result) == 1 and pk.result[0].slot == "main", "選んだ武器が結果に入る")
-    # 複数を選んだ順 (一覧の並びとは逆) が、そのまま結果の順になる。検索で一覧が変わっても、選んだものは残る
+    # With multiple picks, the result keeps the order they were clicked (not list order). Picks survive the list changing due to a search
     pk2 = A.WeaponPicker(root, "試験", cands, job="SMN", resdb=rdb)
     pk2.only_job.set(False)
     pk2.fill()
@@ -235,7 +235,7 @@ if os.path.exists(real_inv) and res_dir:
     pk3.ok()
     check([it for it in pk3.result] == [pk3.shown[3]], "もう一度クリックで外したものは、結果から消える")
 
-# アビリティ強化の装備を選ぶ画面
+# The ability-enhancing gear picker
 import ability_gear as AG0
 if os.path.exists(real_inv) and res_dir:
     root.wait_window = lambda w: None
@@ -255,7 +255,7 @@ if os.path.exists(real_inv) and res_dir:
     ap = A.AbilityGearPicker(root, "試験", rows_ab, missing_ab)
     check(len(ap.box.curselection()) == len({AG0.pick_key(r["entry"]) for r in rows_ab}), "最初は、アビリティ・部位・使い方の組ごとに 1 つ選ばれている")
     check("効果" in ap.detail.cget("text") or ap.detail.cget("text") != "", "選ぶと説明が出る")
-    ap.box.selection_set(0, "end")      # 全部選ぶ → 同じアビリティ・部位は、強化の進んだ 1 つに絞られる
+    ap.box.selection_set(0, "end")      # select all -> each ability/slot is narrowed to the most upgraded piece
     ap.ok()
     check(len(ap.result) == len({AG0.pick_key(r["entry"]) for r in rows_ab}), "同じ組は 1 つに絞られる")
     last = None
@@ -267,13 +267,13 @@ if os.path.exists(real_inv) and res_dir:
     check(any("アストラルフロウ" in t for t in titles) and any("効果中の装備" in t for t in titles), "一覧に、追加した強化装備のセットが出る")
     check(gui.tree.set(gui.tree.selection()[0], "state") == A.STATE_ON, "割り当て済みになる")
     check("ＧＬホーン+1" in "".join(gui.gear_txt.get("1.0", "end")) or "BC" in gui.gear_txt.get("1.0", "end") or True, "詳細が出る")
-    # 対応表の無いジョブでは案内を出す (messagebox は呼ばずに、対応表の有無だけ確かめる)
+    # Jobs without a mapping table get a notice (we don't call messagebox; just check whether the table exists)
     check(all(AG0.entries_for_job(j) for j in A.C.ALL_JOBS), "全ジョブに対応表がある")
     gui.project.assignments.clear()
     gui.project.custom = []
     gui.project._cur().buffs.clear()
 
-# data フォルダーと、最後に選んだ所持品の一覧を覚える (次に起動したとき、最初から入っている)
+# Remember the data folder and the last inventory list chosen (pre-filled on the next launch)
 remember_dir = ENV.TEST_DATA
 if os.path.isdir(remember_dir):
     gui.data_dir.set(remember_dir)
@@ -288,7 +288,7 @@ if os.path.isdir(remember_dir):
     check(not os.path.exists(os.path.join(A.BASE, "gearswapkit_settings.json")) or A.SETTINGS != os.path.join(A.BASE, "gearswapkit_settings.json"),
           "テストは本物の設定ファイルを使っていない")
 
-# ロックスタイル番号の欄: ジョブごとに入り、ジョブを変えると、そのジョブの番号が出る
+# Lockstyle number field: stored per job; switching jobs shows that job's number
 gui.job_var.set("COR")
 gui.on_job()
 gui.lockstyle_var.set("94")
@@ -302,7 +302,7 @@ check(gui.lockstyle_var.get() == "94", "COR に戻すと、94 が出る")
 gui.lockstyle_var.set("")
 check(gui.project.lockstyle is None, "欄を空にすると、使わない")
 
-# ファストキャストの欄は「詠唱の開始 (ファストキャスト)」に出る (全ジョブ)。計算した値は、ナイトの 3 段階の表示にも出る
+# The Fast Cast field appears on the precast (Fast Cast) set for every job. The calculated value also shows in PLD's 3-stage display
 for job in ("WHM", "PLD"):
     gui.job_var.set(job)
     gui.on_job()
@@ -322,7 +322,7 @@ check(not gui.fc_box.winfo_manager() and bool(gui.stage_box.winfo_manager())
       "詠唱中断では、欄は出ず、3 段階の着替えに計算した値が出る")
 gui.project.assignments.pop("sets.precast.FC", None)
 
-# 言語の切り替え: 英語にして画面を作り直しても動き、主なボタンが英語になり、作業内容は残る。最後に日本語に戻す
+# Language switch: after switching to English and rebuilding the UI it still works, the main buttons are in English, and the project is kept. Switch back to Japanese at the end
 import i18n as I18N
 gui.job_var.set("COR")
 gui.on_job()
@@ -349,8 +349,8 @@ root.update()
 check(I18N.lang() == "ja" and gui.make_btn.cget("text") == "Lua を作る", "日本語に戻せる")
 gui.lockstyle_var.set("")
 
-# 閉じるときの自動保存: 保存先 (data フォルダーの <ジョブ>_kit.json) が無ければ黙って保存して閉じる。
-# あれば上書きを聞き、いいえなら閉じずに戻る。本物の窓は閉じないように、destroy を差し替える
+# Auto-save on close: if the save file (<job>_kit.json in the data folder) doesn't exist, save silently and close.
+# If it exists, ask before overwriting; on No, stay open. destroy is swapped out so the real window isn't closed
 import tempfile
 tmpd = tempfile.mkdtemp()
 gui.data_dir.set(tmpd)
@@ -378,7 +378,7 @@ gui.on_close()
 check(asked and closed, "はいなら、上書きして閉じる")
 gui.root = root
 check(A.load_settings().get("last_project") == saved, "閉じるときに保存したファイルを、前回の作業として覚える")
-# 次に起動したとき、前回の作業が開く
+# On the next launch, the previous project opens
 root2 = tk.Toplevel(root)
 gui2 = A.App(root2)
 check(gui2.project_path == saved and gui2.project.has_work("WAR"), "起動したとき、前回の作業を自動で開く")

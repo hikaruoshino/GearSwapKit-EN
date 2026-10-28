@@ -1,5 +1,5 @@
--- 出力した Lua の「強化が効いている間に魔法を唱えるときの装備」(学者の章など) の動きを、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/cast_lua_test.lua <出力した Lua のパス> <precast のバフ番号> <midcast のバフ番号>
+-- Simulates GearSwap to check the generated Lua's "gear for casting while a buff is active" (Scholar stratagems, etc.).
+-- Run: lua5.1.exe tests/cast_lua_test.lua <path to generated Lua> <precast buff ID> <midcast buff ID>
 local path, pre_id, mid_id = arg[1], tonumber(arg[2]), tonumber(arg[3])
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -23,17 +23,17 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 
 local magic = {action_type = "Magic"}
 local ability = {action_type = "Ability"}
 
--- 強化が無いとき: 何も着ない
+-- No buff: nothing is equipped
 env.job_post_precast(magic, {}, nil, {})
 env.job_post_midcast(magic, {}, nil, {})
 check(#equipped == 0, "強化が無いときは着ない")
 
--- 詠唱開始と詠唱中の両方で着る強化 (電光石火の章など: 詠唱時間と再詠唱時間の両方に効く) だけが効いている
+-- Only a buff worn at both precast and midcast is active (e.g. Celerity: affects both casting time and recast)
 env.buffactive[pre_id] = 1
 env.job_post_precast(magic, {}, nil, {})
 check(#equipped == 1 and equipped[1].feet ~= nil, "詠唱を始めるときに、足の装備を着る")
@@ -45,7 +45,7 @@ env.job_post_precast(ability, {}, nil, {})
 check(#equipped == 0, "魔法でなければ (アビリティ) 着ない")
 env.buffactive[pre_id] = nil
 
--- 詠唱中用の強化 (令狸執鼠の章など) が効いている
+-- A midcast buff is active (e.g. Perpetuance)
 env.buffactive[mid_id] = 1
 env.job_post_midcast(magic, {}, nil, {})
 check(#equipped == 1, "詠唱中に、章の装備を着る")

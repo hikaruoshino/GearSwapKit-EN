@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""GearSwap の data フォルダーに、キットの出力を上書きするファイルがないかを調べる。
+"""Check the GearSwap data folder for files that would override the kit's output.
 
-Mote-Include は、ジョブの Lua を読み込んだあとに、次のファイルを自動で読み込み、同じ名前の関数を上書きする
-(Mote-Include.lua の init_include・Mote-Utility.lua の load_sidecar)。
-  - user-globals.lua / <キャラ名>-globals.lua
-  - <ジョブ>_gear.lua / <キャラ名>_<ジョブ>_gear.lua  (data 直下・data/<フォルダー>/・data/common/・data/gear/)
-これらが init_gear_sets を定義していると、キットが作ったセットは使われない。
+After loading the job Lua, Mote-Include automatically loads the files below, which override functions with the same names
+(init_include in Mote-Include.lua, load_sidecar in Mote-Utility.lua):
+  - user-globals.lua / <character>-globals.lua
+  - <JOB>_gear.lua / <character>_<JOB>_gear.lua  (directly in data, data/<folder>/, data/common/, data/gear/)
+If any of these defines init_gear_sets, the sets the kit built won't be used.
 """
 import os
 
@@ -13,7 +13,7 @@ from i18n import L
 
 
 def find_conflicts(data_dir, job):
-    """[(ファイルのパス, 理由)] を返す。data_dir が無ければ空。"""
+    """Return [(file path, reason)]. Empty if there is no data_dir."""
     found = []
     if not data_dir or not os.path.isdir(data_dir):
         return found

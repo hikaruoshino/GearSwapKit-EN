@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-"""GearSwapKit の画面 (tkinter)。
+"""GearSwapKit's main window (tkinter).
 
-  1. ジョブを選ぶ
-  2. セット (待機・戦闘中・詠唱の開始など) を選んで、「export を割り当てる」で、ゲームで書き出したファイルを渡す
-  3. 「Lua を作る」で、GearSwap の data フォルダーに <ジョブ>.lua を出力する
+  1. Pick a job
+  2. Pick a set (idle, engaged, precast, etc.) and hand it a file exported in game with "Assign export"
+  3. "Make Lua" writes <job>.lua to GearSwap's data folder
 
-画面の文字は L("日本語", "English") で、今の言語のほうを出す (i18n.py)。言語は設定ファイルの "lang" に覚え、
-初めて起動したときに選んでもらう。上の段の「Language / 言語」で変えると、画面をその場で作り直す。
+UI text is written as L("Japanese", "English"), and the current language's text is shown (i18n.py). The language is stored
+as "lang" in the settings file and chosen on first launch. Changing it with the top-row Language selector rebuilds the window on the spot.
 
-ゲームには何も送らず、メモリも触らない。読むのは、ユーザーが自分で書き出した export のファイルだけ。
+Nothing is sent to the game and memory is never touched. The only files read are exports the user made themselves.
 """
 import json
 import os
@@ -33,9 +33,9 @@ VERSION = "1.2.2"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")
-OLD_SETTINGS = os.path.join(BASE, "gearswapkit_settings.json")     # 前の版の置き場所 (EXE の隣)。読むだけ
+OLD_SETTINGS = os.path.join(BASE, "gearswapkit_settings.json")     # Where older versions kept it (next to the EXE). Read only
 
-# アビリティ強化の装備の注意書き (対応表の items の note) の英語
+# English for the notes on ability gear (the items' note in the table)
 NOTE_EN = {
     "オーグメントしたものだけ": "Only works if the piece is augmented.",
     "オーグメント (忘れ去られた願い) をしたものだけ": "Only works if the piece is augmented (Forgotten Wish).",
@@ -43,10 +43,10 @@ NOTE_EN = {
     "オーグメントの性能として記載": "This property comes from the augment.",
 }
 
-STATE_ON = "✔ 割り当て済み"      # 日本語のときの表示 (今の言語の表示は state_on() / state_off())
+STATE_ON = "✔ 割り当て済み"      # Japanese-mode text (state_on() / state_off() give the current language)
 STATE_OFF = "未設定"
 
-# 言語の選択肢 (表示名, コード)。表示名は、どちらの言語のときも同じ
+# Language choices (label, code). Labels are the same in either language
 LANG_CHOICES = (("日本語", "ja"), ("English", "en"))
 
 SLOT_EN = {
@@ -67,17 +67,17 @@ def state_off():
 
 
 def slot_name(slot):
-    """部位の表示名 (今の言語)。"""
+    """Display name of a slot (current language)."""
     return L(EP.SLOT_JA.get(slot, slot), SLOT_EN.get(slot, slot))
 
 
 def kinds():
-    """「技ごとの追加」の種類 [(base, 表示名, 説明)]。set_catalog に今の言語で返す関数があれば、そちらを使う。"""
+    """Kinds for "Add per skill" [(base, label, help)]. Uses set_catalog's current-language functions when it has them."""
     return [(C.CUSTOM_KINDS[i][0], C.kind_label(i), C.kind_help(i)) for i in range(len(C.CUSTOM_KINDS))]
 
 
 def item_display(name, resdb):
-    """装備の表示名。英語のときは、res で英語名を引けるなら英語名 (引けなければそのまま)。"""
+    """Display name for gear. In English mode, the English name from res if found (otherwise unchanged)."""
     if not name:
         return L("(名前を読めません)", "(unreadable name)")
     if i18n.is_en() and resdb is not None and hasattr(resdb, "item_en"):
@@ -91,14 +91,14 @@ def item_display(name, resdb):
 
 
 def ability_display(entry):
-    """アビリティ強化の対応表のアビリティ名 (英語のときは英語名)。"""
+    """Ability name from the ability gear table (English name in English mode)."""
     if i18n.is_en():
         return entry.get("ability_en") or entry.get("ability_ja", "")
     return entry.get("ability_ja") or entry.get("ability_en", "")
 
 
 def load_settings():
-    """覚えている設定 (data フォルダー・最後に選んだ export のファイル・言語) を読む。読めなければ空。"""
+    """Load saved settings (data folder, last chosen export file, language). Empty if unreadable."""
     for path in (SETTINGS, OLD_SETTINGS):
         try:
             with open(path, "rb") as f:
@@ -111,7 +111,7 @@ def load_settings():
 
 
 def save_settings(data):
-    """設定を書く。書けなくても (読み取り専用の場所など)、キットの動きは止めない。"""
+    """Write settings. If that fails (e.g. a read-only location), the kit keeps working."""
     try:
         os.makedirs(os.path.dirname(SETTINGS), exist_ok=True)
         with open(SETTINGS, "w", encoding="utf-8", newline="\n") as f:
@@ -121,7 +121,7 @@ def save_settings(data):
 
 
 def default_data_dir():
-    """Windower の GearSwap の data フォルダーらしい場所を、よくある置き場所から探す。"""
+    """Look for Windower's GearSwap data folder in the usual install locations."""
     candidates = [
         os.path.join(os.path.expanduser("~"), "Documents", "Windower4", "addons", "gearswap", "data"),
         r"C:\Windower4\addons\gearswap\data",
@@ -135,8 +135,8 @@ def default_data_dir():
 
 
 def ask_first_language(root):
-    """初めて起動したとき (設定に言語が無いとき) に、言語を選ぶ小さな画面を出す。戻り値: "ja" / "en"。
-    閉じられたときは日本語。"""
+    """On first launch (no language in settings), show a small window to pick a language. Returns "ja" / "en".
+    Japanese if the window is closed."""
     chosen = ["ja"]
     win = tk.Toplevel(root)
     win.title("GearSwapKit — Language / 言語")
@@ -162,7 +162,7 @@ def ask_first_language(root):
 
 
 class WeaponPicker:
-    """所持品の武器の候補から、複数を選ぶ小さな画面 (検索つき)。選んだ Item のリストが self.result に入る。"""
+    """Small window for picking several weapons from inventory candidates (with search). The chosen Items go in self.result."""
 
     def __init__(self, parent, title, items, job=None, resdb=None):
         self.items = items
@@ -197,7 +197,7 @@ class WeaponPicker:
         self.order_lbl.pack(anchor="w")
         frame = ttk.Frame(self.win, padding=8)
         frame.pack(fill="both", expand=True)
-        self.order = []        # クリックした順の Item
+        self.order = []        # Items in click order
         self.box = tk.Listbox(frame, selectmode="multiple", exportselection=False)
         self.box.bind("<<ListboxSelect>>", lambda e: self.on_select())
         sb = ttk.Scrollbar(frame, orient="vertical", command=self.box.yview)
@@ -228,11 +228,11 @@ class WeaponPicker:
         for i, it in enumerate(self.shown):
             self.box.insert("end", self.label(it))
             if it in self.order:
-                self.box.selection_set(i)     # 検索で一覧が変わっても、選んだものは選んだまま
+                self.box.selection_set(i)     # keep selections selected even when the search changes the list
         self.show_order()
 
     def on_select(self):
-        """クリックした順を覚える (選ばれたものは後ろに足し、外れたものは消す)。"""
+        """Track click order (newly selected items go to the end, deselected ones are dropped)."""
         picked = {self.shown[i] for i in self.box.curselection()}
         shown = set(self.shown)
         self.order = [it for it in self.order if it in picked or it not in shown]
@@ -249,7 +249,7 @@ class WeaponPicker:
         self.order_lbl.config(text=text)
 
     def usable(self, item):
-        """ジョブで絞るときの判定。res に名前が無い装備 (None) は、判断できないので、残す。"""
+        """Job filter check. Gear not in res (None) can't be judged, so it's kept."""
         if not (self.only_job.get() and self.resdb is not None and self.job):
             return True
         return self.resdb.usable_by(item.name, self.job) is not False
@@ -260,8 +260,8 @@ class WeaponPicker:
 
 
 class NamePicker:
-    """技・魔法・アビリティの一覧から、複数を選ぶ小さな画面 (検索・グループの絞り込みつき)。
-    選んだものの [{en, ja, group}] が self.result に入る。"""
+    """Small window for picking several WS, spells or abilities from a list (with search and group filter).
+    The chosen [{en, ja, group}] go in self.result."""
 
     def __init__(self, parent, title, items, note=""):
         self.items = items
@@ -327,10 +327,10 @@ class NamePicker:
 
 
 class AbilityGearPicker:
-    """アビリティ強化の装備を、持っているものの中から選ぶ小さな画面。
-    rows: [{entry, gen, spec, item}]。最初は、アビリティごとに、持っている中でいちばん強化の進んだものが選ばれる。
-    選んだ rows が self.result に入る (同じアビリティ・同じ部位では、いちばん強化の進んだ 1 つだけ)。
-    英語のときは、装備の名前を res の英語名で出す (resdb があって引けるとき)。"""
+    """Small window for choosing ability gear from what you own.
+    rows: [{entry, gen, spec, item}]. Initially, the most upgraded piece you own is selected for each ability.
+    The chosen rows go in self.result (only the most upgraded one per ability and slot).
+    In English mode, gear names are shown with their English names from res (when resdb exists and has them)."""
 
     def __init__(self, parent, title, rows, missing=(), resdb=None):
         self.rows = rows
@@ -394,7 +394,7 @@ class AbilityGearPicker:
         if e.get("cast_phase"):
             when += " (%s%s%s)" % (AG.cast_on_name(e.get("cast_on", "Magic")), L("・", ", "),
                                    AG.cast_phase_name(e["cast_phase"]))
-        # 対応表の効果・注意・必要条件の文は日本語だけなので、英語のときは英語の文にする
+        # The table's effect, note and requirement text is Japanese only, so use English text in English mode
         effect = L(e["effect"], "Enhances %s" % e.get("ability_en", ""))
         if note and i18n.is_en():
             note = NOTE_EN.get(note, "See the Japanese note: " + note)
@@ -428,28 +428,28 @@ class App:
         self.job_var = tk.StringVar(value=self.project.job)
         self.weapons_var = tk.BooleanVar(value=False)
         self.lockstyle_var = tk.StringVar(value="")
-        self.project_path = None     # 最後に保存した / 開いた作業のファイル (閉じるときの自動保存の保存先)
-        self._traces = []            # _build で、作り直しても残る変数 (data_dir など) に付けた trace (作り直すときに外す)
+        self.project_path = None     # Work file last saved / opened (the target for auto-save on close)
+        self._traces = []            # Traces _build puts on variables that survive a rebuild (data_dir etc.), removed on rebuild
         self._build()
         self.update_resdb()
         self.refresh()
         root.protocol("WM_DELETE_WINDOW", self.on_close)
-        # 前回の作業 (最後に保存した / 開いた / 閉じるときに保存したもの) を開く
+        # Open the previous work (last saved / opened / saved on close)
         last = self.settings.get("last_project")
         if last and os.path.isfile(last):
             self.load_project_file(last, quiet=True)
 
     def autosave_path(self):
-        """閉じるときの保存先: 最後に保存した / 開いた作業のファイル。無ければ data フォルダーの <ジョブ>_kit.json。"""
+        """Where to save on close: the work file last saved / opened, or <job>_kit.json in the data folder if none."""
         if self.project_path:
             return self.project_path
         d = self.data_dir.get().strip()
         return os.path.join(d, "%s_kit.json" % self.project.job) if d and os.path.isdir(d) else None
 
     def on_close(self):
-        """閉じるときに、作業を自動で保存する。ファイルがあるときは上書きしてよいか聞き、いいえなら閉じずに戻る。"""
+        """Auto-save the work on close. If the file exists, ask before overwriting; on No, return without closing."""
         if not any(self.project.has_work(j) for j in C.ALL_JOBS):
-            self.root.destroy()          # 何も作業していなければ、保存せずに閉じる
+            self.root.destroy()          # nothing has been worked on, so close without saving
             return
         path = self.autosave_path()
         if not path:
@@ -457,9 +457,9 @@ class App:
                                                 defaultextension=".json",
                                                 filetypes=[("JSON", "*.json")], initialfile="%s_kit.json" % self.project.job)
             if not path:
-                return                   # 保存先を選ばなかったら、閉じずに戻る
+                return                   # no save location chosen, so return without closing
         elif os.path.exists(path):
-            # すでに保存してあって (保存した直後・開いたまま変えていない)、中身が同じなら、聞かずにそのまま閉じる
+            # Already saved (just saved, or opened and unchanged) with identical content: close without asking
             text = self.project.to_json()
             try:
                 with open(path, encoding="utf-8") as f:
@@ -468,7 +468,7 @@ class App:
                         self.root.destroy()
                         return
             except (OSError, UnicodeDecodeError):
-                pass                     # 読めなければ、今までどおり聞く
+                pass                     # if it can't be read, ask as usual
             if not messagebox.askyesno(APP_NAME, L("閉じる前に、作業を保存します。\n\n%s\n\nこのファイルはすでにあります。上書きして閉じますか?\n"
                                                    "(いいえを押すと、閉じずに画面に戻ります)",
                                                    "Your work will be saved before closing.\n\n%s\n\nThis file already exists. "
@@ -481,12 +481,12 @@ class App:
             messagebox.showerror(APP_NAME, L("保存できなかったので、閉じずに戻ります。\n%s",
                                              "Couldn't save, so the window stays open.\n%s") % ex)
             return
-        self.remember_file("last_project", path)      # 次に起動したとき、この作業を開く
+        self.remember_file("last_project", path)      # open this work on next launch
         self.root.destroy()
 
-    # --- 言語 ---
+    # --- Language ---
     def on_lang(self):
-        """上の「Language / 言語」で選んだ言語にする。設定に覚えて、画面をその場で作り直す。"""
+        """Switch to the language picked in the top-row Language selector. Saves it to settings and rebuilds the window on the spot."""
         code = dict(LANG_CHOICES).get(self.lang_var.get(), "ja")
         if code == i18n.lang():
             return
@@ -496,7 +496,7 @@ class App:
         self.rebuild()
 
     def rebuild(self):
-        """今の言語で画面を作り直す。作業内容 (self.project)・data フォルダー・ジョブ・選んでいる行などはそのまま。"""
+        """Rebuild the window in the current language. Work (self.project), data folder, job, selected row etc. are kept."""
         sel = self.current_path()
         try:
             kind_index = [k[1] for k in self._kinds_shown].index(self.kind_var.get())
@@ -523,10 +523,10 @@ class App:
         self.say(L("表示を日本語にしました。", "Switched the display to English."))
 
     def _trace(self, var, fn):
-        """作り直しても残る変数に trace を付ける (作り直すときに外せるよう、覚えておく)。"""
+        """Add a trace to a variable that survives a rebuild (remembered so it can be removed on rebuild)."""
         self._traces.append((var, var.trace_add("write", lambda *a: fn())))
 
-    # --- 画面の組み立て ---
+    # --- Building the window ---
     def _build(self):
         self.root.title(L("%s %s — GearSwap のひな形を作る", "%s %s — GearSwap template builder") % (APP_NAME, VERSION))
         top = ttk.Frame(self.root, padding=8)
@@ -545,7 +545,7 @@ class App:
         self.jobs_lbl.pack(side="left", padx=(14, 0))
         ttk.Button(top, text=L("作業を保存", "Save work"), command=self.save_project).pack(side="right")
         ttk.Button(top, text=L("作業を開く", "Open work"), command=self.open_project).pack(side="right", padx=4)
-        # 言語の切り替え (表示名はどちらの言語でも同じ)
+        # Language switcher (labels are the same in either language)
         self.lang_var = tk.StringVar(value=[n for n, c in LANG_CHOICES if c == i18n.lang()][0])
         lang_cb = ttk.Combobox(top, textvariable=self.lang_var, values=[n for n, _c in LANG_CHOICES],
                                width=8, state="readonly")
@@ -561,14 +561,14 @@ class App:
         entry_box.pack(side="left", fill="x", expand=True, padx=6)
         self.dir_entry = ttk.Entry(entry_box, textvariable=self.data_dir)
         self.dir_entry.pack(fill="x")
-        # 欄が空のあいだ、重ねて薄い案内を出す (入力すると消える)
+        # While the field is empty, overlay a faint hint (it disappears once you type)
         self.dir_hint = tk.Label(entry_box, text=L("例: C:\\Windower4\\addons\\gearswap\\data   (右の「選ぶ…」で探せます)",
                                                    "e.g. C:\\Windower4\\addons\\gearswap\\data   (or use Browse… on the right)"),
                                  foreground="#999", background="white", anchor="w")
         self.dir_hint.place(in_=self.dir_entry, x=4, y=2, relheight=0.9)
         self.dir_hint.bind("<Button-1>", lambda e: self.dir_entry.focus_set())
         self._trace(self.data_dir, self.update_dir_hint)
-        self.update_dir_hint()     # 覚えたフォルダーが最初から入っているときは、案内の文字を出さない (重なって空に見えるため)
+        self.update_dir_hint()     # don't show the hint when a remembered folder is already filled in (the overlap makes it look empty)
         self._trace(self.data_dir, self.remember_data_dir)
         ttk.Button(folder, text=L("選ぶ…", "Browse…"), command=self.choose_dir).pack(side="left")
 
@@ -595,13 +595,13 @@ class App:
         ttk.Combobox(add, textvariable=self.kind_var, values=[k[1] for k in self._kinds_shown], width=14,
                      state="readonly").pack(side="left")
         self.name_var = tk.StringVar()
-        # ドロップダウン: 今のジョブで使える技 (WS は武器の種類で絞る)。名前を打って探すこともできる
+        # Dropdown: actions usable by the current job (WS filtered by weapon type). You can also type a name to search
         self.name_cb = ttk.Combobox(add, textvariable=self.name_var, height=20)
         self.name_cb.pack(side="left", fill="x", expand=True, padx=6)
         self.name_cb.bind("<Return>", lambda e: self.add_with_export())
         self._name_map = {}
         ttk.Button(add, text=L("export を割り当てて追加…", "Assign export & add…"), command=self.add_with_export).pack(side="left")
-        # 被ファランクスを選んだときだけ出す: ファランクスに反応して自動で着替えるか
+        # Shown only when Phalanx received is picked: whether to swap automatically on Phalanx
         self.recv_auto_var = tk.BooleanVar(value=True)
         self.recv_auto_box = ttk.Checkbutton(left, text=L("ファランクスに反応して自動で着替える (自分に向けた詠唱の開始で着て、届いたら戻す)",
                                                           "Swap automatically for incoming Phalanx (equip when a cast on you "
@@ -630,7 +630,7 @@ class App:
         self.path_lbl.pack(anchor="w")
         self.help_lbl = ttk.Label(right, text="", wraplength=520, justify="left")
         self.help_lbl.pack(anchor="w", pady=(6, 6))
-        # 窓の幅に合わせて、ヘルプ文の折り返しの幅を変える
+        # Match the help text's wrap width to the window width
         right.bind("<Configure>", lambda e: self.help_lbl.config(wraplength=max(200, e.width - 24)))
         btns = ttk.Frame(right)
         btns.pack(anchor="w")
@@ -642,8 +642,8 @@ class App:
         self.pick_btn.pack(side="left", padx=(6, 0))
         self.remove_btn = ttk.Button(btns, text=L("この追加を削除", "Remove this set"), command=self.remove_custom)
         self.remove_btn.pack(side="left")
-        # ナイトの詠唱中断のときだけ出す: 3 段階の着替え (ファストキャスト → 詠唱中断 → 着弾の装備)
-        # 詠唱中 (精霊魔法) のときだけ出す: 属性帯・オルペウスサッシュの自動選択
+        # Shown only for PLD's spell interruption set: 3-stage swap (Fast Cast -> interruption -> landing gear)
+        # Shown only for midcast (Elemental Magic): auto-pick of elemental obi / Orpheus's Sash
         self.waist_box = ttk.Frame(right)
         self.waist_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(self.waist_box, text=L("属性帯 (八輪の帯) とオルペウスサッシュを自動で選ぶ (天候・曜日・対象との距離で、効果の大きいほう)",
@@ -653,7 +653,7 @@ class App:
         ttk.Label(self.waist_box, text=L("(震天動地の章が効いている間は腰を替えず、震天動地の章の装備を最優先で着ます)",
                                          "(While Immanence is active, the waist isn't swapped and your Immanence gear takes priority.)"),
                   foreground="#666").pack(anchor="w")
-        # からくり士のオートマトンの WS・敵対心のときだけ出す: 自動の事前着替え
+        # Shown only for PUP automaton WS / enmity sets: automatic pre-equip
         self.pup_box = ttk.Frame(right)
         self.pup_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(self.pup_box, text=L("自動で先に着る (オートマトンの TP 930 以上で WS の装備・ストロボ / フラッシュバルブの"
@@ -672,7 +672,7 @@ class App:
                         variable=self.stage_var, command=self.on_three_stage).pack(anchor="w")
         self.stage_fc_lbl = ttk.Label(self.stage_box, text="", foreground="#666")
         self.stage_fc_lbl.pack(anchor="w", pady=(2, 0))
-        # 「詠唱の開始 (ファストキャスト)」のときだけ出す (全ジョブ): セットのファストキャストの合計
+        # Shown only for "precast (Fast Cast)" (all jobs): the set's Fast Cast total
         self.fc_box = ttk.Frame(right)
         fc_row = ttk.Frame(self.fc_box)
         fc_row.pack(anchor="w")
@@ -684,7 +684,7 @@ class App:
         ttk.Label(fc_row, text=L("(export を割り当てると自動で計算します。ナイトの 3 段階の着替えに使います)",
                                  "(Calculated automatically when you assign an export. Used for PLD's 3-stage swap.)"),
                   foreground="#666").pack(side="left")
-        # 上限 (80%) を超えて無駄になっていないかの知らせ
+        # Warning when Fast Cast goes over the cap (80%) and is wasted
         self.fc_advice = ttk.Label(self.fc_box, text="", foreground="#a33", wraplength=520, justify="left")
         self.fc_advice.pack(anchor="w", pady=(2, 0))
         self.gear_txt = tk.Text(right, height=14, wrap="none", state="disabled", background="#fafafa")
@@ -700,7 +700,7 @@ class App:
                                                "Equip your gear in game, run //gs export, then assign the file it creates."))
         self.status.pack(side="left", padx=10)
 
-    # --- 表示の更新 ---
+    # --- Display updates ---
     def jobs_text(self):
         worked = [j for j in C.ALL_JOBS if self.project.has_work(j)]
         return (L("作業のあるジョブ: ", "Jobs with work: ") + L("・", ", ").join(worked)) if worked else ""
@@ -735,7 +735,7 @@ class App:
         return e["path"] if e else None
 
     def item_name(self, name):
-        """装備の表示名 (英語のときは res の英語名)。"""
+        """Display name for gear (English name from res in English mode)."""
         return item_display(name, self.project.resdb)
 
     def set_gear_text(self, text):
@@ -833,18 +833,18 @@ class App:
             if slot == "ammo" and G.ammo_as_gear(self.project.job):
                 skipped = False
             if slot in ("main", "sub") and self.project.job == "PLD" and e["path"] in G.PLD_WEAPON_SETS:
-                skipped = False     # ナイトの対魔法・状態異常耐性は、武器も着替える
+                skipped = False     # PLD's magic / status resistance sets swap weapons too
             if slot == "main" and self.project.job == "PUP" and e["path"] in (G.PUP_WS_SET, "sets.precast.JA.Maneuver"):
-                skipped = False     # からくり士のオートマトンの WS は、メイン (シュコアトルなど) も持ち替える
+                skipped = False     # PUP automaton WS sets also swap the main weapon (Xiucoatl etc.)
             if slot in ("main", "sub", "range") and (e["path"].startswith("sets.midcast.Increased") or e["path"] in ("sets.Sleep",) + G.PHALANX_SETS):
-                skipped = False     # 受ける強化 (剣・盾の被ファランクス+ など) と睡眠から起きる装備は、武器も持ち替える (generator.py の keep_for と同じ)
+                skipped = False     # Received-buff sets (sword/shield Phalanx received+ etc.) and the wake-from-sleep set swap weapons too (same as keep_for in generator.py)
             lines.append("%s\t%s%s" % (slot_name(slot), self.item_name(it.name),
                                          L("   ← 武器は出力に含めません", "   ← weapons are left out of the Lua") if skipped else ""))
         text = "\n".join(lines) if lines else L("(まだ装備が割り当てられていません)", "(No gear assigned yet.)")
         self.set_gear_text(text)
 
     def update_resdb(self):
-        """data フォルダーの位置から、同じ Windower の res フォルダーを探す (日本語名 → 英語名の変換に使う)。"""
+        """Find the res folder of the same Windower install from the data folder's location (used to map Japanese names to English)."""
         res = R.guess_res_dir(self.data_dir.get())
         old = self.project.resdb.res_dir if self.project.resdb is not None else None
         if self.project.resdb is None or old != res:
@@ -861,7 +861,7 @@ class App:
         return [k[1] for k in self._kinds_shown].index(self.kind_var.get())
 
     def refresh_name_choices(self):
-        """ドロップダウンの中身を、今の種類とジョブに合わせて作り直す (res が要る)。"""
+        """Rebuild the dropdown contents for the current kind and job (needs res)."""
         if not hasattr(self, "name_cb"):
             return
         kind = self.kind_index()
@@ -869,7 +869,7 @@ class App:
         if self.project.resdb is not None and self.project.resdb.available():
             items = CH.choices(self.project.resdb, ["ws", "ja", "magic", "pet", "received"][kind], self.project.job)
         elif kind == 4:
-            items = CH.choices(None, "received", self.project.job)    # 被強化の装備は res が無くても選べる
+            items = CH.choices(None, "received", self.project.job)    # received-buff gear can be picked even without res
         self._name_map = {}
         labels = []
         for it in items:
@@ -883,17 +883,17 @@ class App:
         self.name_cb.config(values=labels)
 
     def _chosen_received(self):
-        """「被強化の装備」で選んでいるもの (IncreasedPhalanx など)。ほかの種類・未選択なら None。"""
+        """What's picked under "Received buffs" (IncreasedPhalanx etc.). None for other kinds or when nothing is picked."""
         if self.kind_index() != 4:
             return None
         text = self.name_var.get().strip()
-        if text in self._name_map:      # ドロップダウンから選んだとき (表示名 → 英語名)
+        if text in self._name_map:      # picked from the dropdown (label -> English name)
             return self._name_map[text][0]
         st, en, _ja = self.project.resolve(4, text)
         return en if st == "ok" else None
 
     def update_recv_auto_box(self):
-        """被ファランクスを選んだときだけ、自動で着替えるかのチェックを出す (今の設定を入れておく)。"""
+        """Show the auto-swap checkbox only when Phalanx received is picked (filled with the current setting)."""
         if not hasattr(self, "recv_auto_box"):
             return
         if self._chosen_received() == "IncreasedPhalanx":
@@ -909,9 +909,9 @@ class App:
                 self.kind_help.config(text=text)
                 return
 
-    # --- 操作 ---
+    # --- Actions ---
     def on_lockstyle(self):
-        """ロックスタイル番号 (1〜200) を、今のジョブの作業内容に入れる。空なら使わない。"""
+        """Store the lockstyle set number (1-200) in the current job's work. Blank means unused."""
         if getattr(self, "_lockstyle_loading", False):
             return
         text = self.lockstyle_var.get().strip()
@@ -925,7 +925,7 @@ class App:
         self.jobs_lbl.config(text=self.jobs_text())
 
     def show_lockstyle(self):
-        """今のジョブのロックスタイル番号を、欄に出す (ジョブを変えたとき・作業を開いたとき)。"""
+        """Show the current job's lockstyle number in the field (on job change or when opening work)."""
         self._lockstyle_loading = True
         try:
             self.lockstyle_var.set(str(self.project.lockstyle) if self.project.lockstyle else "")
@@ -944,14 +944,14 @@ class App:
         self.show_detail()
 
     def remember_data_dir(self):
-        """data フォルダーを覚える (次に起動したとき、最初から入っているように)。実在するフォルダーだけ。"""
+        """Remember the data folder (so it's prefilled on next launch). Only folders that exist."""
         d = self.data_dir.get().strip()
         if d and os.path.isdir(d) and self.settings.get("data_dir") != d:
             self.settings["data_dir"] = d
             save_settings(self.settings)
 
     def export_start(self, key):
-        """ファイルを選ぶ画面の最初の場所: 前に選んだファイルのフォルダー → data フォルダーの export → 指定なし。"""
+        """Starting location for the file dialog: folder of the last chosen file -> export in the data folder -> none."""
         last = self.settings.get(key, "")
         if last and os.path.isdir(os.path.dirname(last)):
             return os.path.dirname(last), os.path.basename(last)
@@ -970,7 +970,7 @@ class App:
             self.data_dir.set(d)
 
     def ask_equipped_set(self, title=None):
-        """着ている装備を //gs export で書き出したファイルを選んでもらい、{スロット: Item} を返す。やめたとき・読めないときは None。"""
+        """Ask for a //gs export file of the equipped gear and return {slot: Item}. None if cancelled or unreadable."""
         if title is None:
             title = L("//gs export で書き出したファイルを選んでください", "Choose a file made with //gs export")
         start, _name = self.export_start("last_export")
@@ -994,12 +994,12 @@ class App:
             messagebox.showwarning(APP_NAME, L("装備を読めませんでした。//gs export で書き出したファイルか、確認してください。",
                                                "No gear found in this file. Make sure it was made with //gs export."))
             return None
-        self.remember_file("last_export", path)    # 次に選ぶとき、同じフォルダーから開く
+        self.remember_file("last_export", path)    # open from the same folder next time
         return items
 
     def add_with_export(self):
-        """技ごとの追加: ドロップダウンで選んだ技に、export の装備を割り当てて足す。
-        割り当てたときだけ、左の一覧に出す (選んだだけでは増やさない。一覧が煩雑にならないように)。"""
+        """Add per skill: assign export gear to the action picked in the dropdown and add it.
+        It only shows up in the left list once assigned (just picking it doesn't add it, to keep the list tidy)."""
         kind = self.kind_index()
         self.update_resdb()
         text = self.name_var.get().strip()
@@ -1033,7 +1033,7 @@ class App:
         path = self.project.path_for(kind, en)
         if kind == RECEIVED_KIND and en == "IncreasedPhalanx":
             self.project.set_received_auto(en, self.recv_auto_var.get())
-        self.project.add_pair(kind, en, ja)      # すでにあれば、何もしない (装備は下で置き換える)
+        self.project.add_pair(kind, en, ja)      # no-op if it already exists (the gear is replaced below)
         self.project.assign(path, items)
         self.name_var.set("")
         self.refresh(select=path)
@@ -1076,10 +1076,10 @@ class App:
         self.refresh(select=e["path"])
         self.say(self.assigned_msg(e["title"], len(items)))
         if e["path"] == "sets.precast.FC":
-            self.calc_fast_cast()       # ファストキャストのセットを替えたら、合計を計算し直す
+            self.calc_fast_cast()       # recalculate the total when the Fast Cast set changes
 
     def ask_inventory(self):
-        """//gs export all で書き出した所持品の一覧のファイルを選んでもらい、読む。戻り値: {スロット: [Item]} または None。"""
+        """Ask for an inventory file made with //gs export all and read it. Returns {slot: [Item]} or None."""
         start, name = self.export_start("last_inventory")
         path = filedialog.askopenfilename(title=L("//gs export all で書き出した所持品の一覧を選んでください",
                                                   "Choose the inventory file made with //gs export all"),
@@ -1105,7 +1105,7 @@ class App:
         return EP.parse_inventory(text)
 
     def pick_ability_gear(self):
-        """所持品の一覧から、アビリティを強化する装備 (ＧＬホーン+1 など) を探して、選んで足す。"""
+        """Find ability-enhancing gear (Glyphic Horn +1 etc.) in the inventory list, let the user choose, and add it."""
         job = self.project.job
         entries = AG.entries_for_job(job)
         if not entries:
@@ -1147,7 +1147,7 @@ class App:
         self.say(msg)
 
     def pick_weapons(self):
-        """//gs export all で書き出した所持品の一覧から、武器を選んで足す。"""
+        """Pick weapons from an inventory list made with //gs export all and add them."""
         e = self.current()
         if e and e.get("ammo_role"):
             inv = self.ask_inventory()
@@ -1210,12 +1210,12 @@ class App:
             return
         self.project.set_three_stage(self.stage_var.get())
         if self.stage_var.get() and not self.project.fast_cast:
-            self.calc_fast_cast()       # まだ 0 なら、ファストキャストのセットから入れる
+            self.calc_fast_cast()       # if it's still 0, fill it in from the Fast Cast set
         elif not self.stage_var.get():
             self.say(L("3 段階の着替えを使いません。", "3-stage swap turned off."))
 
     def calc_fast_cast(self):
-        """ファストキャストのセット (sets.precast.FC) の装備から、ファストキャストを足し合わせて入れる。"""
+        """Add up Fast Cast from the gear in the Fast Cast set (sets.precast.FC) and fill it in."""
         self.update_resdb()
         items = self.project.assignments.get("sets.precast.FC")
         if not items:
@@ -1225,7 +1225,7 @@ class App:
         res_dir = self.project.resdb.res_dir if self.project.resdb is not None and self.project.resdb.available() else None
         total, rows, unknown = FCALC.set_fast_cast(res_dir, items)
         self.project.set_fast_cast(total)
-        self.show_detail()      # 欄 (詠唱の開始) と、3 段階の着替えの表示 (詠唱中断) を合わせる
+        self.show_detail()      # sync the field (precast) and the 3-stage swap display (interruption)
         sep = L("・", ", ")
         detail = sep.join("%s %d" % (self.item_name(n), v) for _s, n, v in rows) or L("該当なし", "none")
         msg = L("ファストキャストのセットから %d%% と計算して入れました (%s)。",
@@ -1244,7 +1244,7 @@ class App:
         self.fc_advice.config(text=FCALC.advice(self.project.fast_cast, self.project.job))
 
     def ws_label(self, en):
-        """WS の英語名を「日本語名 (英語名)」にする (res が無ければ英語名のまま。英語のときも英語名だけ)。"""
+        """Turn a WS's English name into "Japanese name (English name)" (English name alone without res, and in English mode)."""
         if i18n.is_en():
             return en
         for it in CH.choices(self.project.resdb, "ws", self.project.job):
@@ -1253,7 +1253,7 @@ class App:
         return en
 
     def apply_ammo(self, e, items):
-        """選んだ矢弾を、役目に決める。特殊弾は、続けて使う WS を選んでもらう。複数選ばれたときは最初の 1 つ。"""
+        """Assign the chosen ammo to its role. Special ammo then asks which WS to use it for. If several are chosen, the first one wins."""
         item = items[0]
         role = e["ammo_role"]
         name = self.item_name(item.name)
@@ -1294,19 +1294,19 @@ class App:
     def say(self, text):
         self.status.config(text=text)
 
-    # --- 出力 ---
+    # --- Output ---
     def preview(self):
         win = tk.Toplevel(self.root)
         win.title(L("出力する Lua の確認", "Preview Lua"))
         win.geometry("860x620")
         txt = tk.Text(win, wrap="none")
         txt.pack(fill="both", expand=True)
-        self.update_resdb()     # 「作業を開く」のあとでも、技の種類 (セットの置き場所) を res で調べられるように
+        self.update_resdb()     # so the WS type (where its set goes) can be looked up in res even right after "Open work"
         txt.insert("1.0", self.project.to_lua())
         txt.config(state="disabled")
 
     def make_lua(self):
-        self.update_resdb()     # 「作業を開く」のあとでも、技の種類 (セットの置き場所) を res で調べられるように
+        self.update_resdb()     # so the WS type (where its set goes) can be looked up in res even right after "Open work"
         if not self.project.has_work(self.project.job):
             messagebox.showinfo(APP_NAME, L("まだ、どのセットにも装備が割り当てられていません。", "No gear has been assigned to any set yet."))
             return
@@ -1315,7 +1315,7 @@ class App:
             messagebox.showwarning(APP_NAME, L("GearSwap の data フォルダーを選んでください。", "Please choose your GearSwap data folder."))
             return
         if self.project.job == "PLD" and self.project.three_stage and not self.project.fast_cast:
-            # ファストキャストが 0 だと、着弾の装備に替える前に詠唱が終わってしまう (ケアルの装備にならない)
+            # With Fast Cast at 0, the spell finishes before the landing gear goes on (Cure gear never gets worn)
             if not messagebox.askyesno(APP_NAME, L("3 段階の着替えを使いますが、ファストキャストが 0% のままです。\n"
                                                    "このままだと、着弾の装備 (ケアルなど) に替える前に詠唱が終わってしまいます。\n\n"
                                                    "「詠唱の開始 (ファストキャスト)」の「装備から計算」で入れてから作るのがおすすめです。\n"
@@ -1358,7 +1358,7 @@ class App:
         messagebox.showinfo(APP_NAME, msg)
         self.say(L("%s を作りました。", "Created %s.") % path)
 
-    # --- 作業の保存 ---
+    # --- Saving work ---
     def save_project(self):
         path = filedialog.asksaveasfilename(title=L("作業を保存", "Save work"), defaultextension=".json",
                                             filetypes=[("JSON", "*.json")],
@@ -1380,11 +1380,11 @@ class App:
             self.load_project_file(path)
 
     def load_project_file(self, path, quiet=False):
-        """作業のファイルを読み込んで、画面に出す。quiet なら、読めなくても知らせない (起動時の自動で開く)。戻り値: 開けたか。"""
+        """Load a work file and show it. With quiet, read failures aren't reported (auto-open at launch). Returns whether it opened."""
         try:
             with open(path, encoding="utf-8") as f:
                 self.project = Project.from_json(f.read())
-        except Exception as ex:      # 形の違う JSON (別のツールのもの・手で直したもの) でも、落ちずに知らせる
+        except Exception as ex:      # report instead of crashing even on JSON of a different shape (from another tool, or hand-edited)
             if not quiet:
                 messagebox.showerror(APP_NAME, L("作業のファイルとして読めませんでした。\n%s", "Couldn't read this as a work file.\n%s") % ex)
             return False
@@ -1393,7 +1393,7 @@ class App:
         self.job_var.set(self.project.job)
         self.weapons_var.set(self.project.include_weapons)
         self.project.set_resdb(None)
-        self.update_resdb()          # 新しい作業に res を付け直し、技のドロップダウンを開いたジョブに合わせる
+        self.update_resdb()          # reattach res to the new work and match the action dropdown to the opened job
         self.show_lockstyle()
         self.update_recv_auto_box()
         self.refresh()
@@ -1403,17 +1403,17 @@ class App:
 
 def main():
     root = tk.Tk()
-    # 窓のアイコン (EXE では --include-data-files で同梱した icon.ico を、展開先の __file__ の隣から読む)
+    # Window icon (in the EXE, icon.ico is bundled with --include-data-files and read from next to __file__ in the extraction folder)
     icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon.ico")
     if os.path.exists(icon):
         try:
-            root.iconbitmap(default=icon)  # default= で、あとから開く窓 (言語の選択・一覧など) にも付く
+            root.iconbitmap(default=icon)  # default= also applies it to windows opened later (language picker, lists, etc.)
         except tk.TclError:
             pass
     settings = load_settings()
     code = settings.get("lang")
     if code not in i18n.LANGS:
-        # 初めて起動したとき: 先に言語を選んでもらい、覚えてから本体を作る
+        # First launch: ask for the language first, save it, then build the main window
         root.withdraw()
         code = ask_first_language(root)
         settings["lang"] = code

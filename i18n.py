@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""画面と出力の言語 (日本語 / 英語) の切り替え。
+"""Switch the UI and output language (Japanese / English).
 
-使い方: 文の場所で L("日本語の文", "English text") と書く。今の言語のほうを返す。
-言語は app.py が設定ファイルから読み、set_lang() で決める (初回起動で選び、上の「Language / 言語」で変える)。
-英語のときは、出力する Lua も英語クライアント向けにする (generator.py が lang() を見る)。
+Usage: write L("Japanese text", "English text") wherever text appears; it returns the one for the current language.
+app.py reads the language from the settings file and applies it with set_lang() (chosen on first launch, changed via the "Language" menu at the top).
+In English mode, the generated Lua also targets the English client (generator.py checks lang()).
 """
 
 LANGS = ("ja", "en")
@@ -24,11 +24,11 @@ def is_en():
 
 
 def L(ja, en):
-    """今の言語の文。"""
+    """Text in the current language."""
     return en if _lang == "en" else ja
 
 
-# 魔法のスキルの名前 (セットのキー sets.midcast['…'] に使う)。日本語クライアントは日本語、英語クライアントは英語で探す
+# Magic skill names (used as set keys, sets.midcast['...']). The Japanese client looks them up in Japanese, the English client in English
 SKILL_EN = {
     "回復魔法": "Healing Magic", "強化魔法": "Enhancing Magic", "弱体魔法": "Enfeebling Magic",
     "精霊魔法": "Elemental Magic", "暗黒魔法": "Dark Magic", "神聖魔法": "Divine Magic",
@@ -38,5 +38,5 @@ SKILL_EN = {
 
 
 def skill_name(ja):
-    """スキルの名前を、今の言語のクライアントが使う名前にする。"""
+    """Convert a skill name to the name the client uses in the current language."""
     return SKILL_EN.get(ja, ja) if _lang == "en" else ja

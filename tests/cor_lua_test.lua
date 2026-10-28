@@ -1,5 +1,5 @@
--- 出力した Lua の「遠隔攻撃・ロール・クイックドロー」を、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/cor_lua_test.lua <出力した Lua のパス>   (test_cor.py が作る COR の Lua)
+-- Simulates GearSwap to check the generated Lua's "ranged attacks, rolls and Quick Draw".
+-- Run: lua5.1.exe tests/cor_lua_test.lua <path to generated Lua>   (the COR Lua built by test_cor.py)
 local path = arg[1]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -24,7 +24,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 local S = env.sets
 
 check(S.midcast.RA == S.RA_STP and S.RA_STP.head == "STP帽", "sets.midcast.RA は遠隔攻撃 (STP)")

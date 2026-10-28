@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""GearSwap の export (//gs export) の Lua を読む。
+"""Read the Lua written by GearSwap's export (//gs export).
 
-2 種類の形式を読める:
-  1. 装備中のセット   : sets.exported = { main="…", head={ name="…", augments={…} }, … }  (スロットごとに 1 つ)
-  2. 所持品の一覧     : 同じスロット名の行が重複して並ぶ ("item=" の行も混ざる)
+Two formats are supported:
+  1. Equipped set   : sets.exported = { main="...", head={ name="...", augments={...} }, ... }  (one per slot)
+  2. Inventory list : lines with the same slot name repeat (with "item=" lines mixed in)
 
-Lua を実行せず、文字列と { } の対応だけを見て読む (他人から受け取ったファイルでも安全)。
+The Lua isn't executed; only strings and matching { } are looked at (so files received from others are safe).
 """
 import re
 
@@ -22,7 +22,7 @@ _KEY = re.compile(r'([A-Za-z_][A-Za-z_0-9]*)\s*=\s*')
 
 
 class Item:
-    """装備 1 つ。raw は Lua にそのまま書ける表記 ("名前" か { name=…, augments=… })。"""
+    """One piece of gear. raw is the notation that can be written into Lua as is ("name" or { name=..., augments=... })."""
 
     def __init__(self, slot, name, raw):
         self.slot = slot
@@ -40,7 +40,7 @@ class Item:
 
 
 def _read_string(text, i):
-    """text[i] が引用符のとき、(文字列の中身, 次の位置) を返す。"""
+    """When text[i] is a quote, return (string contents, next position)."""
     quote = text[i]
     j = i + 1
     out = []
@@ -58,7 +58,7 @@ def _read_string(text, i):
 
 
 def _read_table(text, i):
-    """text[i] == '{' のとき、対応する '}' までの文字列 (両端を含む) と次の位置を返す。"""
+    """When text[i] == '{', return the text up to the matching '}' (both braces included) and the next position."""
     depth = 0
     j = i
     while j < len(text):
@@ -88,8 +88,8 @@ def _table_name(raw):
 
 
 def strip_comments(text):
-    """Lua のコメント (-- から行末まで・--[[ … ]] / --[==[ … ]==] の複数行) を取り除く。文字列の中の -- は残す。
-    export のファイルを手で直して、装備の行をコメントアウトしていても、その装備を読まないようにするため。"""
+    """Strip Lua comments (-- to end of line, and multi-line --[[ ... ]] / --[==[ ... ]==]). A -- inside a string is kept.
+    This way, gear lines commented out by hand-editing an export file aren't read."""
     out = []
     i, n = 0, len(text)
     while i < n:
@@ -111,7 +111,7 @@ def strip_comments(text):
                 i = n if end < 0 else end + len(close)
             else:
                 end = text.find('\n', i)
-                i = n if end < 0 else end      # 改行は残す
+                i = n if end < 0 else end      # keep the newline
             continue
         out.append(c)
         i += 1
@@ -119,8 +119,8 @@ def strip_comments(text):
 
 
 def parse_entries(text):
-    """ファイル内の「スロット=装備」を、出てきた順に全部返す ([Item, …])。item= の行 (アイテム) は除く。
-    コメント (--) の中の装備は読まない。"""
+    """Return every "slot=gear" in the file in order of appearance ([Item, ...]). item= lines (non-gear items) are skipped.
+    Gear inside comments (--) isn't read."""
     text = strip_comments(text)
     items = []
     i = 0
@@ -133,7 +133,7 @@ def parse_entries(text):
         if j >= len(text):
             break
         if key not in SLOTS:
-            # スロット以外 (sets.exported = { の外側など) は、中身を読み続ける
+            # Not a slot (e.g. the outer sets.exported = {): keep reading inside it
             i = j
             continue
         if text[j] in ('"', "'"):
@@ -147,12 +147,12 @@ def parse_entries(text):
             i = j
             continue
         items.append(Item(key, name, raw))
-        i = nxt   # 表の中の name= や augments= は、この表の読み取りで済んでいる
+        i = nxt   # name= and augments= inside the table were already handled when the table was read
     return items
 
 
 def parse_equipped_set(text):
-    """装備中のセットを {スロット: Item} で返す。同じスロットが複数あれば、最初のものを使う。"""
+    """Return the equipped set as {slot: Item}. If a slot appears more than once, the first one is used."""
     result = {}
     for it in parse_entries(text):
         result.setdefault(it.slot, it)
@@ -160,7 +160,7 @@ def parse_equipped_set(text):
 
 
 def parse_inventory(text):
-    """所持品の一覧を {スロット: [Item, …]} で返す (重複は除く)。"""
+    """Return the inventory list as {slot: [Item, ...]} (duplicates removed)."""
     result = {}
     for it in parse_entries(text):
         lst = result.setdefault(it.slot, [])
@@ -170,7 +170,7 @@ def parse_inventory(text):
 
 
 def looks_like_inventory(text):
-    """同じスロットが 2 回以上出る、または item= の行があれば、所持品の一覧とみなす。"""
+    """Treat the text as an inventory list if any slot appears twice or more, or if there are item= lines."""
     seen = set()
     for it in parse_entries(text):
         if it.slot in seen:
@@ -191,10 +191,10 @@ def read_file(path):
 
 
 def weapon_candidates(inventory, slot, resdb=None):
-    """所持品の一覧 (parse_inventory の結果) から、そのスロットに使える武器の候補を返す。
-    メイン = main の行・サブ = sub の行 + main の行 (片手武器を二刀流で持つため)・遠隔 = range の行・矢弾 = ammo の行。"""
-    # //gs export all は、片手武器 (ブルトガングなど) を sub= として書き出すので、メインの候補には sub の行も入れる。
-    # res があれば、メインに装備できないもの (盾・グリップ) は除く
+    """From an inventory list (the result of parse_inventory), return the weapon candidates usable in that slot.
+    main = main lines; sub = sub lines + main lines (for dual-wielding one-handed weapons); range = range lines; ammo = ammo lines."""
+    # //gs export all writes one-handed weapons (Burtgang etc.) as sub=, so sub lines are included in the main candidates too.
+    # With res available, items that can't go in main (shields, grips) are excluded
     keys = {"main": ["main", "sub"], "sub": ["sub", "main"], "range": ["range"], "ammo": ["ammo"]}.get(slot, [])
     out = []
     for key in keys:

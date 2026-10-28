@@ -1,6 +1,6 @@
--- 武器 (剣・盾) の入った被ファランクスの動きを、GearSwap と Windower を模擬して確認する。
--- 着る前の武器を覚えて、届いたら (または自分で唱えたあとに) その武器に戻すこと。
--- 実行: lua5.1.exe tests/received_weapons_lua_test.lua <出力した Lua のパス>   (武器入りの被ファランクスを登録した Lua)
+-- Simulates GearSwap and Windower to check received Phalanx with weapons (sword and shield).
+-- It should remember the weapons held before equipping and switch back to them once it lands (or after casting it yourself).
+-- Run: lua5.1.exe tests/received_weapons_lua_test.lua <path to generated Lua>   (a Lua with received Phalanx including weapons registered)
 local path = arg[1]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -41,7 +41,7 @@ check(set and set.main == 'サクパタソード' and set.sub == 'プリュウ�
 local function last() return sent[#sent] end
 local function cmd(name) local ev = {}; env.job_self_command({name}, ev); return ev.handled end
 
--- ほかの人 (コルモルなど) が自分にファランクス → 武器を覚えてから着る → 届いたら武器を着直す
+-- Someone else (Koru-Moru, etc.) casts Phalanx on me -> remember weapons, then equip -> re-equip the weapons when it lands
 handler({actor_id = PALLY, category = 8, param = 24931, targets = {{id = ME, actions = {{param = 107}}}}})
 check(last() == "gs c received_save; gs equip sets.midcast.IncreasedPhalanx", "唱え始めで、武器を覚えてから着る (実際 " .. tostring(last()) .. ")")
 check(cmd('received_save'), "received_save を受け付ける")
@@ -57,7 +57,7 @@ check(w and w.main == '元の剣' and w.sub == '元の盾', "覚えていた武�
 check(updates == before + 1, "待機・戦闘中の装備にも着替え直す")
 check(env.received_weapons == nil, "着直したら、覚えた武器を消す")
 
--- 自分で自分にファランクス → 詠唱中に着る → 唱えたあとに武器を戻す
+-- Phalanx on myself -> wear it during midcast -> restore weapons after casting
 env.player.equipment.main, env.player.equipment.sub = '元の剣', '元の盾'
 equipped = {}
 env.job_post_midcast({id = 106, target = {type = 'SELF'}, action_type = 'Magic'}, {}, nil, {})

@@ -1,5 +1,5 @@
--- 出力した Lua の「強化が効いている間に WS・遠隔攻撃をするときの装備」の動きを、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/action_lua_test.lua <出力した Lua のパス> <バフ番号> <WeaponSkill / Ranged Attack>
+-- Simulates GearSwap to check the generated Lua's "gear for WS / ranged attacks while a buff is active".
+-- Run: lua5.1.exe tests/action_lua_test.lua <path to generated Lua> <buff ID> <WeaponSkill / Ranged Attack>
 local path, bid, kind = arg[1], tonumber(arg[2]), arg[3]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -23,7 +23,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 
 local ws = {action_type = "Ability", type = "WeaponSkill"}
 local ra = {action_type = "Ranged Attack", type = "Misc"}

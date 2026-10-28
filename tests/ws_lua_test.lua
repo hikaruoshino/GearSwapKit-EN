@@ -1,5 +1,5 @@
--- 出力した Lua の「WS の分け方 (job_get_spell_map)」を、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/ws_lua_test.lua <出力した Lua のパス>   (魔攻と遠隔の両方のセットがある Lua)
+-- Simulates GearSwap to check the generated Lua's "WS mapping (job_get_spell_map)".
+-- Run: lua5.1.exe tests/ws_lua_test.lua <path to generated Lua>   (a Lua with both magical and ranged sets)
 local path = arg[1]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -18,7 +18,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 
 local map = env.job_get_spell_map
 check(map({type = "WeaponSkill", english = "Leaden Salute", skill = "射撃"}) == "Magic", "レデンサリュート (射撃・魔法属性) は Magic")
@@ -28,7 +28,7 @@ check(map({type = "WeaponSkill", english = "Jishnu's Radiance", skill = "Archery
 check(map({type = "WeaponSkill", english = "Savage Blade", skill = "片手剣"}) == nil, "サベッジブレードは分けない (共通の WS)")
 check(map({type = "BlackMagic", english = "Fire", skill = "精霊魔法"}) == nil, "WS でなければ分けない")
 
--- 技ごとのセットが、元のセットを引き継いでいる
+-- Per-WS sets inherit from their base set
 local ls = env.sets.precast.WS["Leaden Salute"]
 check(ls and ls.neck == env.sets.precast.WS.Magic.neck, "レデンサリュートのセットは、魔攻の WS の装備を引き継ぐ")
 

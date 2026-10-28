@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""ナイトの仕組み (敵対心・詠唱中断・3 段階の着替え・対魔法 / 状態異常耐性の手動切り替え) の確認。
-実行 (GearSwapKit/ で): python -I tests/test_pld.py"""
+"""Tests for the Paladin features (enmity, spell interruption, 3-stage swaps, manual toggles for magic defense / status resistance).
+Run (from GearSwapKit/): python -I tests/test_pld.py"""
 import os
 import subprocess
 import sys
@@ -25,7 +25,7 @@ def check(cond, msg):
         sys.stdout.buffer.write(("NG: %s\n" % msg).encode("utf-8"))
 
 
-# 一覧: ナイトだけ
+# List: PLD only
 for job in C.ALL_JOBS:
     paths = [e["path"] for e in C.sets_for_job(job)]
     check(("sets.midcast.interruption" in paths) == (job == "PLD"), "%s: 詠唱中断はナイトだけ" % job)
@@ -65,7 +65,7 @@ p1 = make(True)
 lua1 = p1.to_lua()
 check("gs c land" in lua1 and "local fast_cast = 40" in lua1, "3 段階を選ぶと、着弾の命令とファストキャストが出る")
 
-# 遠隔のジョブ (狩人・コルセア) 以外は、矢弾をセットに入れる (ストンチタスラム+1 など)
+# Jobs other than the ranged ones (RNG, COR) keep ammo in their sets (Staunch Tathlum +1, etc.)
 pa = make(False)
 pa.assign("sets.midcast.interruption", H('sets.exported={ ammo="ストンチタスラム+1", head="ＣＶアーメット+3" }'))
 check('        ammo="ストンチタスラム+1",' in pa.to_lua(), "ナイトでは、矢弾をセットに入れる")
@@ -77,7 +77,7 @@ for rj in ("RNG", "COR"):
     pr_.assign("sets.idle", H('sets.exported={ ammo="クロノブレット", head="ＣＶアーメット+3" }'))
     check('ammo="クロノブレット"' not in pr_.to_lua(), "%s (遠隔のジョブ) は、矢弾をセットに入れない" % rj)
 
-# 対魔法・状態異常耐性は、メインとサブも入れる (武器の切り替えがあっても)。ほかのセットには入れない
+# Magic defense and status resistance sets include main and sub (even with weapon switching). Other sets don't
 pw2 = make(False)
 pw2.add_weapon("main", EP.Item("main", "ブルトガング", '"ブルトガング"'))
 pw2.assign("sets.idle.Magical", H('sets.exported={ main="マリグナスソード", sub="イージス", head="対魔法の頭" }'))
@@ -87,7 +87,7 @@ check('main="マリグナスソード",' in lw and 'sub="イージス",' in lw, 
 check('sub="ドゥバン",' not in lw, "待機のセットには、武器を入れない (今までどおり)")
 check("gs c weapons')" in lw and "stateField == 'Magical'" in lw, "対魔法をオフにしたら、選んでいる武器に戻す")
 
-# ファストキャストの計算 (res の説明 + オーグメント)。作者のナイトの FC セットで 69%
+# Fast Cast calculation (res descriptions + augments). The author's PLD FC set comes to 69%
 import fastcast as FCALC
 RES = ENV.RES
 if os.path.isdir(RES):
@@ -110,7 +110,7 @@ if os.path.isdir(RES):
 check(FCALC.set_fast_cast(None, H('sets.exported={ feet={ name="オディシアグリーヴ", augments={\'"Fast Cast"+6\',}} }'))[0] == 6,
       "res が無くても、オーグメントの値は数える")
 
-# 上限を超えたときの知らせ
+# Notice when the cap is exceeded
 check(FCALC.advice(69, "PLD").startswith("サポ赤にすると") and "84%" in FCALC.advice(69, "PLD"), "69% はサポ赤で上限を超えると知らせる")
 check(FCALC.advice(50, "PLD") == "", "50% (サポ赤でも 65%) は知らせない")
 check("10%" in FCALC.advice(90, "WHM") and FCALC.advice(90, "WHM").startswith("装備だけで"), "装備だけで 90% は、10% 超え")
@@ -124,13 +124,13 @@ for _t, _j in ((69, "PLD"), (90, "WHM"), (50, "RDM")):
     check(_m and not _re.search("[ぁ-んァ-ン一-龥]", _m), "英語のとき、知らせに日本語が残らない (%s %d%%): %s" % (_j, _t, _m))
 i18n.set_lang("ja")
 
-# 保存と読み直し
+# Save and reload
 p2 = Project.from_json(p1.to_json())
 p2.set_job("PLD")
 check(p2.three_stage and p2.fast_cast == 40, "3 段階とファストキャストを保存して読み直せる")
 check(Project("PLD").set_fast_cast("abc") == 0 and Project("PLD").set_fast_cast(120) == 100, "ファストキャストの値の丸め")
 
-# ナイト以外では出さない
+# Not emitted for jobs other than PLD
 pw = Project("WAR")
 pw.assign("sets.precast.WS", H('sets.exported={ head="ＮＹヘルム+1" }'))
 check("interruption" not in pw.to_lua() and "Magical" not in pw.to_lua(), "ナイト以外には、ナイトの仕組みを出さない")

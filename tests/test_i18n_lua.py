@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""英語 (英語クライアント向け) の出力の確認。
-主なジョブに英語の装備名を割り当てて出力し、日本語が残らない・luac を通る・スキルのキーが英語・
-日本語名の別名と set_language('japanese') が出ない、を確かめる。
-実行 (GearSwapKit/ で): python -I tests/test_i18n_lua.py"""
+"""Tests for English output (for the English client).
+Assigns English gear names to the main jobs, generates Lua, and checks that no Japanese remains, it passes luac,
+skill keys are in English, and neither Japanese-name aliases nor set_language('japanese') are emitted.
+Run (from GearSwapKit/): python -I tests/test_i18n_lua.py"""
 import os
 import re
 import subprocess
@@ -34,7 +34,7 @@ H = EP.parse_equipped_set
 JOBS = ("SMN", "PLD", "PUP", "COR", "SCH", "BST", "RNG", "WHM")
 
 
-# 学者の腰の自動選択を、英語クライアントの値 (天候・曜日・スキル名) で動かす模擬
+# Mock that runs SCH's automatic waist selection with English client values (weather, day, skill names)
 WAIST_TEST = r"""
 local path = arg[1]
 local fails = 0
@@ -114,7 +114,7 @@ try:
     for job in JOBS:
         try:
             lua = build(job).to_lua()
-        except Exception as ex:     # 割り当ての途中で失敗したら、それも報告する
+        except Exception as ex:     # if assignment fails partway, report that too
             check(False, "%s: 出力できない (%r)" % (job, ex))
             continue
         outs[job] = lua
@@ -122,14 +122,14 @@ try:
         check(not bad, "%s: 日本語が残っている: %s" % (job, " / ".join(bad[:5])))
         check("set_language('japanese')" not in lua, "%s: set_language('japanese') を出さない" % job)
         check("-- GearSwap file for %s" % job in lua, "%s: 見出しが英語" % job)
-    # スキルのキーが英語
+    # Skill keys are in English
     whm = outs.get("WHM", "")
     check("sets.midcast['Healing Magic']" in whm or "sets.midcast['Enhancing Magic']" in whm,
           "WHM: スキルのキーが英語 (sets.midcast['Healing Magic'] など)")
-    # 日本語名の別名を出さない (獣使いの「ほんきだせ」など)
+    # No Japanese-name aliases (e.g. the Japanese name of BST's Sic)
     check("Fallback sets" not in outs.get("BST", "") or "JA['" not in outs.get("BST", "").split("Fallback sets")[1].split("end")[0],
           "BST: 日本語名の別名を出さない")
-    # 判定の値が英語
+    # Values used in conditions are in English
     sch = outs.get("SCH", "")
     check("'Hachirin-no-Obi'" in sch and "\"Orpheus's Sash\"" in sch, "SCH: 腰の名前が英語")
     check("buffactive['Immanence']" in sch, "SCH: 震天動地の章は英語名で見る")
@@ -146,10 +146,10 @@ try:
                 fh.write(lua)
             r = subprocess.run([LUAC, "-p", path], capture_output=True)
             check(r.returncode == 0, "%s: luac を通る %s" % (job, r.stderr.decode("utf-8", "replace")))
-        # 模擬 GearSwap: 矢弾の使い分け (英語の出力でも動く)
+        # Mock GearSwap: ammo switching (works with English output too)
         if LUA51 and os.path.exists(LUA51):
-            # ammo_lua_test.lua は弾の名前を日本語で持つので、弾の名前はそれに合わせ (データなので出力の確認には使わない)、
-            # スキル名だけを英語クライアントの値に置き換えた写しで動かす
+            # ammo_lua_test.lua holds the bullet names in Japanese, so the bullet names here match it (they're just data and aren't used to check the output);
+            # run a copy with only the skill names swapped for English client values
             pc = Project("COR")
             pc.assign("sets.precast.WS", H('sets.exported={ ammo="クロノブレット", head="Nyame Helm" }'))
             pc.set_ammo("physical", ammo_item("クロノブレット"))
@@ -168,7 +168,7 @@ try:
             r = subprocess.run([LUA51, t_ammo, path], capture_output=True)
             sys.stdout.buffer.write(r.stdout + r.stderr)
             check(r.returncode == 0, "模擬 GearSwap で、英語の出力の矢弾の使い分けが正しい")
-            # 模擬 GearSwap: 学者の腰の自動選択 (英語の天候・曜日・装備名)
+            # Mock GearSwap: SCH automatic waist selection (English weather, day, and gear names)
             t = os.path.join(d, "waist_t.lua")
             with open(t, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(WAIST_TEST)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""矢弾の使い分け (狩人・コルセア) の確認。
-実行 (GearSwapKit/ で): python -I tests/test_ammo.py"""
+"""Tests for situational ammo switching (Ranger, Corsair).
+Run (from GearSwapKit/): python -I tests/test_ammo.py"""
 import os
 import subprocess
 import sys
@@ -29,13 +29,13 @@ def item(name):
     return EP.Item("ammo", name, '"%s"' % name)
 
 
-# 一覧: 矢弾は狩人とコルセアだけ・クイックドローはコルセアだけ
+# List: ammo entries are RNG/COR only; Quick Draw is COR only
 for job in C.ALL_JOBS:
     paths = [e["path"] for e in C.sets_for_job(job)]
     check(("ammo:physical" in paths) == (job in ("RNG", "COR")), "%s の矢弾の項目は、狩人とコルセアだけ" % job)
     check(("ammo:quickdraw" in paths) == (job == "COR"), "%s のクイックドローの弾は、コルセアだけ" % job)
 
-# 所持品の一覧から矢弾の候補を取れる
+# Ammo candidates can be pulled from the inventory list
 inv = EP.parse_inventory('sets.exported={ ammo="クロノブレット", ammo="ライヴブレット", ammo="クロノブレット", head="ＬＡトリコルヌ+3" }')
 check([c.name for c in EP.weapon_candidates(inv, "ammo")] == ["クロノブレット", "ライヴブレット"], "矢弾の候補 (重複なし)")
 
@@ -56,7 +56,7 @@ check('["ホクスボクブレット"] = true,' in lua and '["アニミキーブ
 check('["クロノブレット"] = true,' not in lua and '["ライヴブレット"] = true,' not in lua, "普通の弾は誤射防止の対象にしない")
 check("function job_post_aftercast" in lua and "gs c ammo" in lua, "使ったあとに戻す・読み込み後に装備する")
 
-# 保存して読み直しても残る
+# Survives a save and reload
 pr2 = Project.from_json(pr.to_json())
 pr2.set_job("COR")
 check(pr2.ammo.get("magical") and pr2.ammo["magical"].name == "ライヴブレット", "保存した矢弾を読み直せる")
@@ -64,7 +64,7 @@ check(pr2.ws_ammo.get("Savage Blade") and pr2.ws_ammo["Savage Blade"].name == "�
 pr2.clear("ammo:special")
 check(not pr2.ws_ammo and pr2.ammo, "特殊弾を外しても、ほかの矢弾は残る")
 
-# 矢弾を選ばなければ、今までどおり
+# If no ammo is chosen, output is unchanged
 p3 = Project("COR")
 p3.assign("sets.precast.WS", H('sets.exported={ head="ＮＹヘルム+1" }'))
 check("job_post_aftercast" not in p3.to_lua(), "矢弾を選ばなければ、仕組みを出さない")

@@ -1,37 +1,37 @@
 # -*- coding: utf-8 -*-
-"""ウェポンスキルの分け方 (魔法属性の WS・遠隔の WS)。
+"""Weapon skill categories (magical WS, ranged WS).
 
-res の weapon_skills には「魔法属性か」の項目が無いので、魔法属性の WS (属性物理を含む) は、ここに英語名で持つ。
-遠隔の WS は、res のスキル (弓術 25・射撃 26) のもの。名前が res と合うかは tests/test_ws.py で確かめる。
+res weapon_skills has no "is magical" field, so magical weapon skills (hybrids included) are listed here by English name.
+Ranged weapon skills are those of the res skills Archery (25) and Marksmanship (26). tests/test_ws.py checks that the names match res.
 """
 
-# 魔法属性の WS (魔攻・魔法ダメージの装備が効くもの。属性物理の WS を含む)
+# Magical weapon skills (where Magic Attack / Magic Damage gear applies; hybrid weapon skills included)
 MAGIC_WS = [
-    # 短剣
+    # Dagger
     "Gust Slash", "Cyclone", "Energy Steal", "Energy Drain", "Aeolian Edge",
-    # 片手剣
+    # Sword
     "Burning Blade", "Red Lotus Blade", "Shining Blade", "Seraph Blade", "Sanguine Blade",
-    # 両手剣
+    # Great Sword
     "Frostbite", "Freezebite", "Herculean Slash",
-    # 片手斧
+    # Axe
     "Cloudsplitter", "Primal Rend",
-    # 両手鎌
+    # Scythe
     "Shadow of Death", "Dark Harvest", "Infernal Scythe",
-    # 両手槍
+    # Polearm
     "Thunder Thrust", "Raiden Thrust",
-    # 片手刀
+    # Katana
     "Blade: Ei", "Blade: Yu", "Blade: Teki", "Blade: To", "Blade: Chi",
-    # 両手刀
+    # Great Katana
     "Tachi: Goten", "Tachi: Kagero", "Tachi: Jinpu", "Tachi: Koki",
-    # 片手棍
+    # Club
     "Shining Strike", "Seraph Strike", "Flash Nova",
-    # 両手棍
+    # Staff
     "Earth Crusher", "Rock Crusher", "Starburst", "Sunburst", "Cataclysm", "Vidohunir", "Garland of Bliss", "Omniscience",
-    # 弓術・射撃 (遠隔だが魔法属性なので、こちら)
+    # Archery / Marksmanship (ranged, but magical, so they go here)
     "Flaming Arrow", "Hot Shot", "Trueflight", "Wildfire", "Leaden Salute",
 ]
 
-# 遠隔の WS (res の弓術・射撃。魔法属性のものは MAGIC_WS が優先)
+# Ranged weapon skills (res Archery / Marksmanship; MAGIC_WS takes precedence for magical ones)
 RANGED_WS = [
     "Flaming Arrow", "Piercing Arrow", "Dulling Arrow", "Sidewinder", "Blast Arrow", "Arching Arrow", "Empyreal Arrow",
     "Namas Arrow", "Refulgent Arrow", "Jishnu's Radiance", "Apex Arrow", "Sarv",
@@ -39,22 +39,22 @@ RANGED_WS = [
     "Trueflight", "Leaden Salute", "Numbing Shot", "Wildfire", "Last Stand", "Terminus",
 ]
 
-# クリティカルの WS (クリティカル率・クリティカルダメージの装備が効くもの)。
-# 出どころ: 作者の user-globals.lua の init_weapon_skill (sets.precast.WS.Critical に分けている WS)
+# Critical weapon skills (where Critical hit rate / Critical hit damage gear applies).
+# Source: init_weapon_skill in the author's user-globals.lua (the weapon skills split out into sets.precast.WS.Critical)
 CRIT_WS = [
     "Backhand Blow", "Ascetic's Fury", "Stringing Pummel", "Victory Smite", "Evisceration", "Vorpal Blade",
     "Chant du Cygne", "Power Slash", "Rampage", "Keen Edge", "Raging Rush", "Vorpal Scythe", "Vorpal Thrust",
     "Skewer", "Drakesbane", "Blade: Rin", "Blade: Jin", "Blade: Hi", "True Strike", "Hexa Strike",
 ]
 
-# 遠隔の WS のセット (sets.precast.WS.Range) を出すジョブ (遠隔武器が主のジョブ)
+# Jobs that get the ranged WS set (sets.precast.WS.Range) (jobs that mainly use ranged weapons)
 RANGED_JOBS = ("RNG", "COR")
-# 遠隔の WS・遠隔攻撃のセットを出すジョブ (侍は弓を持てるので、矢弾の使い分けは無しでセットだけ)
+# Jobs that get the ranged WS and ranged attack sets (SAM can use bows, so it gets the sets but no ammo switching)
 RANGED_SET_JOBS = ("RNG", "COR", "SAM")
 
 
 def kind_of(en_name):
-    """WS の英語名から "RangeMagic" (魔法属性の遠隔) / "Magic" / "Range" / "Critical" / None (ふつうの近接物理)。"""
+    """From a WS English name: "RangeMagic" (magical ranged) / "Magic" / "Range" / "Critical" / None (regular physical melee)."""
     if en_name in MAGIC_WS:
         return "RangeMagic" if en_name in RANGED_WS else "Magic"
     if en_name in RANGED_WS:
@@ -64,36 +64,36 @@ def kind_of(en_name):
     return None
 
 
-# ジョブ専用の WS (ミシック WS・エルゴン WS)。武器の種類が合っても、ほかのジョブのドロップダウンには出さない。
-# 出どころ: FF11用語辞典 (wiki.ffo.jp/html/15881.html ミシックウェポンスキル・31448.html エルゴン)。
-# レリック・エンピリアン WS は、その武器を持てるジョブなら使えるので、ここには入れない。
+# Job-exclusive weapon skills (Mythic and Ergon). Not shown in other jobs' dropdowns even if the weapon type matches.
+# Source: the Japanese FF11 wiki (wiki.ffo.jp/html/15881.html for Mythic weapon skills, 31448.html for Ergon).
+# Relic and Empyrean weapon skills are usable by any job that can equip the weapon, so they aren't listed here.
 JOB_ONLY_WS = {
-    "Ascetic's Fury": ('MNK',),  # ミシック
-    'Stringing Pummel': ('PUP',),  # ミシック
-    'Mandalic Stab': ('THF',),  # ミシック
-    'Mordant Rime': ('BRD',),  # ミシック
-    'Pyrrhic Kleos': ('DNC',),  # ミシック
-    'Death Blossom': ('RDM',),  # ミシック
-    'Atonement': ('PLD',),  # ミシック
-    'Expiacion': ('BLU',),  # ミシック
-    'Primal Rend': ('BST',),  # ミシック
-    "King's Justice": ('WAR',),  # ミシック
-    'Insurgency': ('DRK',),  # ミシック
-    'Drakesbane': ('DRG',),  # ミシック
-    'Blade: Kamu': ('NIN',),  # ミシック
-    'Tachi: Rana': ('SAM',),  # ミシック
-    'Mystic Boon': ('WHM',),  # ミシック
-    'Vidohunir': ('BLM',),  # ミシック
-    'Garland of Bliss': ('SMN',),  # ミシック
-    'Omniscience': ('SCH',),  # ミシック
-    'Trueflight': ('RNG',),  # ミシック
-    'Leaden Salute': ('COR',),  # ミシック
-    'Dimidiation': ('RUN',),  # エルゴン
-    'Exudation': ('GEO',),  # エルゴン
+    "Ascetic's Fury": ('MNK',),  # Mythic
+    'Stringing Pummel': ('PUP',),  # Mythic
+    'Mandalic Stab': ('THF',),  # Mythic
+    'Mordant Rime': ('BRD',),  # Mythic
+    'Pyrrhic Kleos': ('DNC',),  # Mythic
+    'Death Blossom': ('RDM',),  # Mythic
+    'Atonement': ('PLD',),  # Mythic
+    'Expiacion': ('BLU',),  # Mythic
+    'Primal Rend': ('BST',),  # Mythic
+    "King's Justice": ('WAR',),  # Mythic
+    'Insurgency': ('DRK',),  # Mythic
+    'Drakesbane': ('DRG',),  # Mythic
+    'Blade: Kamu': ('NIN',),  # Mythic
+    'Tachi: Rana': ('SAM',),  # Mythic
+    'Mystic Boon': ('WHM',),  # Mythic
+    'Vidohunir': ('BLM',),  # Mythic
+    'Garland of Bliss': ('SMN',),  # Mythic
+    'Omniscience': ('SCH',),  # Mythic
+    'Trueflight': ('RNG',),  # Mythic
+    'Leaden Salute': ('COR',),  # Mythic
+    'Dimidiation': ('RUN',),  # Ergon
+    'Exudation': ('GEO',),  # Ergon
 }
 
 
 def usable_by_job(en_name, job):
-    """ジョブ専用の WS なら、そのジョブだけ True。それ以外の WS は True (武器の種類での絞り込みは choices で行う)。"""
+    """For a job-exclusive WS, True only for that job. Any other WS is True (filtering by weapon type happens in choices)."""
     jobs = JOB_ONLY_WS.get(en_name)
     return jobs is None or job in jobs

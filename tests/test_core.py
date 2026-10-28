@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""GearSwapKit の確認。実行 (GearSwapKit/ で): python -I tests/test_core.py"""
+"""Core GearSwapKit tests. Run (from GearSwapKit/): python -I tests/test_core.py"""
 import os
 import sys
 
@@ -74,7 +74,7 @@ check(any(s["path"] == "sets.precast.BloodPactWard" for s in sm), "SMN の一覧
 check(all(s.get("help") for s in sm), "全てのセットにヘルプ文がある")
 check(len({s["path"] for s in C.sets_for_job("BST")}) == len(C.sets_for_job("BST")), "セットの重複がない")
 
-# 本物の export (所持品の一覧) を読めるか
+# Can we read a real export (inventory list)?
 real = ENV.EXPORT_ALL
 if os.path.exists(real):
     text = EP.read_file(real)
@@ -90,7 +90,7 @@ if os.path.exists(real):
     check(len(set(c.raw for c in mains)) == len(mains), "候補に重複がない")
     check(EP.weapon_candidates(inv, "head") == [], "武器以外のスロットは、候補なし")
 
-# //gs export all は片手武器を sub= で書き出すので、メインの候補にも入れる (res があれば、盾・グリップは除く)
+# //gs export all writes one-handed weapons as sub=, so include them as main candidates too (excluding shields and grips when res is available)
 real_all = ENV.EXPORT_ALL
 RES = ENV.RES
 if os.path.exists(real_all) and os.path.isdir(RES):
@@ -102,7 +102,7 @@ if os.path.exists(real_all) and os.path.isdir(RES):
     check("イージス" not in mains and "ドゥバン" not in mains, "盾は、メインの候補に出さない")
     check(rdb.item_slots("イージス") == 2, "res の部位 (イージス = サブ)")
 
-# モードの切り替え: セットのあるモードだけを選択肢にする (戦闘中のカット = HybridMode DT は全ジョブ)
+# Mode switching: only offer modes that have a set (engaged damage reduction = HybridMode DT exists for every job)
 check(any(s["path"] == "sets.engaged.DT" for s in C.sets_for_job("WAR")), "戦闘中 (被ダメージ軽減) は全ジョブにある")
 from project import Project as _P
 pp = _P("PUP")
@@ -117,7 +117,7 @@ pw_ = _P("WAR")
 pw_.assign("sets.engaged", EP.parse_equipped_set('sets.exported={ head="頭" }'))
 check("HybridMode" not in pw_.to_lua(), "カットのセットが無ければ、HybridMode は出さない")
 
-# コメントアウトした装備は読まない (手で直した export)。文字列の中の -- は残す
+# Commented-out gear is ignored (hand-edited exports). A -- inside a string is kept
 COMMENTED = '''sets.exported={
     head="ＢＣホーン+1",
 --    head="ＧＬホーン+1",

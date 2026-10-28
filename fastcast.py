@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""装備のファストキャスト (%) を、Windower の res から足し合わせる (ナイトの 3 段階の着替えの計算に使う)。
+"""Adds up gear Fast Cast (%) from Windower's res (used to time the PLD 3-stage swap).
 
-- 装備の性能: res/item_descriptions.lua の英語の説明の "Fast Cast"+N%  (名前 → 番号は res/items.lua)
-- オーグメント: export の augments の '"Fast Cast"+N'
-同じ名前の装備が複数の版 (Lv75 と Lv99 など) あるときは、大きいほうを使う。res は読むだけ。
+- Gear stats: "Fast Cast"+N% in the English description in res/item_descriptions.lua  (name -> ID via res/items.lua)
+- Augments: '"Fast Cast"+N' in the export's augments
+When several versions share a name (e.g. Lv75 and Lv99), the larger value is used. res is only read.
 """
 import os
 import re
@@ -13,12 +13,12 @@ from i18n import L
 _ITEM = re.compile(r'^\s*\[(\d+)\]\s*=\s*\{id=\d+,en="((?:[^"\\]|\\.)*)",ja="((?:[^"\\]|\\.)*)"')
 _DESC = re.compile(r'^\s*\[(\d+)\]\s*=\s*\{id=\d+,en="((?:[^"\\]|\\.)*)"')
 _FC_DESC = re.compile(r'(?:\\")?Fast Cast(?:\\")?\s*\+(\d+)%')
-# 数値の無い書き方 (オルンミラトルクの Increases "Fast Cast" effect など)。値が分からないので、画面で知らせる
+# Wording with no number (e.g. Orunmila's Torque: Increases "Fast Cast" effect). The value is unknown, so the UI flags it
 _FC_VAGUE = re.compile(r'(?:Increases|Enhances) (?:\\")?Fast Cast(?:\\")? effect')
 _FC_AUG = re.compile(r'"Fast Cast"\s*\+(\d+)')
 
-# 説明に数値の無い装備の値 (Increases "Fast Cast" effect など)。
-# オルンミラトルク = +5%: 作者のナイトの FC セット (sets.precast.FC.value = 69) の合計と、ほかの装備の値 64% の差で確認 (2026-10-26)
+# Values for gear whose description has no number (Increases "Fast Cast" effect, etc.).
+# Orunmila's Torque = +5%: confirmed from the gap between the author's PLD FC set total (sets.precast.FC.value = 69) and the other gear's 64% (2026-10-26)
 KNOWN_VAGUE = {"オルンミラトルク": 5, "orunmila's torque": 5}
 
 _cache = {}
@@ -33,7 +33,7 @@ def _read(path):
 
 
 def _tables(res_dir):
-    """(名前 → [番号], 番号 → 説明のファストキャスト)。res_dir ごとに 1 回だけ読む。"""
+    """(name -> [IDs], ID -> Fast Cast from the description). Read only once per res_dir."""
     if res_dir in _cache:
         return _cache[res_dir]
     ids = {}
@@ -56,7 +56,7 @@ def _tables(res_dir):
 
 
 def item_fast_cast(res_dir, item):
-    """装備 1 つ (export_parser.Item) のファストキャスト。戻り値: (性能 + オーグメントの %, 説明に数値の無いファストキャストがあるか)。"""
+    """Fast Cast of one piece of gear (export_parser.Item). Returns (base stat + augment %, whether its description has Fast Cast with no number)."""
     total = sum(int(x) for x in _FC_AUG.findall(item.raw or ""))
     vague = False
     if res_dir:
@@ -75,13 +75,13 @@ def item_fast_cast(res_dir, item):
     return total, vague
 
 
-FC_CAP = 80          # ファストキャストの上限 (装備と特性を合わせて)
-MAIN_RDM_FC = 38     # 赤魔道士 (メイン) の特性 + ジョブポイント (作者の PLD.lua と同じ値)
-SUB_RDM_FC = 15      # サポ赤の特性 (マスターレベル 30 以上は 20)
+FC_CAP = 80          # Fast Cast cap (gear and traits combined)
+MAIN_RDM_FC = 38     # Red Mage (main) trait + Job Points (same value as the author's PLD.lua)
+SUB_RDM_FC = 15      # /RDM trait (20 at Master Level 30+)
 
 
 def advice(total, job):
-    """ファストキャストの合計 (装備) から、上限を超えて無駄になっていないかの知らせ。問題が無ければ空。"""
+    """Warn when the gear Fast Cast total goes over the cap and is wasted. Empty if there's no problem."""
     if total <= 0:
         return ""
     if job == "RDM":
@@ -108,8 +108,8 @@ def advice(total, job):
 
 
 def set_fast_cast(res_dir, items):
-    """セット ({部位: Item}) のファストキャストの合計 (%)。
-    戻り値: (合計, [(部位, 名前, 値)] 値が 0 より大きいもの, [名前] 数値の分からないファストキャストの装備)。"""
+    """Total Fast Cast (%) of a set ({slot: Item}).
+    Returns (total, [(slot, name, value)] for values above 0, [names] of Fast Cast gear with unknown values)."""
     rows, unknown = [], []
     for slot, it in (items or {}).items():
         v, vague = item_fast_cast(res_dir, it)

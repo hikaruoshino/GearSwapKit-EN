@@ -1,5 +1,5 @@
--- 出力した Lua の「遠隔魔攻 (sets.precast.WS.RangeMagic)」の分け方を、GearSwap を模擬して確認する。
--- 実行: lua5.1.exe tests/ws_rmagic_lua_test.lua <出力した Lua のパス>   (test_ws.py が作る、魔攻と遠隔魔攻のある COR の Lua)
+-- Simulates GearSwap to check the generated Lua's "ranged magical WS (sets.precast.WS.RangeMagic)" mapping.
+-- Run: lua5.1.exe tests/ws_rmagic_lua_test.lua <path to generated Lua>   (the COR Lua built by test_ws.py, with magical and ranged magical sets)
 local path = arg[1]
 local fails = 0
 local function check(cond, msg) if not cond then fails = fails + 1; io.write("NG: " .. msg .. "\n") end end
@@ -18,7 +18,7 @@ setfenv(chunk, env)
 chunk()
 env.user_setup()
 env.init_gear_sets()
-if env.after_gear_sets then env.after_gear_sets() end   -- GearSwap と同じ順 (get_sets の中で init_gear_sets のあと)
+if env.after_gear_sets then env.after_gear_sets() end   -- Same order as GearSwap (after init_gear_sets inside get_sets)
 
 local map = env.job_get_spell_map
 check(map({type = "WeaponSkill", english = "Leaden Salute", skill = "射撃"}) == "RangeMagic", "レデンサリュート (射撃・魔法属性) は RangeMagic")

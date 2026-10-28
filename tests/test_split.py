@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""出力した ジョブ.lua の「装備のセット」の部分を、ジョブ_gear.lua に丸ごと写しても動くかを確かめる (全ジョブ・日本語と英語)。
-- 印 (装備のセット ここから / ここまで) が 1 組だけあり、その中は init_gear_sets の関数だけ
-- 切り出した部分だけで luac を通る
-- 切り出した部分が、システムの部分の local (buff_gear など) を使っていない (別のファイルからは見えないため)
-- システムの部分 + 別のファイルとして読んだ装備のセット で、模擬 GearSwap の確認 (v110_lua_test.lua) が通る
-実行 (GearSwapKit/ で): python -I tests/test_split.py"""
+"""Checks that the gear sets section of a generated JOB.lua still works when copied wholesale into JOB_gear.lua (all jobs, Japanese and English).
+- There is exactly one pair of markers (gear sets begin / end), with only the init_gear_sets function between them
+- The extracted section passes luac on its own
+- The extracted section doesn't use locals from the system part (buff_gear, etc.), since they aren't visible from another file
+- The system part plus the gear sets loaded as a separate file passes the mock GearSwap check (v110_lua_test.lua)
+Run (from GearSwapKit/): python -I tests/test_split.py"""
 import os
 import re
 import subprocess
@@ -32,7 +32,7 @@ def check(cond, msg):
 
 
 H = EP.parse_equipped_set
-# v110_lua_test.lua が名前で確かめる装備 (test_v110.py と同じ)
+# Gear that v110_lua_test.lua checks by name (same as test_v110.py)
 GEAR = {"sets.TreasureHunter": 'head="TH帽"', "sets.engaged.dual11": 'waist="dual11腰"',
         "sets.engaged.dual21": 'waist="dual21腰"', "sets.midcast.Entrust": 'head="エントラスト帽"',
         "sets.Sleep": 'main="プライムソード", head="フレンジーサリット"', "sets.midcast.IncreasedCursna": 'neck="カーズナ首"',
@@ -65,7 +65,7 @@ for lang in ("ja", "en"):
         check(("_gear.lua" in gear.split("\n")[1]), "%s: 印のすぐ下に、ジョブ_gear.lua の作り方の一文がある" % name)
         code = [ln for ln in gear.split("\n") if ln.strip() and not ln.strip().startswith("--")]
         check(code[0] == "function init_gear_sets()" and code[-1] == "end", "%s: 装備のセットの中は init_gear_sets の関数だけ" % name)
-        # システムの部分のファイルの頭の local を、装備のセットが使っていないか
+        # Make sure the gear sets don't use the file-level locals from the system part
         locals_ = set(re.findall(r"^local (?:function )?([A-Za-z_][A-Za-z0-9_]*)", system, re.M))
         for extra in re.findall(r"^local ([A-Za-z_][A-Za-z0-9_, ]*?)\s*=", system, re.M):
             locals_.update(n.strip() for n in extra.split(","))
@@ -77,7 +77,7 @@ for lang in ("ja", "en"):
         if os.path.exists(LUAC):
             r = subprocess.run([LUAC, "-p", gear_path], capture_output=True)
             check(r.returncode == 0, "%s: 切り出した装備のセットだけで luac を通る %s" % (name, r.stderr.decode("utf-8", "replace")))
-        # システムの部分 + 別のファイルの装備のセット (GearSwap がサイドカーを読むのと同じく、local は見えない)
+        # System part + gear sets from a separate file (locals aren't visible, just like when GearSwap loads a sidecar)
         side = gear_path.replace("\\", "/")
         split_lua = system + ("\nlocal sidecar = assert(loadfile('%s'))\nsetfenv(sidecar, getfenv(1))\nsidecar()\n" % side)
         split_path = os.path.join(d, "%s_%s_split.lua" % (job, lang))
