@@ -24,6 +24,8 @@
     "timing": "use",
     "effect": "アストラルフロウ効果アップ (効果時間 +30 秒)",
     "source": "wiki.ffo.jp/html/3552.html・30922.html",
+    "timing_basis": "wiki.ffo.jp/html/30922.html: アストラルフロウ使用時に効果が付く (使う瞬間)",
+    "timing_confidence": "wiki",
     "items": [
      {
       "ja": "ＳＭホーン+2",
@@ -58,6 +60,8 @@
     },
     "effect": "神獣の加護効果アップ (加護のランクの底上げと上限の拡張。ベコナー系は +2〜+5)",
     "source": "wiki.ffo.jp/html/23302.html・33151.html・18157.html",
+    "timing_basis": "作者がゲーム内で確認 (2026-10-26・試験環境 gearswaptest: 神獣の加護が付いた瞬間に頭が替わり、切れると戻る)",
+    "timing_confidence": "author",
     "items": [
      {
       "ja": "ＣＬホーン+1"
@@ -86,6 +90,8 @@
     "timing": "use",
     "effect": "マナシード効果アップ (変換で増える TP が増える。ベコナー系は +110〜+140)",
     "source": "wiki.ffo.jp/html/23302.html・33151.html・22225.html",
+    "timing_basis": "作者がゲーム内で確認 (2026-10-26・試験環境 gearswaptest: マナシードを使う瞬間に手が替わる)",
+    "timing_confidence": "author",
     "items": [
      {
       "ja": "ＣＬブレーサー+1"
@@ -114,6 +120,8 @@
     "timing": "use",
     "effect": "エレメントサイフォン効果アップ (MP 回復量が増える。ベコナー系は +50〜+80)",
     "source": "wiki.ffo.jp/html/23302.html・33151.html・14780.html",
+    "timing_basis": "wiki.ffo.jp/html/14780.html: エレメントサイフォン使用時に効果が付く (使う瞬間)",
+    "timing_confidence": "wiki",
     "items": [
      {
       "ja": "ＣＬピガッシュ+1"

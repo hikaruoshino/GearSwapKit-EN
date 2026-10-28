@@ -642,7 +642,6 @@ class App:
         self.pick_btn.pack(side="left", padx=(6, 0))
         self.remove_btn = ttk.Button(btns, text=L("この追加を削除", "Remove this set"), command=self.remove_custom)
         self.remove_btn.pack(side="left")
-        # Shown only for PLD's spell interruption set: 3-stage swap (Fast Cast -> interruption -> landing gear)
         # Shown only for midcast (Elemental Magic): auto-pick of elemental obi / Orpheus's Sash
         self.waist_box = ttk.Frame(right)
         self.waist_var = tk.BooleanVar(value=False)
@@ -664,6 +663,7 @@ class App:
         ttk.Label(self.pup_box, text=L("(ゲームでは //gs c toggle PetAutoGear で一時的に止められます)",
                                        "(In game, //gs c toggle PetAutoGear turns this off temporarily.)"),
                   foreground="#666").pack(anchor="w")
+        # Shown only for PLD's spell interruption set: 3-stage swap (Fast Cast -> interruption -> landing gear)
         self.stage_box = ttk.Frame(right)
         self.stage_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(self.stage_box, text=L("3 段階で着替える (詠唱中は詠唱中断、着弾の直前にケアル・敵対心などの装備)",
