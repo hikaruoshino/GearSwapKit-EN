@@ -30,7 +30,7 @@ You can also run it from source with Python 3 (with tkinter): `python app.py`.
 ## Quick start
 
 1. **Equip the gear** for one situation in game (say, your idle set).
-2. Type `//gs export`. GearSwap writes a file to `Windower4/addons/gearswap/data/export/`. Repeat for each situation (idle, engaged, precast…).
+2. Type `//gs export`. GearSwap writes a file to `Windower4/addons/gearswap/data/export/`. Repeat for each situation (idle, engaged, precast…). You can **rename the exported files**, even to Japanese names (for example `待機セット.lua`): the kit reads the contents, not the file name.
 3. Start the kit and pick your **job** and your **GearSwap data folder** (`…/Windower4/addons/gearswap/data`). The kit remembers the folder.
 4. Pick a set from the list on the left. The right side explains what it's for.
 5. Click **Assign export…** and choose the export file for that set.
