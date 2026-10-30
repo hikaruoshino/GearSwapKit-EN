@@ -54,7 +54,7 @@ For gear searches (job ability gear, weapon cycles, ammo), also run `//gs export
 - **Weapon cycle**: `//gs c cycle MainWeapons` (and `SubWeapons` / `RangeWeapons`) swaps through weapons in the order you picked them.
 - **Lockstyle**: set a lockstyle number and it's applied after the file loads.
 - **Fast Cast math**: adds up the Fast Cast on your precast set and warns you when you're wasting slots past the 80% cap (counting the Red Mage trait and /RDM).
-- **Your work is saved**: the kit saves when you close it and reopens your last session next time.
+- **Your work is saved**: the kit saves when you close it and reopens your last session next time. Since 1.2.3, your work, the settings and the Lua are written to a temporary file first and then swapped in, so a crash mid-save never leaves you with an empty file.
 
 Picking a weapon skill for its own set:
 
@@ -80,7 +80,7 @@ All of these are opt-in (a checkbox or a mode), so they stay out of your way if 
 
 **Puppetmaster**
 - Automaton tank and automaton Store TP modes for idle and engaged.
-- Automaton WS and enmity (Strobe / Flashbulb) gear, **pre-equipped** before the move fires (at 930 TP, or 2 seconds before Strobe/Flashbulb is ready), since the automaton fires instantly at 1000 TP. Swaps to Xiucoatl for the WS unless you're holding Kenkonken.
+- Automaton WS and enmity (Strobe / Flashbulb) gear, **pre-equipped** before the move fires (at 930 TP, or 2 seconds before Strobe/Flashbulb is ready), since the automaton fires instantly at 1000 TP. Swaps to Xiucoatl for the WS unless you're holding Kenkonken. This is an opt-in checkbox (off by default); in game, `//gs c toggle PetAutoGear` turns it off for a while.
 - Maneuvers swap to Kenkonken and put your weapon back afterward (or keep it with `//gs c toggle KeepManeuverWeapon` to save TP).
 
 **Summoner**

@@ -7,6 +7,8 @@ import datetime
 import json
 import os
 import shutil
+import tempfile
+import time
 
 import choices as CH
 import export_parser as EP
@@ -32,6 +34,29 @@ MERIT_HELP_EN = ("Gear that enhances a merit trait (Optimization, Fine-Tuning, e
                  "layered over your idle and engaged sets (for PUP and DRG, only while your pet is out).")
 # English display names for grouped sets that aren't in the list (set_path in ability_gear.json)
 SPECIAL_SET_TITLES_EN = {"sets.Stormsurge": "Stormsurge feet (when casting storm spells)"}
+
+
+def atomic_write(path, text, newline=None):
+    """Write to a temporary file in the same folder, then swap it in. A crash mid-write never leaves the current file empty."""
+    d = os.path.dirname(os.path.abspath(path))
+    fd, tmp = tempfile.mkstemp(dir=d, prefix=".gsk_", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline=newline) as f:
+            f.write(text)
+        for i in range(5):
+            try:
+                os.replace(tmp, path)
+                break
+            except PermissionError:
+                if i == 4:
+                    raise
+                time.sleep(0.1)  # antivirus or sync software can hold the target file for a moment
+    except BaseException:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
 
 
 def _key_name(path):
@@ -467,15 +492,16 @@ class Project:
                            pup_auto=self._cur().pup_auto, auto_waist=self._cur().auto_waist)
 
     def write_lua(self, data_dir):
-        """Write data_dir/<job>.lua, backing up any existing file in the same folder first. Returns (path, backup or None)."""
+        """Write data_dir/<job>.lua, backing up any existing file in the same folder first. Returns (path, backup or None).
+        The whole Lua is built before anything is written, so a failure while building never empties the current file."""
+        text = self.to_lua()
         path = os.path.join(data_dir, "%s.lua" % self.job)
         backup = None
         if os.path.exists(path):
             stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             backup = os.path.join(data_dir, "%s.lua.%s.bak" % (self.job, stamp))
             shutil.copy2(path, backup)
-        with open(path, "w", encoding="utf-8", newline="\n") as f:
-            f.write(self.to_lua())
+        atomic_write(path, text, newline="\n")
         return path, backup
 
     # --- Save / load (for resuming work; all jobs) ---

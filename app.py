@@ -26,10 +26,10 @@ import i18n
 import resdb as R
 import set_catalog as C
 from i18n import L
-from project import Project, RECEIVED_KIND
+from project import Project, RECEIVED_KIND, atomic_write
 
 APP_NAME = "GearSwapKit"
-VERSION = "1.2.2"
+VERSION = "1.2.3"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")
@@ -114,8 +114,7 @@ def save_settings(data):
     """Write settings. If that fails (e.g. a read-only location), the kit keeps working."""
     try:
         os.makedirs(os.path.dirname(SETTINGS), exist_ok=True)
-        with open(SETTINGS, "w", encoding="utf-8", newline="\n") as f:
-            f.write(json.dumps(data, ensure_ascii=False, indent=1))
+        atomic_write(SETTINGS, json.dumps(data, ensure_ascii=False, indent=1), newline="\n")
     except OSError:
         pass
 
@@ -475,8 +474,7 @@ class App:
                                                    "Overwrite it and close?\n(No returns to the window without closing.)") % path):
                 return
         try:
-            with open(path, "w", encoding="utf-8") as f:
-                f.write(self.project.to_json())
+            atomic_write(path, self.project.to_json())
         except OSError as ex:
             messagebox.showerror(APP_NAME, L("保存できなかったので、閉じずに戻ります。\n%s",
                                              "Couldn't save, so the window stays open.\n%s") % ex)
@@ -1339,6 +1337,7 @@ class App:
                             "%s already exists.\nA backup of the current file will be kept in the same folder before overwriting.\n"
                             "Continue?") % target):
             return
+        G.MISSING_DATA.clear()
         try:
             path, backup = self.project.write_lua(d)
         except OSError as ex:
@@ -1355,7 +1354,16 @@ class App:
                       "\n使うなら、今の一覧の項目に割り当て直してください。\n・",
                       "\n\nThese sets are no longer in the kit's list, so they weren't written (they're still in your work file)."
                       "\nTo use them, reassign them to a set in the current list.\n・") + "\n・".join(orphans))
-        messagebox.showinfo(APP_NAME, msg)
+        if G.MISSING_DATA:
+            # Without the data files, the per-move set mappings (pet moves, Blue Magic) are left out of the Lua: say so
+            msg += (L("\n\n注意: キットのデータのファイルが読めなかったので、そのファイルを使う対応 (ペットの技・青魔法の分類) は、"
+                      "出力に入っていません。キットを入れ直してください。\n・",
+                      "\n\nWarning: some of the kit's data files couldn't be read, so the mappings that use them "
+                      "(pet moves, Blue Magic types) are not in the file. Please reinstall the kit.\n・")
+                    + "\n・".join(sorted(G.MISSING_DATA)))
+            messagebox.showwarning(APP_NAME, msg)
+        else:
+            messagebox.showinfo(APP_NAME, msg)
         self.say(L("%s を作りました。", "Created %s.") % path)
 
     # --- Saving work ---
@@ -1365,8 +1373,7 @@ class App:
                                             initialfile="%s_kit.json" % self.project.job)
         if path:
             try:
-                with open(path, "w", encoding="utf-8") as f:
-                    f.write(self.project.to_json())
+                atomic_write(path, self.project.to_json())
             except OSError as ex:
                 messagebox.showerror(APP_NAME, L("保存できませんでした。\n%s", "Couldn't save.\n%s") % ex)
                 return

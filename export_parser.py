@@ -12,6 +12,15 @@ import re
 SLOTS = ['main', 'sub', 'range', 'ammo', 'head', 'neck', 'left_ear', 'right_ear', 'body',
          'hands', 'left_ring', 'right_ring', 'back', 'waist', 'legs', 'feet']
 
+# Slot aliases GearSwap accepts (slot_map in GearSwap/statics.lua). //gs export itself only writes the full names,
+# but hand-edited or shared sets can use them
+SLOT_ALIASES = {
+    'ranged': 'range',
+    'ear1': 'left_ear', 'ear2': 'right_ear', 'lear': 'left_ear', 'rear': 'right_ear',
+    'learring': 'left_ear', 'rearring': 'right_ear',
+    'ring1': 'left_ring', 'ring2': 'right_ring', 'lring': 'left_ring', 'rring': 'right_ring',
+}
+
 SLOT_JA = {
     'main': 'メイン', 'sub': 'サブ', 'range': '遠隔', 'ammo': '矢弾', 'head': '頭', 'neck': '首',
     'left_ear': '左耳', 'right_ear': '右耳', 'body': '胴', 'hands': '手', 'left_ring': '左指',
@@ -128,7 +137,7 @@ def parse_entries(text):
         m = _KEY.search(text, i)
         if not m:
             break
-        key = m.group(1)
+        key = SLOT_ALIASES.get(m.group(1), m.group(1))
         j = m.end()
         if j >= len(text):
             break
@@ -145,6 +154,9 @@ def parse_entries(text):
             name = _table_name(raw)
         else:
             i = j
+            continue
+        if not (name or "").strip():
+            i = nxt          # an empty item such as head="" is not treated as gear
             continue
         items.append(Item(key, name, raw))
         i = nxt   # name= and augments= inside the table were already handled when the table was read
