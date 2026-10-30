@@ -29,7 +29,7 @@ from i18n import L
 from project import Project, RECEIVED_KIND, atomic_write
 
 APP_NAME = "GearSwapKit"
-VERSION = "1.2.4"
+VERSION = "1.2.5"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")
@@ -994,12 +994,32 @@ class App:
                                                "Equip the gear for this set, run //gs export, and choose the file it creates."))
             return None
         items = EP.parse_equipped_set(text)
+        unread = self.unread_note(text)
         if not items:
             messagebox.showwarning(APP_NAME, L("装備を読めませんでした。//gs export で書き出したファイルか、確認してください。",
-                                               "No gear found in this file. Make sure it was made with //gs export."))
+                                               "No gear found in this file. Make sure it was made with //gs export.") + unread)
             return None
+        if unread:
+            # Don't silently skip typos made when editing by hand (ear1== etc.). Whatever could be read is still assigned
+            messagebox.showwarning(APP_NAME, L("次の行は読めなかったので、割り当てません。\n"
+                                               "書き間違い (= が 2 つ・引用符や { } の閉じ忘れなど) がないか確かめてください。"
+                                               "装備の名前の代わりに変数 (gear.… など) を書いた行も読めません。",
+                                               "These lines couldn't be read and won't be assigned.\n"
+                                               "Check them for typos (a doubled =, a missing quote or brace). "
+                                               "Lines that use a variable (gear.… etc.) instead of an item name can't be read either.") + unread)
         self.remember_file("last_export", path)    # open from the same folder next time
         return items
+
+    @staticmethod
+    def unread_note(text, limit=5):
+        """Turn the unread lines into text to append to a warning ("" if there are none)."""
+        lines = EP.unread_lines(text)
+        if not lines:
+            return ""
+        out = ["", ""] + [L("%d 行目: %s", "Line %d: %s") % (no, s[:60]) for no, s in lines[:limit]]
+        if len(lines) > limit:
+            out.append(L("ほか %d 行", "and %d more") % (len(lines) - limit))
+        return "\n".join(out)
 
     def add_with_export(self):
         """Add per skill: assign export gear to the action picked in the dropdown and add it.

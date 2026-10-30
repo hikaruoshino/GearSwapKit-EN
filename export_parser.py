@@ -28,6 +28,11 @@ SLOT_JA = {
 }
 
 _KEY = re.compile(r'([A-Za-z_][A-Za-z_0-9]*)\s*=\s*')
+# Inside a { ... } table, a slot= after a newline means the closing brace was forgotten and the next line's gear got swallowed
+_SLOT_NAMES = '|'.join(sorted(SLOTS + list(SLOT_ALIASES), key=len, reverse=True))
+_SLOT_IN_TABLE = re.compile(r'\n\s*(?:%s)\s*=' % _SLOT_NAMES)
+_ITEM_TABLE = re.compile(r'\{\s*name\s*=')      # one item's table { name="...", augments={...} }
+_NO_EQUALS = re.compile(r'(?:^|[{,])[ \t]*(%s)[ \t]*["\'{]' % _SLOT_NAMES, re.M)
 
 
 class Item:
@@ -61,6 +66,8 @@ def _read_string(text, i):
             continue
         if c == quote:
             return ''.join(out), j + 1
+        if c == '\n':
+            break                       # a Lua "..." string can't span lines (missing closing quote)
         out.append(c)
         j += 1
     raise ValueError('文字列が閉じていません')
@@ -107,8 +114,8 @@ def strip_comments(text):
             try:
                 _value, j = _read_string(text, i)
             except ValueError:
-                out.append(text[i:])
-                break
+                j = text.find('\n', i)          # unclosed quote: keep the rest of the line as is and carry on
+                j = n if j < 0 else j
             out.append(text[i:j])
             i = j
             continue
@@ -117,7 +124,9 @@ def strip_comments(text):
             if m:
                 close = ']' + m.group(1) + ']'
                 end = text.find(close, i + m.end())
-                i = n if end < 0 else end + len(close)
+                stop = n if end < 0 else end + len(close)
+                out.append('\n' * text.count('\n', i, stop))   # keep the newlines so line numbers don't shift
+                i = stop
             else:
                 end = text.find('\n', i)
                 i = n if end < 0 else end      # keep the newline
@@ -127,11 +136,12 @@ def strip_comments(text):
     return ''.join(out)
 
 
-def parse_entries(text):
-    """Return every "slot=gear" in the file in order of appearance ([Item, ...]). item= lines (non-gear items) are skipped.
-    Gear inside comments (--) isn't read."""
+def _scan(text):
+    """Return (gear read [Item, ...], spots that couldn't be read [positions in the comment-stripped text, ...], the comment-stripped text).
+    Spots that couldn't be read = a slot name whose value isn't "..." / { ... } (ear1== etc.), an unclosed quote or { },
+    or a non-slot name with what looks like an item name (lefft_ear="..." etc.)."""
     text = strip_comments(text)
-    items = []
+    items, unread = [], []
     i = 0
     while True:
         m = _KEY.search(text, i)
@@ -140,27 +150,81 @@ def parse_entries(text):
         key = SLOT_ALIASES.get(m.group(1), m.group(1))
         j = m.end()
         if j >= len(text):
+            if key in SLOTS:
+                unread.append(m.start())
             break
         if key not in SLOTS:
-            # Not a slot (e.g. the outer sets.exported = {): keep reading inside it
+            # Not a slot (e.g. the outer sets.exported = {): keep reading inside it.
+            # But if it carries a gear-shaped value ("..." or { name=... }), it's a misspelled slot name (lefft_ear etc.)
+            if key not in ('item', 'name') and (text[j] in ('"', "'") or _ITEM_TABLE.match(text, j)):
+                unread.append(m.start())
+                if text[j] == '{':
+                    try:
+                        _raw, i = _read_table(text, j)
+                        continue
+                    except ValueError:
+                        pass
             i = j
             continue
-        if text[j] in ('"', "'"):
-            value, nxt = _read_string(text, j)
-            raw = '"%s"' % value.replace('\\', '\\\\').replace('"', '\\"')
-            name = value
-        elif text[j] == '{':
-            raw, nxt = _read_table(text, j)
-            name = _table_name(raw)
-        else:
-            i = j
+        try:
+            if text[j] in ('"', "'"):
+                value, nxt = _read_string(text, j)
+                raw = '"%s"' % value.replace('\\', '\\\\').replace('"', '\\"')
+                name = value
+            elif text[j] == '{':
+                raw, nxt = _read_table(text, j)
+                if _SLOT_IN_TABLE.search(raw):
+                    raise ValueError('{ } が閉じていません')   # missing closing brace: it swallowed the next line's slot
+                name = _table_name(raw)
+            elif re.match(r'empty\b', text[j:j + 6]):
+                i = j + 5            # sub=empty (GearSwap's "wear nothing") isn't treated as gear
+                continue
+            else:
+                unread.append(m.start())     # a variable (gear.X etc.) or a typo (ear1== etc.)
+                i = j
+                continue
+            if '=' in name and text[j] != '{':
+                # Item names never contain = (checked against res): a missing closing quote read on into the next item on the same line (compact format).
+                # Skip this item and re-read from just after its opening quote (the next item then reads correctly with its own quotes)
+                unread.append(m.start())
+                i = j + 1
+                continue
+        except ValueError:
+            unread.append(m.start())     # unclosed quote or { }: skip this line and carry on from the next one
+            nl = text.find('\n', j)
+            if nl < 0:
+                break
+            i = nl
             continue
         if not (name or "").strip():
             i = nxt          # an empty item such as head="" is not treated as gear
             continue
         items.append(Item(key, name, raw))
         i = nxt   # name= and augments= inside the table were already handled when the table was read
-    return items
+    # A missing = (neck"..." / neck "..."): a slot name and a value at the start of a line or right after { or ,
+    for m in _NO_EQUALS.finditer(text):
+        unread.append(m.start(1))
+    unread.sort()
+    return items, unread, text
+
+
+def parse_entries(text):
+    """Return every "slot=gear" in the file in order of appearance ([Item, ...]). item= lines (non-gear items) are skipped.
+    Gear inside comments (--) isn't read."""
+    return _scan(text)[0]
+
+
+def unread_lines(text):
+    """Return the lines that look like gear but couldn't be read, as [(line number, line text), ...] (to flag typos made when editing by hand)."""
+    _items, unread, stripped = _scan(text)
+    out = []
+    for pos in unread:
+        no = stripped.count('\n', 0, pos) + 1
+        if not out or out[-1][0] != no:
+            # The line text runs from the unread slot name to the end of the line (so even a one-line file shows which item it is)
+            end = stripped.find('\n', pos)
+            out.append((no, stripped[pos:end if end >= 0 else len(stripped)].strip()))
+    return out
 
 
 def parse_equipped_set(text):

@@ -34,6 +34,7 @@ You can also run it from source with Python 3 (with tkinter): `python app.py`.
 3. Start the kit and pick your **job** and your **GearSwap data folder** (`…/Windower4/addons/gearswap/data`). The kit remembers the folder.
 4. Pick a set from the list on the left. The right side explains what it's for.
 5. Click **Assign export…** and choose the export file for that set.
+   - If you edited the export by hand and some lines can't be read (a doubled `=`, a missing quote or `}`, a misspelled slot name…), the kit tells you which ones, e.g. "Line 12: …" (since 1.2.5). Everything it could read is still assigned.
 6. **Preview Lua** shows what you'll get. **Make Lua** writes `data/<JOB>.lua` (if the file already exists, a backup is saved next to it first).
 7. In game, `//gs reload`. Remember to reload every time you remake the Lua.
 
