@@ -29,7 +29,7 @@ from i18n import L
 from project import Project, RECEIVED_KIND, atomic_write
 
 APP_NAME = "GearSwapKit"
-VERSION = "1.2.3"
+VERSION = "1.2.4"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")
@@ -539,8 +539,6 @@ class App:
         ttk.Checkbutton(top, text=L("武器 (メイン・サブ・遠隔・矢弾) もセットに含める",
                                     "Include weapons (main / sub / range / ammo) in sets"),
                         variable=self.weapons_var, command=self.on_weapons).pack(side="left")
-        self.jobs_lbl = ttk.Label(top, text="", foreground="#555")
-        self.jobs_lbl.pack(side="left", padx=(14, 0))
         ttk.Button(top, text=L("作業を保存", "Save work"), command=self.save_project).pack(side="right")
         ttk.Button(top, text=L("作業を開く", "Open work"), command=self.open_project).pack(side="right", padx=4)
         # Language switcher (labels are the same in either language)
@@ -551,6 +549,14 @@ class App:
         lang_cb.bind("<<ComboboxSelected>>", lambda e: self.on_lang())
         self.lang_cb = lang_cb
         ttk.Label(top, text="Language / 言語").pack(side="right")
+
+        # Jobs with work get their own row below the top bar and wrap to the window width
+        # (in the top bar they got cut off as jobs were added, and pushed the Save/Open buttons out of the window)
+        jobs_row = ttk.Frame(self.root, padding=(8, 0, 8, 4))
+        jobs_row.pack(fill="x")
+        self.jobs_lbl = ttk.Label(jobs_row, text="", foreground="#555", justify="left")
+        self.jobs_lbl.pack(side="left", fill="x", expand=True)
+        jobs_row.bind("<Configure>", lambda e: self.jobs_lbl.config(wraplength=max(200, e.width - 16)))
 
         folder = ttk.Frame(self.root, padding=(8, 0, 8, 6))
         folder.pack(fill="x")
