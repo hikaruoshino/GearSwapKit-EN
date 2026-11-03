@@ -44,7 +44,7 @@ For gear searches (job ability gear, weapon cycles, ammo), also run `//gs export
 
 - **Pick sets from a list**: idle, engaged, precast (Fast Cast), weapon skills, midcast by magic skill and spell family (Cure, Regen, Refresh, Drain, Helix...), each with a short explanation.
 - **Weapon skills sorted for you**: magical, critical-hit (Evisceration, Vorpal Blade, Blade: Jin...), and ranged weapon skills each go to their own set, and per-WS sets are built on top of the right one.
-- **Modes**: make the set and the mode shows up. `IdleMode` (DT, Refresh), `OffenseMode` (Acc, SubtleBlow, plus Parry on DNC and Enn on RDM), `HybridMode` (DT), `CastingMode` (MB and Acc on BLM/RDM/SCH/GEO), `RangedMode` (Acc, plus Critical on RNG/COR).
+- **Modes**: make the set and the mode shows up. `IdleMode` (DT, Evasion, Refresh), `OffenseMode` (Acc, SubtleBlow, plus Parry on DNC and Enn on RDM), `HybridMode` (DT, Evasion), `CastingMode` (MB and Acc on BLM/RDM/SCH/GEO), `RangedMode` (Acc, plus Critical on RNG/COR). Evasion (since 1.3.0) shows up only when you've made that set.
 - **Treasure Hunter**: `//gs c toggle TreasureHunter` layers your TH gear over engaged gear until you turn it off.
 - **Dual wield by subjob**: `sets.engaged.dual11` goes on automatically when you're /NIN, `dual21` when you're /DNC.
 - **Waking up from sleep**: put slip gear in `sets.Sleep` and it goes on the moment you're slept; the HP drain wakes you, and your weapons and gear come back afterward. Gear that works: Frenzy Sallet, Berserker's Torque, Vim Torque (+1), Sacrifice Torque, and stage-one and stage-two prime weapons (the same weapon at stage three or higher doesn't have the drain).
@@ -138,7 +138,7 @@ GearSwap loads extra files after your job Lua and they can override it: `user-gl
 
 ## Status
 
-- Tested in game on the **Japanese client** (Summoner, Paladin, Puppetmaster, Corsair, Ranger, Scholar, Red Mage, Blue Mage and more).
+- Tested in game on the **Japanese client** (Summoner, Paladin, Puppetmaster, Corsair, Ranger, Scholar, Red Mage, Blue Mage and more), including the Evasion sets (since 1.3.0: assigning them in the window, generating the Lua, and switching with IdleMode / HybridMode).
 - **Not yet tested on the English client.** The English output follows the same logic with English names. If something doesn't swap, please open an issue with your job, what you did, and what you saw. Reports are very welcome.
 - Beastmaster pet move sorting is tested only in a simulated GearSwap.
 

@@ -11,7 +11,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 failed = []
 for path in sorted(glob.glob(os.path.join(HERE, "test_*.py"))):
-    r = subprocess.run([sys.executable, "-I", path], cwd=ROOT, capture_output=True)
+    r = subprocess.run([sys.executable, "-X", "utf8", "-I", path], cwd=ROOT, capture_output=True)
     out = (r.stdout + r.stderr).decode("utf-8", "replace").strip().splitlines()
     last = out[-1] if out else "(出力なし)"
     sys.stdout.buffer.write(("%s %s: %s\n" % ("OK  " if r.returncode == 0 else "NG  ", os.path.basename(path), last)).encode("utf-8"))

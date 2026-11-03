@@ -46,6 +46,13 @@ check(Project("PUP").pup_auto is False, "自動の事前着替えは、初めは
 lua0, lua1 = make(False).to_lua(), make(True).to_lua()
 check("function job_pet_midcast" in lua0 and "pet_tick" not in lua0, "チェックなし: 技が出たときの着替えだけ")
 check("pet_tick" in lua1 and "PetAutoGear" in lua1, "チェックあり: 自動の事前着替えも出す")
+# 1.3.0: send no pet_tick while there is no automaton. Send one last tick right after it goes
+i_tick = lua1.index("windower.raw_register_event('prerender'")
+body = lua1[i_tick:lua1.index("end)", i_tick)]
+check("pet_was_out" in body and "if not out and not pet_was_out then return end" in body,
+      "いないあいだは送らない (消えた直後の 1 回は送る)")
+check(body.index("pet_was_out = out") < body.index("send_command('gs c pet_tick')"),
+      "送る前に前回の状態を更新する")
 p2 = Project.from_json(make(True).to_json())
 p2.set_job("PUP")
 check(p2.pup_auto, "チェックを保存して読み直せる")

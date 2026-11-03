@@ -1108,12 +1108,17 @@ def pup_blocks(emitted, auto=False):
                        "    if set then equip(set) else handle_equipping_gear(player.status); restore_main() end",
                        "end",
                        "",
-                       L("-- 1 秒に 1 回だけ見る (毎フレームは重いので)", "-- Check once per second (every frame is too heavy)"),
+                       L("-- 1 秒に 1 回だけ見る (毎フレームは重いので)。オートマトンがいないあいだは送らない (消えた直後の 1 回は送って、普段の装備に戻す)",
+                         "-- Check once per second (every frame is too heavy). Send nothing while there is no automaton (one last tick right after it goes, to restore normal gear)"),
                        "local pet_last_tick = 0",
+                       "local pet_was_out = false",
                        "windower.raw_register_event('prerender', function()",
                        "    local now = os.time()",
                        "    if now == pet_last_tick then return end",
                        "    pet_last_tick = now",
+                       "    local out = (pet and pet.isvalid) and true or false",
+                       "    if not out and not pet_was_out then return end",
+                       "    pet_was_out = out",
                        "    send_command('gs c pet_tick')",
                        "end)",
                        "",
@@ -1452,9 +1457,9 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     out.append("")
     out.append("function user_setup()")
     # Mode cycling: only offer modes that have a set
-    for field, base, modes in (("IdleMode", "sets.idle", ("DT", "Refresh", "Tate")),
+    for field, base, modes in (("IdleMode", "sets.idle", ("DT", "Evasion", "Refresh", "Tate")),
                                ("OffenseMode", "sets.engaged", ("Acc", "SubtleBlow", "Parry", "Enn", "Tate", "PetSTP")),
-                               ("HybridMode", "sets.engaged", ("DT",)),
+                               ("HybridMode", "sets.engaged", ("DT", "Evasion")),
                                ("CastingMode", "sets.midcast['精霊魔法']", ("MB", "Acc")),
                                ("RangedMode", "sets.midcast.RA", ("Acc", "Critical"))):
         linked = {tg for ts in links.values() for tg in ts}
