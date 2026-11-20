@@ -437,6 +437,25 @@ EXTRA_ENTRIES += [
     (("GEO",), dict(path="sets.midcast.Entrust", title="エントラスト中のインデ", verified=False,
                     help="エントラストを使ったあと、ほかの人にインデ魔法をかける間の装備。インデの効果時間アップなどを入れます。")),
 ]
+# Impact can only be cast while wearing Twilight Cloak (body); the jobs are the levels of res/spells.lua id=503.
+# Not layered on the normal Fast Cast set (its head piece would clash with the cloak, which covers the head too).
+# The paths match the "Magic" per-move sets (sets.midcast['Impact']) so the same set is never built twice
+IMPACT_JOBS = ("WHM", "BLM", "RDM", "DRK", "SMN", "SCH", "GEO")
+IMPACT_SETS = ("sets.precast.FC['Impact']", "sets.midcast['Impact']")
+EXTRA_ENTRIES += [
+    (IMPACT_JOBS, dict(path=IMPACT_SETS[0], alias="sets.precast.FC['インパクト']", title="インパクト (詠唱の開始)",
+                       verified=False,
+                       help="インパクトを唱え始める装備。ファストキャストの装備を入れます。胴にはトワイライトプリス (またはクレパスクラプリス) を入れます "
+                            "(着ていないと、インパクトを唱えられません)。プリスは頭と胴の両方の枠を使うので、頭には別の装備を入れません "
+                            "(頭を入れなければ、頭は外します)。"
+                            "「詠唱の開始 (ファストキャスト)」には重ねないので、使う部位をすべて入れます。強化中の装備 (学者の章など) も重ねません。")),
+    (IMPACT_JOBS, dict(path=IMPACT_SETS[1], alias="sets.midcast['インパクト']", title="インパクト (詠唱中・着弾)",
+                       verified=False,
+                       help="インパクトの詠唱中から着弾までの装備。胴はトワイライトプリスのままにします。"
+                            "プリスは頭と胴の両方の枠を使うので、頭には別の装備を入れません (頭を入れなければ、頭は外します)。"
+                            "魔法命中・魔法攻撃力などを入れます。精霊魔法の装備 (MB・魔命重視を含む) には重ねません。"
+                            "腰の自動選択 (八輪の帯・オルペウスサッシュ) と強化中の装備 (学者の章など) も、インパクトでは替えません。")),
+]
 
 
 BAR_ELEMENT_ENTRY = dict(
@@ -551,6 +570,8 @@ _EN = {
     "sets.midcast.ElementalNinjutsu": ("Elemental Ninjutsu (Katon, Hyoton...)", "Gear worn while casting Katon, Hyoton, Huton, Doton, Raiton or Suiton: Magic Attack, Magic Accuracy, etc."),
     "sets.precast.FC.Utsusemi": ("Utsusemi (precast)", "Gear worn when you start casting Utsusemi (Ichi, Ni, San). Stack Fast Cast to get it off quickly."),
     "sets.midcast.Utsusemi": ("Utsusemi (midcast)", "Gear worn while casting Utsusemi: spell interruption rate -, etc."),
+    "sets.precast.FC['Impact']": ("Impact (precast)", "Gear worn when you start casting Impact: put your Fast Cast gear here. Put Twilight Cloak (or Crepuscular Cloak) in the body slot; Impact can't be cast without it. The cloak takes up both the head and body slots, so leave the head slot empty (the set then takes your hat off). This set isn't built on top of \"Precast (Fast Cast)\", so fill in every slot you want. Buff gear (SCH stratagems, etc.) isn't layered on either."),
+    "sets.midcast['Impact']": ("Impact (midcast / until it lands)", "Gear worn from midcast until Impact lands. Keep Twilight Cloak (or Crepuscular Cloak) in the body slot and leave the head slot empty (the cloak covers both; the set takes your hat off). Add Magic Accuracy, Magic Attack Bonus, etc. It isn't built on top of your Elemental Magic sets (MB and Acc included). The auto waist (Hachirin-no-Obi / Orpheus's Sash) and buff gear (SCH stratagems, etc.) never swap in for Impact."),
     # weapon cycle
     "weapons:main": ("Weapon cycle (main)", "Lets you cycle through main weapons. In game, each //gs c cycle MainWeapons switches to the next one. Equip each weapon, run //gs export, and add it here with \"Add weapons from export\". Weapons don't go in the gear sets (idle, engaged, etc.); TP is lost only when the weapon actually changes."),
     "weapons:sub": ("Weapon cycle (sub)", "Lets you cycle through sub-slot items (shield, off-hand weapon, grip). In game, switch with //gs c cycle SubWeapons. Add them the same way as main. Two-handed weapons can't use a sub, so watch out."),

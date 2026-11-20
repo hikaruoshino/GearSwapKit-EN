@@ -247,7 +247,7 @@ def overlay_blocks(buffs, emitted, job=None, toggles=(), dual=(), status=(), low
                 "local function cast_matches(kind, spell)",
                 "    if kind == 'WeaponSkill' then return spell.type == 'WeaponSkill' end",
                 "    if kind == 'Ranged Attack' then return spell.action_type == 'Ranged Attack' end",
-                "    return spell.action_type == 'Magic'",
+                "    return spell.action_type == 'Magic' and spell.english ~= 'Impact'",
                 "end",
                 "local function equip_cast_gear(phase, spell)",
                 "    for _, b in ipairs(cast_gear[phase]) do",
@@ -1158,8 +1158,8 @@ def waist_blocks(emitted, enabled):
     has_imm = IMMANENCE_SET in emitted
     imm = ([L("    -- 震天動地の章の装備を最優先 (ほかの装備の上から、最後に着る)",
               "    -- Immanence gear has top priority (equipped last, over everything else)"),
-            L("    if (buffactive['震天動地の章'] or buffactive['Immanence']) and spell.action_type == 'Magic' then",
-              "    if buffactive['Immanence'] and spell.action_type == 'Magic' then"),
+            L("    if (buffactive['震天動地の章'] or buffactive['Immanence']) and spell.action_type == 'Magic' and spell.english ~= 'Impact' then",
+              "    if buffactive['Immanence'] and spell.action_type == 'Magic' and spell.english ~= 'Impact' then"),
             "        equip(%s)" % IMMANENCE_SET,
             "    end"] if has_imm else [])
     if not enabled:
@@ -1522,6 +1522,8 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
         if not base and src in emitted:
             base = src
         lines = set_lines(p, used[p], include_weapons, base, cycle_slots, keep_for(p))
+        if lines and p in _SC.IMPACT_SETS and "head" not in used[p]:
+            lines.insert(1, "        head=empty,")   # Impact: the cloak covers the head slot too, so take the hat off
         if lines:
             emitted.add(p)
             # Link to the names Mote-Include looks for (sets.midcast.RA = sets.RA_STP etc.). Per-roll sets layer on the link target

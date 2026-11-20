@@ -29,7 +29,7 @@ from i18n import L
 from project import Project, RECEIVED_KIND, atomic_write
 
 APP_NAME = "GearSwapKit"
-VERSION = "1.3.0"
+VERSION = "1.3.1"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")
@@ -1380,6 +1380,9 @@ class App:
                       "\n使うなら、今の一覧の項目に割り当て直してください。\n・",
                       "\n\nThese sets are no longer in the kit's list, so they weren't written (they're still in your work file)."
                       "\nTo use them, reassign them to a set in the current list.\n・") + "\n・".join(orphans))
+        impact = self.project.impact_warnings()
+        if impact:
+            msg += L("\n\n注意 (インパクト):\n・", "\n\nWarning (Impact):\n・") + "\n・".join(impact)
         if G.MISSING_DATA:
             # Without the data files, the per-move set mappings (pet moves, Blue Magic) are left out of the Lua: say so
             msg += (L("\n\n注意: キットのデータのファイルが読めなかったので、そのファイルを使う対応 (ペットの技・青魔法の分類) は、"
@@ -1387,6 +1390,7 @@ class App:
                       "\n\nWarning: some of the kit's data files couldn't be read, so the mappings that use them "
                       "(pet moves, Blue Magic types) are not in the file. Please reinstall the kit.\n・")
                     + "\n・".join(sorted(G.MISSING_DATA)))
+        if G.MISSING_DATA or impact:
             messagebox.showwarning(APP_NAME, msg)
         else:
             messagebox.showinfo(APP_NAME, msg)
