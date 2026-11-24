@@ -609,8 +609,14 @@ class BardSongs(unittest.TestCase):
                     if common:
                         project.assign("sets.midcast.SongEffect", export_parser.parse_equipped_set(
                             'sets.exported={range="Common Horn", feet="Duration"}'))
+                        project.assign("sets.midcast.March", export_parser.parse_equipped_set(
+                            'sets.exported={range="Family Horn", hands="March Hands"}'))
                     self.check_song(project, (en, ja, "March", "SELF", "Idle",
-                                              ("Custom", "Individual Horn", None, "Duration" if common else "Idle")))
+                                              ("Custom", "Individual Horn", "March Hands" if common else "Idle",
+                                               "Duration" if common else "Idle")))
+                    if common:
+                        self.check_song(project, ("Victory March", "栄光の凱旋マーチ", "March", "SELF", "Idle",
+                                                  ("Song FC", "Family Horn", "March Hands", "Duration")))
 
 
 if __name__ == "__main__":
