@@ -12,6 +12,7 @@ Nothing is sent to the game and memory is never touched. The only files read are
 """
 import json
 import os
+import re
 import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
@@ -29,7 +30,7 @@ from i18n import L
 from project import Project, RECEIVED_KIND, atomic_write
 
 APP_NAME = "GearSwapKit"
-VERSION = "1.3.1"
+VERSION = "1.4.0"
 BASE = os.path.dirname(os.path.abspath(sys.argv[0] if "__compiled__" in globals() else __file__))
 _APPDATA = os.environ.get("APPDATA") or os.path.expanduser("~")
 SETTINGS = os.path.join(_APPDATA, "GearSwapKit", "gearswapkit_settings.json")
@@ -262,9 +263,10 @@ class NamePicker:
     """Small window for picking several WS, spells or abilities from a list (with search and group filter).
     The chosen [{en, ja, group}] go in self.result."""
 
-    def __init__(self, parent, title, items, note=""):
+    def __init__(self, parent, title, items, note="", selected=None):
         self.items = items
-        self.result = []
+        self.selected = set(selected) if selected is not None else None
+        self.result = [] if selected is None else None
         self.all_label = L("すべて", "All")
         self.win = tk.Toplevel(parent)
         self.win.title(title)
@@ -284,19 +286,22 @@ class NamePicker:
         cb.bind("<<ComboboxSelected>>", lambda e: self.fill())
         if note:
             ttk.Label(self.win, text=note, foreground="#555", padding=(8, 0), wraplength=520).pack(anchor="w")
-        ttk.Label(self.win, text=L("使いたいものを選んでください (Ctrl や Shift を押しながらクリックで、複数)。",
-                                   "Select the ones you want (Ctrl/Shift+click to select several)."),
-                  padding=(8, 2)).pack(anchor="w")
+        hint = (L("使いたいものを選んでください (Ctrl や Shift を押しながらクリックで、複数)。",
+                  "Select the ones you want (Ctrl/Shift+click to select several).") if selected is None else
+                L("曲をクリックすると選択、もう一度クリックすると解除します。",
+                  "Click a song to select it. Click it again to deselect it."))
+        ttk.Label(self.win, text=hint, padding=(8, 2)).pack(anchor="w")
         frame = ttk.Frame(self.win, padding=8)
         frame.pack(fill="both", expand=True)
-        self.box = tk.Listbox(frame, selectmode="extended", exportselection=False)
+        self.box = tk.Listbox(frame, selectmode="extended" if selected is None else "multiple", exportselection=False)
         sb = ttk.Scrollbar(frame, orient="vertical", command=self.box.yview)
         self.box.config(yscrollcommand=sb.set)
         self.box.pack(side="left", fill="both", expand=True)
         sb.pack(side="left", fill="y")
         bottom = ttk.Frame(self.win, padding=8)
         bottom.pack(fill="x")
-        ttk.Button(bottom, text=L("選んだものを足す", "Add selected"), command=self.ok).pack(side="right")
+        action = L("選んだものを足す", "Add selected") if selected is None else L("選択を適用", "Apply selection")
+        ttk.Button(bottom, text=action, command=self.ok).pack(side="right")
         ttk.Button(bottom, text=L("やめる", "Cancel"), command=self.win.destroy).pack(side="right", padx=6)
         self.shown = []
         self.fill()
@@ -313,15 +318,27 @@ class NamePicker:
     def fill(self):
         q = self.query.get().strip().lower()
         g = self.group.get()
+        self.remember_selection()
         self.box.delete(0, "end")
         self.shown = [it for it in self.items
                       if (g == self.all_label or it["group"] == g)
                       and (not q or q in it["ja"].lower() or q in it["en"].lower())]
-        for it in self.shown:
+        for index, it in enumerate(self.shown):
             self.box.insert("end", self.label(it))
+            if self.selected is not None and it["en"] in self.selected:
+                self.box.selection_set(index)
+
+    def remember_selection(self):
+        if self.selected is not None:
+            self.selected.difference_update(it["en"] for it in self.shown)
+            self.selected.update(self.shown[i]["en"] for i in self.box.curselection())
 
     def ok(self):
-        self.result = [self.shown[i] for i in self.box.curselection()]
+        if self.selected is None:
+            self.result = [self.shown[i] for i in self.box.curselection()]
+        else:
+            self.remember_selection()
+            self.result = [it for it in self.items if it["en"] in self.selected]
         self.win.destroy()
 
 
@@ -447,7 +464,7 @@ class App:
 
     def on_close(self):
         """Auto-save the work on close. If the file exists, ask before overwriting; on No, return without closing."""
-        if not any(self.project.has_work(j) for j in C.ALL_JOBS):
+        if not self.has_unsaved():
             self.root.destroy()          # nothing has been worked on, so close without saving
             return
         path = self.autosave_path()
@@ -554,9 +571,10 @@ class App:
         # (in the top bar they got cut off as jobs were added, and pushed the Save/Open buttons out of the window)
         jobs_row = ttk.Frame(self.root, padding=(8, 0, 8, 4))
         jobs_row.pack(fill="x")
+        self.dummy_button = ttk.Button(jobs_row, command=self.edit_dummy_songs)
         self.jobs_lbl = ttk.Label(jobs_row, text="", foreground="#555", justify="left")
         self.jobs_lbl.pack(side="left", fill="x", expand=True)
-        jobs_row.bind("<Configure>", lambda e: self.jobs_lbl.config(wraplength=max(200, e.width - 16)))
+        self.jobs_lbl.bind("<Configure>", lambda e: self.jobs_lbl.config(wraplength=max(1, e.width - 4)))
 
         folder = ttk.Frame(self.root, padding=(8, 0, 8, 6))
         folder.pack(fill="x")
@@ -710,6 +728,11 @@ class App:
         return (L("作業のあるジョブ: ", "Jobs with work: ") + L("・", ", ").join(worked)) if worked else ""
 
     def refresh(self, select=None):
+        if self.project.job == "BRD":
+            self.dummy_button.config(text=L("下歌を選ぶ（%d曲）…", "Choose dummy songs (%d)…") % len(self.project.dummy_songs))
+            self.dummy_button.pack(side="right", before=self.jobs_lbl)
+        else:
+            self.dummy_button.pack_forget()
         self.jobs_lbl.config(text=self.jobs_text())
         sel = select or self.current_path()
         self.tree.delete(*self.tree.get_children())
@@ -836,6 +859,8 @@ class App:
             skipped = (slot in ("main", "sub", "range", "ammo")) and not self.project.include_weapons
             if slot == "ammo" and G.ammo_as_gear(self.project.job):
                 skipped = False
+            if slot == "range" and self.project.job == "BRD" and e["path"] in G.BRD_SONG_SETS:
+                skipped = False
             if slot in ("main", "sub") and self.project.job == "PLD" and e["path"] in G.PLD_WEAPON_SETS:
                 skipped = False     # PLD's magic / status resistance sets swap weapons too
             if slot == "main" and self.project.job == "PUP" and e["path"] in (G.PUP_WS_SET, "sets.precast.JA.Maneuver"):
@@ -846,6 +871,43 @@ class App:
                                          L("   ← 武器は出力に含めません", "   ← weapons are left out of the Lua") if skipped else ""))
         text = "\n".join(lines) if lines else L("(まだ装備が割り当てられていません)", "(No gear assigned yet.)")
         self.set_gear_text(text)
+
+    def edit_dummy_songs(self):
+        if self.project.job != "BRD":
+            return
+        self.update_resdb()
+        songs = [it for it in CH.choices(self.project.resdb, "magic", "BRD") if it["group"] in ("歌唱", "Singing")]
+        if songs:
+            # Target bit 32 marks enemy songs. Daurdabla also cannot cast the two instrument-specific songs.
+            friendly = set()
+            spells = R._read_text(os.path.join(self.project.resdb.res_dir, "spells.lua"))
+            for line in spells.splitlines():
+                if 'type="BardSong"' in line:
+                    targets = re.search(r"\btargets=(\d+)", line)
+                    name = R._EN.search(line)
+                    if targets and name and not int(targets[1]) & 32:
+                        friendly.add(R._unescape(name[1]))
+            songs = [it for it in songs if it["en"] in friendly and it["en"] not in ("Honor March", "Aria of Passion")]
+        selected = self.project.dummy_songs
+        if not songs:
+            messagebox.showwarning(APP_NAME, L("歌の一覧を読み込めません。Windower の data フォルダーを確認してください。",
+                                               "Couldn't load the song list. Check your Windower data folder."))
+            if not selected:
+                return
+        known = {it["en"] for it in songs}
+        songs.extend(dict(en=name, ja=name, group=L("保存済み", "Saved")) for name in selected if name not in known)
+        picker = NamePicker(self.root, L("下歌を選ぶ", "Choose dummy songs"), songs, selected=selected,
+                            note=L("下歌として使う曲を選んでください。選択を外すと通常の歌に戻ります。",
+                                   "Select the songs to use as dummy songs. Deselect a song to use it normally."))
+        if picker.result is not None:
+            names = [it["en"] for it in picker.result]
+            if set(names) != set(selected):
+                self.project.set_dummy_songs(names)
+                self.refresh()
+                if self.has_unsaved():
+                    self.say(L("下歌の変更は未保存です。", "Dummy song changes are unsaved."))
+                else:
+                    self.say(L("下歌の選択を元に戻しました。", "Restored the previous dummy song selection."))
 
     def update_resdb(self):
         """Find the res folder of the same Windower install from the data folder's location (used to map Japanese names to English)."""
@@ -1410,6 +1472,34 @@ class App:
             self.project_path = path
             self.remember_file("last_project", path)
             self.say(L("作業を保存しました。", "Work saved."))
+
+    def has_unsaved(self):
+        """Compare saved projects including cleared selections. Check new projects for changes from defaults."""
+        path = self.project_path
+        if path and os.path.isfile(path):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    return f.read() != self.project.to_json()
+            except (OSError, UnicodeDecodeError):
+                return True
+        return any(self.project.has_changes(j) for j in C.ALL_JOBS)
+
+    def save_current(self):
+        """Save the current project and report whether it was saved."""
+        path = self.project_path or filedialog.asksaveasfilename(
+            title=L("今の作業を保存", "Save your current work"), defaultextension=".json",
+            filetypes=[("JSON", "*.json")], initialfile="%s_kit.json" % self.project.job)
+        if not path:
+            return False
+        try:
+            atomic_write(path, self.project.to_json())
+        except OSError as ex:
+            messagebox.showerror(APP_NAME, L("保存できませんでした。\n%s", "Couldn't save.\n%s") % ex)
+            return False
+        self.project_path = path
+        self.remember_file("last_project", path)
+        self.say(L("作業を保存しました。", "Work saved."))
+        return True
 
     def open_project(self):
         path = filedialog.askopenfilename(title=L("作業を開く", "Open work"), filetypes=[("JSON", "*.json")])

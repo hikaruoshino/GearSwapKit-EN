@@ -1301,9 +1301,144 @@ def ws_base(path, emitted):
     return None
 
 
+BRD_SONG_SETS = {"sets.midcast.SongEffect", "sets.midcast.Daurdabla",
+                 "sets.midcast['Honor March']", "sets.midcast['Aria of Passion']"}
+BRD_SHARED_SETS = {"sets.midcast.SongEffect", "sets.midcast.Daurdabla"}
+
+
+def brd_song_blocks(dummy_songs, shared_songs, range_cycle):
+    """Resolve song gear at cast time after init_gear_sets has populated the split gear file."""
+    top = ["local dummy_songs = {"]
+    for name in dummy_songs:
+        top.append("    [%s] = true," % _lua_str(name))
+    top += ["}",
+            "local special_instruments = {",
+            "    ['Honor March'] = {%s}," % L("'マルシュアス', 'Marsyas'", "'Marsyas'"),
+            "    ['Aria of Passion'] = {%s}," % L("'ラックナシェード', 'Loughnashade'", "'Loughnashade'"),
+            "}",
+            "local function instrument_for(names, gear_set)",
+            "    local item = gear_set and gear_set.range",
+            "    local name = type(item) == 'table' and item.name or item",
+            "    if name == names[1]%s then return item end" % L(" or name == names[2]", ""),
+            "    return names[1]",
+            "end",
+            "local function friendly_song(spell)",
+            "    return spell.type == 'BardSong' and not (spell.targets and spell.targets.Enemy)",
+            "        and not (spell.target and spell.target.type == 'MONSTER')",
+            *([] if shared_songs else ["        and special_instruments[spell.english] ~= nil"]),
+            "end",
+            "",
+            "local active_song",
+            "local last_retry_notice",
+            "if windower and windower.raw_register_event then",
+            "    windower.raw_register_event('zone change', function()",
+            "        if active_song then active_song.cast = nil end",
+            "    end)",
+            "end",
+            "local function song_cast(spell)",
+            L("    -- 通常終了は受信側で作った spell、中断は元の spell が渡る。登録時の表で照合する。",
+              "    -- A result packet can supply a fresh spell table. Use the original cast from the registry."),
+            "    return (_global and _global.spell) or spell",
+            "end",
+            "",
+            "local function range_name(item)",
+            "    local name = type(item) == 'table' and item.name or item",
+            "    return type(name) == 'string' and name:lower() or name",
+            "end",
+            "",
+            "local function equip_song_range(item)",
+            "    active_song.instrument = range_name(item)",
+            "    equip({range = item})",
+            "end",
+            "",
+            "local function song_in_progress()",
+            "    if not active_song or not active_song.cast then return false end",
+            "    if active_song.timestamp and gearswap and gearswap.command_registry then",
+            "        local entry = gearswap.command_registry[active_song.timestamp]",
+            "        return entry and entry.spell == active_song.cast and entry.midaction",
+            "    end",
+            "    local busy, current = midaction()",
+            "    return busy and current == active_song.cast",
+            "end",
+            "",
+            "function job_precast(spell, action, spellMap, eventArgs)",
+            "    if spell.type == 'BardSong' and song_in_progress() then",
+            "        eventArgs.cancel = true",
+            "        if not active_song.retry_notified and add_to_chat then",
+            "            local now = os.clock()",
+            "            if last_retry_notice and now - last_retry_notice < 3 then return end",
+            "            last_retry_notice = now",
+            "            active_song.retry_notified = true",
+            "            add_to_chat(122, %s)" % _lua_str(L("歌の詠唱中のため、再入力を取り消しました。",
+                                                          "Already singing. The additional song request was canceled.")),
+            "        end",
+            "    end",
+            "end",
+            "",
+            "function job_aftercast(spell, action, spellMap, eventArgs)",
+            "    if not active_song then return end",
+            "    local cast = song_cast(spell)",
+            "    if cast ~= active_song.cast then",
+            "        if song_in_progress() then eventArgs.handled = true end",
+            "        return",
+            "    end",
+            "    local restore_range = active_song.previous_range",
+            "    active_song = nil",
+            *(["    local selected = state and state.RangeWeapons and state.RangeWeapons.value",
+               "    restore_range = weapon_items.range[selected] or restore_range"] if range_cycle else []),
+            "    if restore_range then equip({range = restore_range}) end",
+            "end",
+            "",
+            "local function dummy_song(spell)",
+            "    return dummy_songs[spell.english] and not special_instruments[spell.english]",
+            "end",
+            "",
+            "function job_midcast(spell, action, spellMap, eventArgs)",
+            "    if active_song and active_song.cast == song_cast(spell) and dummy_song(spell) then eventArgs.handled = true end",
+            "end",
+            "",
+            "local function equip_song(spell, spellMap)",
+            "    if not active_song or active_song.cast ~= song_cast(spell) then return end",
+            "    local name = spell.english",
+            "    local instrument = special_instruments[name]",
+            "    if dummy_song(spell) then",
+            "        if sets.midcast.Daurdabla then equip(sets.midcast.Daurdabla) end",
+            "        return (sets.midcast.Daurdabla and sets.midcast.Daurdabla.range) or %s" % _lua_str(L("ダウルダヴラ", "Daurdabla")),
+            "    end",
+            "    local common = sets.midcast.SongEffect",
+            "    if spellMap == nil and name == 'Honor March' then spellMap = 'March' end",
+            "    local family = sets.midcast[spellMap]",
+            "    local individual = sets.midcast[name] or sets.midcast[spell.name]",
+            "    if common then equip(common) end",
+            "    if family then equip(family) end",
+            "    if individual then equip(individual) end",
+            "    if instrument then",
+            "        instrument = instrument_for(instrument, individual)",
+            "    else",
+            "        instrument = (individual and individual.range) or (family and family.range)",
+            "    end",
+            "    return instrument or (common and common.range) or %s" % _lua_str(L("ギャッラルホルン", "Gjallarhorn")),
+            "end", ""]
+    pre = ["    if friendly_song(spell) and not eventArgs.handled and not eventArgs.cancel",
+           "        and not (_global and _global.cancel_spell) then",
+           "        local item = player.equipment.range",
+           "        if item == 'empty' or item == '' then item = empty end",
+           "        if active_song and active_song.instrument and range_name(item) == active_song.instrument then",
+           "            active_song.cast = song_cast(spell)",
+           "        else",
+           "            active_song = {cast = song_cast(spell), previous_range = item}",
+           "        end",
+           "        active_song.timestamp = _global and _global.timestamp",
+           "        active_song.retry_notified = false",
+           "        local instrument = special_instruments[spell.english]",
+           "        if instrument then equip_song_range(instrument_for(instrument, sets.midcast[spell.english])) end",
+           "    end"]
+    return top, pre
+
+
 def build_lua(job, assignments, include_weapons=False, title=None, aliases=None, weapons=None, buffs=None, lockstyle=None,
               received_manual=(), ammo=None, ws_ammo=None, pld_three_stage=False, pld_fast_cast=0, pup_auto=False,
-              auto_waist=False):
+              auto_waist=False, dummy_songs=()):
     """assignments: {path: {slot: Item}}. Empty sets aren't written.
     aliases: {alias path: source path}. Adds an `alias = source` line only when the source set is written
     (stock Mote-Include looks up move names in English, while builds modified for Japanese names look them up in Japanese; this makes both work).
@@ -1339,8 +1474,9 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     if ammo_top:
         cycle_slots.add("ammo")     # ammo is swapped by the ammo-selection logic, so keep it out of sets
     keep_slots = ("ammo",) if ammo_as_gear(job) and "ammo" not in cycle_slots else ()
-
     def keep_for(path):
+        if job == "BRD" and path in BRD_SONG_SETS:
+            return keep_slots + ("range",)
         # Paladin anti-magic / status resistance sets also swap main and sub (Malignance Sword, Aegis, etc.)
         if job == "PLD" and path in PLD_WEAPON_SETS:
             return tuple(keep_slots) + ("main", "sub")
@@ -1358,6 +1494,16 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
             return tuple(keep_slots) + ("main", "sub", "range")
         return keep_slots
     emitted_paths = {p for p in used if set_lines(p, used[p], include_weapons, cycle_slots=cycle_slots, keep_slots=keep_for(p))}
+    song_names = []
+    if job == "BRD" and isinstance(dummy_songs, (list, tuple)):
+        song_names = list(dict.fromkeys(n.strip() for n in dummy_songs if isinstance(n, str) and n.strip()))
+    shared_songs = bool(song_names or emitted_paths & BRD_SHARED_SETS)
+    brd_songs = job == "BRD" and bool(song_names or emitted_paths & BRD_SONG_SETS)
+    if brd_songs:
+        out[0] += "\n" + L("-- 味方歌の共通・下歌・専用二曲のセットでは、武器除外時も range の楽器を使います。",
+                           "-- The shared song, dummy song and two instrument-specific song sets keep their ranged instrument even when weapons are excluded.")
+        song_top, song_pre = brd_song_blocks(song_names, shared_songs, "range" in cycle_slots)
+        out.extend(song_top)
     pld = pld_blocks(emitted_paths, pld_three_stage, pld_fast_cast) if job == "PLD" else pld_blocks(set())
     out.extend(pld["top"])     # before job_self_command (it uses the local land_set)
     pup = pup_blocks(emitted_paths, pup_auto) if job == "PUP" else pup_blocks(set())
@@ -1434,6 +1580,10 @@ def build_lua(job, assignments, include_weapons=False, title=None, aliases=None,
     post_mid = ((["    equip_cast_gear('midcast', spell)"] if has_cast else []) + phalanx_mid + recv_mid + pld["post_midcast"] + storm_lines
                 + waist["post_midcast"] + entrust + other)
     post_pre = post_pre + holy
+    if brd_songs:
+        post_pre += song_pre
+        post_mid.insert(0, "    local instrument = equip_song(spell, spellMap)")
+        post_mid.append("    if instrument then equip_song_range(instrument) end")
     if post_pre:
         out += ["function job_post_precast(spell, action, spellMap, eventArgs)"] + post_pre + ["end", ""]
     if post_mid:

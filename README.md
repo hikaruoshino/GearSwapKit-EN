@@ -102,8 +102,17 @@ All of these are opt-in (a checkbox or a mode), so they stay out of your way if 
 - **Ammo by role**: physical bullets for shooting and physical WS, magic bullets for Leaden Salute and friends, a Quick Draw bullet, and special bullets for chosen WS. Special and Quick Draw bullets are swapped back out afterward so you never shoot them by accident.
 - Separate WS sets for melee, ranged, magical and ranged-magical weapon skills.
 
-**Bard**
-- Song precast, plus a set for each song family: March, Minuet, Madrigal, Ballad, Minne, Paeon, Etude, Carol, Prelude, Mambo, Lullaby, Threnody, Elegy, Requiem.
+**Bard (1.4.0)**
+- Put Fast Cast gear in song precast and duration gear in the common beneficial-song set (`SongEffect`). At midcast, family gear overrides common gear, then the individual song overrides matching slots. Gjallarhorn is the default instrument for ordinary beneficial songs. Set the ranged slot in `SongEffect` to choose another instrument.
+- Use **Choose dummy songs** to select the songs that open extra slots. Put your instrument, such as Daurdabla or Terpander, in the dummy-song set. An empty ranged slot defaults to Daurdabla. Once the slots are open, overwrite the dummy songs with the songs you want to keep.
+- Configuring a common set, a dummy-song set or a dummy song enables instrument changes for ordinary beneficial songs at midcast. Song instruments still change with weapon export turned off. If you use ranged weapon cycling, the selected ranged weapon returns after casting.
+- If you added Honor March or Aria of Passion as a spell in 1.3.1, open the saved project and regenerate the Bard Lua. Configuring only those songs preserves instrument choices for other songs. For an ordinary beneficial song, an exported instrument in its individual or family set takes precedence over the common instrument.
+- Dummy songs use only the dummy-song set for midcast armor. Adjust its duration gear so you can overwrite the dummy songs with the songs you want to keep.
+- Without ranged weapon cycling, the kit restores the instrument you wore before casting by name. If you own two identically named instruments with different augments, it cannot distinguish the original copy. Remove incompatible ammunition before exporting a song set.
+- Honor March uses Marsyas and Aria of Passion uses Loughnashade from precast through midcast. Assign Honor-specific armor to its individual set to override matching March slots. Hostile songs retain their own gear and instrument.
+- While casting a beneficial song whose instrument the kit manages, entering another song cancels the new request so the first song keeps its midcast gear. This applies to repeats, other beneficial songs and hostile songs. Starting with a hostile song does not trigger this protection. Other spells and abilities pass through and can change your gear. If you configured only the instrument-specific songs, protection starts only when you cast Honor March or Aria of Passion.
+- The kit displays “Already singing. The additional song request was canceled.” at most once per cast. Even if you start a new cast, it suppresses further notices for three seconds after the previous cancellation notice. These limits apply only to the kit’s cancellation notice.
+- Even when the notice is suppressed, a canceled song is not queued. Enter it again after the first song finishes or is interrupted. If the server response is delayed or lost, you may need to wait for the response or for GearSwap’s record of the cast to expire. This protection and its chat notice have been tested in simulation and are still unverified in game.
 
 **Blue Mage**
 - Blue magic split into physical, magical, buff, healing and debuff (magic accuracy) sets. The kit ships with the spell list (`blu_spells.json`), so it works on the English client too.

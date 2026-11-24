@@ -31,7 +31,7 @@ def check(cond, msg):
 
 
 H = EP.parse_equipped_set
-JOBS = ("SMN", "PLD", "PUP", "COR", "SCH", "BST", "RNG", "WHM")
+JOBS = ("SMN", "PLD", "PUP", "COR", "SCH", "BST", "RNG", "WHM", "BRD")
 
 
 # Mock that runs SCH's automatic waist selection with English client values (weather, day, skill names)

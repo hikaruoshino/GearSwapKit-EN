@@ -6,6 +6,7 @@ Assignments, per-skill additions and weapon cycles are stored **separately for e
 import datetime
 import json
 import os
+import re
 import shutil
 import tempfile
 import time
@@ -104,6 +105,7 @@ class JobData:
         self.received_manual = set()   # received-buff gear that isn't swapped in automatically (e.g. {"IncreasedPhalanx"})
         self.ammo = {}             # ammo role (physical/magical/quickdraw) -> Item  (RNG, COR)
         self.ws_ammo = {}          # WS English name -> Item  special ammo (used only for that WS)
+        self.dummy_songs = None    # Distinguish unconfigured dummy songs from an explicitly empty selection.
         self.three_stage = False   # PLD: use the three-stage swap (Fast Cast -> spell interruption -> landing gear)
         self.fast_cast = 0         # PLD: gear Fast Cast (%) used for the three-stage swap timing
         self.pup_auto = False      # PUP: equip automaton weapon skill gear ahead of time (automatic pre-swap)
@@ -115,6 +117,7 @@ class Project:
         self.job = job
         self.include_weapons = False
         self.resdb = None          # res used to look up English names from Japanese ones (works without it)
+        self.load_warnings = []
         self._jobs = {}            # job abbreviation -> JobData
 
     # --- Jobs ---
@@ -170,7 +173,10 @@ class Project:
         """Whether the job has any assignments, additions or weapons."""
         d = self._jobs.get(job)
         return bool(d and (any(d.assignments.values()) or d.custom or any(d.weapons.values()) or d.lockstyle
-                           or d.ammo or d.ws_ammo))
+                           or d.ammo or d.ws_ammo or d.dummy_songs))
+
+    def has_changes(self, job):
+        return self.has_work(job)
 
     def set_resdb(self, resdb):
         self.resdb = resdb
@@ -439,6 +445,30 @@ class Project:
 
     # --- Automatic elemental obi / Orpheus's Sash selection ---
     @property
+    def dummy_songs(self):
+        return list(self._cur().dummy_songs or [])
+
+    def set_dummy_songs(self, names):
+        if self.job != "BRD":
+            return
+        if names is None:
+            self._cur().dummy_songs = None
+            return
+        if not isinstance(names, list):
+            self.load_warnings.append("BRD: dummy_songs: " + L("配列でないので読みません", "not a list, skipped"))
+            return
+        songs = []
+        for name in names:
+            if isinstance(name, str):
+                name = name.strip(" ")
+            if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9 '.-]*", name):
+                self.load_warnings.append("BRD: dummy_songs: " + L("不正な曲名を除きました", "skipped an invalid song name"))
+            elif name not in songs:
+                songs.append(name)
+        if songs or not names:
+            self._cur().dummy_songs = songs
+
+    @property
     def auto_waist(self):
         return self._cur().auto_waist
 
@@ -520,7 +550,8 @@ class Project:
                            received_manual=self._cur().received_manual,
                            ammo=self._cur().ammo, ws_ammo=self._cur().ws_ammo,
                            pld_three_stage=self._cur().three_stage, pld_fast_cast=self._cur().fast_cast,
-                           pup_auto=self._cur().pup_auto, auto_waist=self._cur().auto_waist)
+                           pup_auto=self._cur().pup_auto, auto_waist=self._cur().auto_waist,
+                           **({"dummy_songs": self.dummy_songs} if self.job == "BRD" else {}))
 
     def write_lua(self, data_dir):
         """Write data_dir/<job>.lua, backing up any existing file in the same folder first. Returns (path, backup or None).
@@ -544,12 +575,13 @@ class Project:
                     lockstyle=d.lockstyle, received_manual=sorted(d.received_manual),
                     ammo={r: it.raw for r, it in d.ammo.items()}, ws_ammo={w: it.raw for w, it in d.ws_ammo.items()},
                     three_stage=d.three_stage, fast_cast=d.fast_cast, pup_auto=d.pup_auto,
-                    auto_waist=d.auto_waist)
+                    auto_waist=d.auto_waist,
+                    **({"dummy_songs": d.dummy_songs} if d.dummy_songs is not None else {}))
 
     def to_json(self):
         jobs = {job: self._job_to_dict(d) for job, d in self._jobs.items()
                 if any(d.assignments.values()) or d.custom or any(d.weapons.values()) or d.lockstyle
-                or d.ammo or d.ws_ammo}
+                or d.ammo or d.ws_ammo or d.dummy_songs is not None}
         data = dict(version=2, job=self.job, include_weapons=self.include_weapons, jobs=jobs)
         return json.dumps(data, ensure_ascii=False, indent=1)
 
@@ -581,6 +613,8 @@ class Project:
             self._cur().three_stage = bool(jd.get("three_stage", False))
             self._cur().pup_auto = bool(jd.get("pup_auto", False))
             self._cur().auto_waist = bool(jd.get("auto_waist", False))
+            if job == "BRD" and "dummy_songs" in jd:
+                self.set_dummy_songs(jd["dummy_songs"])
             self.set_fast_cast(jd.get("fast_cast", 0))
             for role, raw in jd.get("ammo", {}).items():
                 found = EP.parse_entries("ammo=%s" % raw)

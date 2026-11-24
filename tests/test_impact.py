@@ -156,7 +156,9 @@ i18n.set_lang("ja")
 
 # Version
 with open(os.path.join(ROOT, "app.py"), encoding="utf-8") as fh:
-    check('VERSION = "1.3.1"' in fh.read(), "版は 1.3.1")
+    version = re.search(r'^VERSION = "(\d+)\.(\d+)\.(\d+)"$', fh.read(), re.MULTILINE)
+    check(version is not None and tuple(map(int, version.groups())) >= (1, 3, 1),
+          "インパクト対応の 1.3.1 以降")
 
 # (d) Mock GearSwap: Mote-Include's set lookup (name -> spellMap -> skill) plus job_post_precast / job_post_midcast
 LUA_TEST = r'''

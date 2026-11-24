@@ -376,6 +376,18 @@ SONG_FAMILIES = [
     ("Elegy", "エレジー", "魔法命中・歌唱スキルなどを入れます。"),
     ("Requiem", "レクイエム", "魔法命中・歌唱スキルなどを入れます。"),
 ]
+EXTRA_ENTRIES += [
+    (("BRD",), dict(path="sets.midcast.SongEffect", title="味方歌（共通の着弾装備）", verified=False,
+                    help="歌の効果時間を延ばす防具と、通常の味方歌に使う楽器（例：ギャッラルホルン）を登録します。マーチなどの系統別装備や曲別装備は、この防具に重ねます。")),
+    (("BRD",), dict(path="sets.midcast.Daurdabla", title="下歌（枠作りの着弾装備）", verified=False,
+                    help="枠作りに指定した歌が着弾するときの装備です。枠作りに使う楽器と防具を登録します。遠隔欄が空の場合はダウルダヴラを使います。")),
+    (("BRD",), dict(path="sets.midcast['Honor March']", alias="sets.midcast['栄典の戴冠マーチ']",
+                    title="栄典の戴冠マーチ（着弾装備）", verified=False,
+                    help="歌FCで詠唱を始め、着弾時は共通・マーチ用の防具に、この曲の装備を重ねます。楽器は詠唱開始からマルシュアスを使います。")),
+    (("BRD",), dict(path="sets.midcast['Aria of Passion']", alias="sets.midcast['冷静と情熱のアリア']",
+                    title="冷静と情熱のアリア（着弾装備）", verified=False,
+                    help="歌FCで詠唱を始め、着弾時は共通の防具に、この曲の装備を重ねます。楽器は詠唱開始からラックナシェードを使います。")),
+]
 EXTRA_ENTRIES += [(("BRD",), dict(path="sets.midcast.%s" % fam, title="歌 (%s)" % ja, verified=False,
                                   help="%sを歌っている間の装備。%s" % (ja, why)))
                   for fam, ja, why in SONG_FAMILIES]
@@ -518,6 +530,10 @@ AMMO_HELP_TAIL_EN = (" Use \"Pick from inventory…\" to choose from your //gs e
                      "and the kit equips the ammo chosen here to fit the situation.")
 
 _EN = {
+    "sets.midcast.SongEffect": ("Party songs (shared midcast)", "Assign duration gear and your usual instrument, such as Gjallarhorn. Song-family and individual spell gear layer over these slots."),
+    "sets.midcast.Daurdabla": ("Dummy songs (extra song slots)", "Assign your extra-song instrument and armor. An empty ranged slot defaults to Daurdabla. A short duration makes the song easier to replace."),
+    "sets.midcast['Honor March']": ("Honor March (midcast)", "Start in song Fast Cast gear with Marsyas. When the song lands, its gear layers over party-song and March gear, with Marsyas retained."),
+    "sets.midcast['Aria of Passion']": ("Aria of Passion (midcast)", "Start in song Fast Cast gear with Loughnashade. When the song lands, its gear layers over party-song gear, with Loughnashade retained."),
     "sets.idle": ("Idle", "Gear worn when you're not fighting (standing or moving). Put your everyday gear here: Refresh, Regen, movement speed, damage taken -."),
     "sets.idle.DT": ("Idle (DT)", "Idle gear for cutting damage taken (IdleMode set to DT). Stack physical and magic damage taken - (DT)."),
     "sets.idle.Evasion": ("Idle (Evasion)", "Gear for avoiding attacks and magic. Stack Evasion and Magic Evasion. Switch with //gs c cycle IdleMode to Evasion."),
