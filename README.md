@@ -112,7 +112,7 @@ All of these are opt-in (a checkbox or a mode), so they stay out of your way if 
 - Honor March uses Marsyas and Aria of Passion uses Loughnashade from precast through midcast. Assign Honor-specific armor to its individual set to override matching March slots. Hostile songs retain their own gear and instrument.
 - While casting a beneficial song whose instrument the kit manages, entering another song cancels the new request so the first song keeps its midcast gear. This applies to repeats, other beneficial songs and hostile songs. Starting with a hostile song does not trigger this protection. Other spells and abilities pass through and can change your gear. If you configured only the instrument-specific songs, protection starts only when you cast Honor March or Aria of Passion.
 - The kit displays “Already singing. The additional song request was canceled.” at most once per cast. Even if you start a new cast, it suppresses further notices for three seconds after the previous cancellation notice. These limits apply only to the kit’s cancellation notice.
-- Even when the notice is suppressed, a canceled song is not queued. Enter it again after the first song finishes or is interrupted. If the server response is delayed or lost, you may need to wait for the response or for GearSwap’s record of the cast to expire. This protection and its chat notice have been tested in simulation and are still unverified in game.
+- Even when the notice is suppressed, a canceled song is not queued. Enter it again after the first song finishes or is interrupted. If the server response is delayed or lost, you may need to wait for the response or for GearSwap’s record of the cast to expire. Song midcast swaps and duration gear have been confirmed working without errors in 1.4.0 on the Japanese client (the re-entry cancellation guard and its chat notice have been tested in simulation and remain unverified in game).
 
 **Blue Mage**
 - Blue magic split into physical, magical, buff, healing and debuff (magic accuracy) sets. The kit ships with the spell list (`blu_spells.json`), so it works on the English client too.
@@ -148,7 +148,7 @@ GearSwap loads extra files after your job Lua and they can override it: `user-gl
 
 ## Status
 
-- Tested in game on the **Japanese client** (Summoner, Paladin, Puppetmaster, Corsair, Ranger, Scholar, Red Mage, Blue Mage and more), including the Evasion sets (since 1.3.0: assigning them in the window, generating the Lua, and switching with IdleMode / HybridMode).
+- Tested in game on the **Japanese client** (Summoner, Paladin, Puppetmaster, Corsair, Ranger, Scholar, Red Mage, Blue Mage, Bard (1.4.0 song midcast and duration) and more), including the Evasion sets (since 1.3.0: assigning them in the window, generating the Lua, and switching with IdleMode / HybridMode).
 - **Not yet tested on the English client.** The English output follows the same logic with English names. If something doesn't swap, please open an issue with your job, what you did, and what you saw. Reports are very welcome.
 - Beastmaster pet move sorting is tested only in a simulated GearSwap.
 
